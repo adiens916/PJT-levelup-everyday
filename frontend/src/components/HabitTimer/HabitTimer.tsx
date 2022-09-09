@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Box,
+  Button,
   CircularProgress,
   CircularProgressProps,
   Typography,
@@ -8,21 +9,43 @@ import {
 
 export default function CircularStatic() {
   const [progress, setProgress] = useState(10);
+  const [running, setRunning] = useState(true);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) =>
-        prevProgress >= 100 ? 0 : prevProgress + 10,
-      );
-    }, 800);
-    return () => {
-      console.log('unmount');
+    if (running) {
+      const timer = setInterval(() => {
+        setProgress((prevProgress) =>
+          prevProgress >= 100 ? 0 : prevProgress + 10,
+        );
+      }, 800);
+      return () => {
+        clearInterval(timer);
+      };
+    }
+  }, [running]);
 
-      clearInterval(timer);
-    };
-  }, []);
-
-  return <CircularProgressWithLabel value={progress} />;
+  return (
+    <>
+      <Typography variant="h4" textAlign="center" marginY={7}>
+        독서
+      </Typography>
+      <Box display="flex" justifyContent="center">
+        <CircularProgressWithLabel value={progress} />
+      </Box>
+      <Button
+        onClick={() => setRunning(!running)}
+        variant="contained"
+        sx={{
+          display: 'block',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          marginTop: '5rem',
+        }}
+      >
+        시작 / 중지
+      </Button>
+    </>
+  );
 }
 
 function CircularProgressWithLabel(
