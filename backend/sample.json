@@ -1,0 +1,93 @@
+{
+  "habits": [
+    {
+      "id": "1",
+      "name": "운동",
+      "estimate_type": "COUNT",
+      "estimate_unit": "개",
+      "final_goal": "100",
+      "today_goal": "20",
+      "today_progress": "0",
+      "growth_type": "INCREASE",
+      "growth_delta": "1",
+      "day_cycle": "2",
+      "last_done_date": "2022-09-07",
+
+      "is_paused": "N",
+      "start_date": "",
+      "paused_date": "",
+      "progress": ""
+    },
+    {
+      "id": "2",
+      "name": "독서",
+      "estimate_type": "TIME",
+      "estimate_unit": "",
+      "final_goal": "3600",
+      "today_goal": "60",
+      "today_progress": "0",
+      "growth_type": "INCREASE",
+      "growth_delta": "60",
+      "day_cycle": "2",
+      "last_done_date": "2022-09-06",
+
+      "is_paused": "Y",
+      "start_date": "2022-09-09T09:00:00",
+      "paused_date": "2022-09-09T09:00:20",
+      "progress": "20"
+    },
+    {
+      "id": "3",
+      "name": "게임 / 만화",
+      "estimate_type": "TIME",
+      "estimate_unit": "",
+      "final_goal": "1800",
+      "today_goal": "7200",
+      "today_progress": "0",
+      "growth_type": "DECREASE",
+      "growth_delta": "300",
+      "day_cycle": "0",
+      "last_done_date": "2022-09-01",
+
+      "is_paused": "N",
+      "start_date": "",
+      "paused_date": "",
+      "progress": ""
+    }
+  ],
+  "habit_time_logs": [
+    {
+      "id": "1",
+      "habit_id": "1",
+      "start_date": "2022-08-01T09:00:00",
+      "end_date": "2022-08-01T09:10:00",
+      "progress": "2"
+    }
+  ],
+  "habit_day_logs": [
+    {
+      "id": "1",
+      "habit_id": "1",
+      "date": "2022-08-01",
+      "goal": "2",
+      "progress": "2",
+      "success": "Y"
+    },
+    {
+      "id": "2",
+      "habit_id": "1",
+      "date": "2022-08-03",
+      "goal": "4",
+      "progress": "4",
+      "success": "Y"
+    },
+    {
+      "id": "3",
+      "habit_id": "1",
+      "date": "2022-08-05",
+      "goal": "6",
+      "progress": "2",
+      "success": "N"
+    }
+  ]
+}
