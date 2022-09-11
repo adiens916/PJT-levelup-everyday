@@ -30,3 +30,16 @@ class Habit(models.Model):
     start_date = models.DateTimeField(blank=True)
     paused_date = models.DateTimeField(blank=True)
     temporary_progress = models.PositiveIntegerField()
+
+class RoundRecord(models.Model):
+    habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    progress = models.PositiveIntegerField()
+
+class DailyRecord(models.Model):
+    habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
+    date = models.DateTimeField()
+    goal = models.PositiveIntegerField()
+    progress = models.PositiveIntegerField()
+    success = models.BooleanField()
