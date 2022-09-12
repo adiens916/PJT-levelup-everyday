@@ -15,21 +15,24 @@ class Habit(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     estimate_type = models.CharField(max_length=10, choices=ESTIMATE_TYPE_CHOICES)
-    estimate_unit = models.CharField(max_length=10)
+    estimate_unit = models.CharField(max_length=10, blank=True)
     final_goal = models.PositiveIntegerField()
     growth_type = models.CharField(max_length=10, choices=GROWTH_TYPE_CHOICES)
     day_cycle = models.PositiveSmallIntegerField(default=0)
     
-    today_goal = models.PositiveIntegerField()
-    today_progress = models.PositiveIntegerField()
-    growth_amount = models.IntegerField()
-    last_done_date = models.DateTimeField(blank=True)
+    today_goal = models.PositiveIntegerField(null=True, blank=True)
+    today_progress = models.PositiveIntegerField(null=True, blank=True)
+    growth_amount = models.IntegerField(null=True, blank=True)
+    last_done_date = models.DateTimeField(null=True, blank=True)
 
     is_running = models.BooleanField(default=False)
     is_paused = models.BooleanField(default=False)
-    start_date = models.DateTimeField(blank=True)
-    paused_date = models.DateTimeField(blank=True)
-    temporary_progress = models.PositiveIntegerField()
+    start_date = models.DateTimeField(null=True, blank=True)
+    paused_date = models.DateTimeField(null=True, blank=True)
+    temporary_progress = models.PositiveIntegerField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return self.name
 
 class RoundRecord(models.Model):
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
