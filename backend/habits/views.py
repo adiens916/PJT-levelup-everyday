@@ -3,8 +3,9 @@ from typing import Iterable
 
 from django.core import serializers
 from django.db.models import Model
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponseBadRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
 from .models import Habit
 
@@ -34,3 +35,24 @@ def index(request: HttpRequest):
         
         habit.save()
         return JsonResponse({'id': habit.pk})
+
+
+@csrf_exempt
+def start_timer(request: HttpRequest, habit_id: int):
+    if request.method == 'POST':
+        habit: Habit = Habit.objects.get(id=habit_id)
+
+        habit.start_date = timezone.now()
+        habit.is_running = True
+        habit.save()
+
+        return JsonResponse({
+            'success': True, 
+            'start_date': habit.start_date,
+            'is_running': habit.is_running
+        })
+    else:
+        return JsonResponse({
+            'success': False,
+            'error': 'POST method only allowed'
+        })
