@@ -1,16 +1,16 @@
 from django.db import models
 
+ESTIMATE_TYPE_CHOICES = [
+    ('TIME', 'TIME'),
+    ('COUNT', 'COUNT')
+]
+
+GROWTH_TYPE_CHOICES = [
+    ('INCREASE', 'INCREASE'),
+    ('DECREASE', 'DECREASE')
+]
 # Create your models here.
 class Habit(models.Model):
-    ESTIMATE_TYPE_CHOICES = [
-        ('TIME', 'TIME'),
-        ('COUNT', 'COUNT')
-    ]
-
-    GROWTH_TYPE_CHOICES = [
-        ('INC', 'INCREASE'),
-        ('DEC', 'DECREASE')
-    ]
 
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
