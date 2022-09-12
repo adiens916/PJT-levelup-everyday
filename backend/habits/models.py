@@ -20,16 +20,16 @@ class Habit(models.Model):
     growth_type = models.CharField(max_length=10, choices=GROWTH_TYPE_CHOICES)
     day_cycle = models.PositiveSmallIntegerField(default=0)
     
-    today_goal = models.PositiveIntegerField(null=True, blank=True)
-    today_progress = models.PositiveIntegerField(null=True, blank=True)
-    growth_amount = models.IntegerField(null=True, blank=True)
+    today_goal = models.PositiveIntegerField(default=0)
+    today_progress = models.PositiveIntegerField(default=0)
+    growth_amount = models.IntegerField(default=0)
     last_done_date = models.DateTimeField(null=True, blank=True)
 
     is_running = models.BooleanField(default=False)
-    is_paused = models.BooleanField(default=False)
     start_date = models.DateTimeField(null=True, blank=True)
+    is_paused = models.BooleanField(default=False)
     paused_date = models.DateTimeField(null=True, blank=True)
-    temporary_progress = models.PositiveIntegerField(null=True, blank=True)
+    temporary_progress = models.PositiveIntegerField(default=0)
 
     def __str__(self) -> str:
         return self.name

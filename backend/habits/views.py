@@ -3,10 +3,11 @@ from typing import Iterable
 
 from django.core import serializers
 from django.db.models import Model
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
-from .models import Habit
+from .models import Habit, RoundRecord
 
 
 def json_response_wrapper(queryset: Iterable[Model]):
@@ -34,3 +35,50 @@ def index(request: HttpRequest):
         
         habit.save()
         return JsonResponse({'id': habit.pk})
+
+
+@csrf_exempt
+def start_timer(request: HttpRequest, habit_id: int):
+    if request.method == 'POST':
+        habit: Habit = Habit.objects.get(id=habit_id)
+
+        habit.start_date = timezone.now()
+        habit.is_running = True
+        habit.save()
+
+        return JsonResponse({
+            'success': True, 
+            'start_date': habit.start_date,
+            'is_running': habit.is_running
+        })
+    else:
+        return JsonResponse({
+            'success': False,
+            'error': 'POST method only allowed'
+        })
+
+
+@csrf_exempt
+def finish_timer(request: HttpRequest, habit_id: int):
+    if request.method == 'POST':
+        habit: Habit = Habit.objects.get(id=habit_id)
+
+        record = RoundRecord()
+        record.habit = habit
+        record.start_date = habit.start_date
+        record.end_date = timezone.now()
+        record.progress = int(request.POST.get('progress'))
+        record.save()
+
+        habit.start_date = None
+        habit.is_running = False
+        habit.today_progress += record.progress
+        habit.last_done_date = timezone.now()
+        habit.save()
+
+        return json_response_wrapper([record])
+        # return JsonResponse({
+        #     'success': True,
+        #     'start_date': habit.start_date,
+        #     'is_running': habit.is_running
+        # })
