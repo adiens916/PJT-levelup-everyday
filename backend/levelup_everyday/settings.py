@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     # App
+    'account',
     'habits',
 
     # Third-party
@@ -80,6 +81,8 @@ WSGI_APPLICATION = 'levelup_everyday.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
+
+AUTH_USER_MODEL = 'account.User'
 
 DATABASES = env_vars.DATABASES
 
