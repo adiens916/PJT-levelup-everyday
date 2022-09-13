@@ -1,7 +1,5 @@
-from datetime import datetime
-from time import time
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 # Create your models here.
 class User(AbstractUser):
