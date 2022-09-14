@@ -1,6 +1,19 @@
 import datetime
-from django.http import JsonResponse, HttpRequest, HttpResponseBadRequest
+import json
+
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import (
+    authenticate,
+    login as user_login, 
+    logout as user_logout, 
+)
+from django.http import (
+    JsonResponse, 
+    HttpRequest, 
+    HttpResponseBadRequest,
+    HttpResponseNotFound,
+)
+
 from .models import User
 
 
@@ -32,9 +45,24 @@ def signup(request: HttpRequest):
         return HttpResponseBadRequest()
 
 
+@csrf_exempt
 def login(request: HttpRequest):
-    pass
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(request, username=username, password=password)
+
+    if user:
+        user_login(request, user)
+        return JsonResponse({
+            'id': user.pk, 
+            'name': user.get_username(),
+            'last_login': user.last_login
+        })
+    else:
+        result = json.dumps({'success': False, 'error': 'User not found'})
+        return HttpResponseNotFound(result, content_type='application/json')
 
 
+@csrf_exempt
 def logout(request: HttpRequest):
     pass
