@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 ESTIMATE_TYPE_CHOICES = [
@@ -9,8 +10,10 @@ GROWTH_TYPE_CHOICES = [
     ('INCREASE', 'INCREASE'),
     ('DECREASE', 'DECREASE')
 ]
+
 # Create your models here.
 class Habit(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
