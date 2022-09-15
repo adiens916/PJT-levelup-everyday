@@ -1,8 +1,3 @@
-import json
-from typing import Iterable
-
-from django.core import serializers
-from django.db.models import Model
 from django.http import (
     JsonResponse,
     HttpRequest, 
@@ -13,12 +8,7 @@ from django.utils import timezone
 
 from account.models import User
 from .models import Habit, RoundRecord
-
-
-def json_response_wrapper(queryset: Iterable[Model]):
-    queryset_json = serializers.serialize('json', queryset, ensure_ascii=False)
-    queryset_dict = json.loads(queryset_json)
-    return JsonResponse(queryset_dict, safe=False)
+from .views_aux import json_response_wrapper
 
 
 # Create your views here.
