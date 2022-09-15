@@ -11,6 +11,7 @@ from django.http import (
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 
+from account.models import User
 from .models import Habit, RoundRecord
 
 
@@ -47,13 +48,18 @@ def index(request: HttpRequest):
 
 
 @csrf_exempt
-def start_timer(request: HttpRequest, habit_id: int):
+def start_timer(request: HttpRequest):
     if request.method == 'POST':
+        habit_id = request.POST.get('habit_id')
         habit: Habit = Habit.objects.get(id=habit_id)
 
         habit.start_date = timezone.now()
         habit.is_running = True
         habit.save()
+
+        user: User = habit.user
+        user.is_recording = True
+        user.save()
 
         return JsonResponse({
             'success': True, 
@@ -68,8 +74,9 @@ def start_timer(request: HttpRequest, habit_id: int):
 
 
 @csrf_exempt
-def finish_timer(request: HttpRequest, habit_id: int):
+def finish_timer(request: HttpRequest):
     if request.method == 'POST':
+        habit_id = request.POST.get('habit_id')
         habit: Habit = Habit.objects.get(id=habit_id)
 
         record = RoundRecord()
@@ -84,6 +91,10 @@ def finish_timer(request: HttpRequest, habit_id: int):
         habit.today_progress += record.progress
         habit.last_done_date = timezone.now()
         habit.save()
+
+        user: User = habit.user
+        user.is_recording = False
+        user.save()
 
         return json_response_wrapper([record])
         # return JsonResponse({
