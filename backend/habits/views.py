@@ -8,7 +8,10 @@ from django.utils import timezone
 
 from account.models import User
 from .models import Habit, RoundRecord
-from .views_aux import json_response_wrapper
+from .views_aux import (
+    json_response_wrapper,
+    is_day_changed_for_user,
+) 
 
 
 # Create your views here.
@@ -20,6 +23,9 @@ def index(request: HttpRequest):
 
     if request.method == 'GET':
         habit_list = Habit.objects.filter(user=request.user.pk)
+        if is_day_changed_for_user(request.user):
+            # TODO: 자정 후에 미리 다음 날로 넘어가는 기능 추가하기
+            print("A new day begins...")
         return json_response_wrapper(habit_list)
     
     elif request.method == 'POST':
