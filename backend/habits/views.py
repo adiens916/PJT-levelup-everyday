@@ -23,11 +23,15 @@ def index(request: HttpRequest):
         return HttpResponseNotAllowed(result, content_type='application/json')
 
     if request.method == 'GET':
-        habit_list = Habit.objects.filter(user=request.user.pk)
-        if is_day_changed_for_user(request.user):
-            request.user.last_reset_date = timezone.now()
-            # TODO: 자정 후에 미리 다음 날로 넘어가는 기능 추가하기
-            update_goals_and_due_dates(habit_list)
+        user: User = request.user
+        habit_list = Habit.objects.filter(user=user.pk)
+        if is_day_changed_for_user(user):
+            print('day changed')
+            if user.last_reset_date:
+                # TODO: 자정 후에 미리 다음 날로 넘어가는 기능 추가하기
+                update_goals_and_due_dates(habit_list, user)
+            user.last_reset_date = timezone.now()
+            user.save()
         return json_response_wrapper(habit_list)
     
     elif request.method == 'POST':
