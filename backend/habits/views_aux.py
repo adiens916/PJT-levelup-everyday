@@ -8,21 +8,13 @@ from django.http import JsonResponse
 
 from account.models import User
 from .models import DailyRecord, Habit, RoundRecord
+from .tests import is_day_changed, is_due_today
 
 
 def json_response_wrapper(queryset: Iterable[Model]):
     queryset_json = serializers.serialize('json', queryset, ensure_ascii=False)
     queryset_dict = json.loads(queryset_json)
     return JsonResponse(queryset_dict, safe=False)
-
-
-def is_day_changed(date_reset_last: datetime, reset_time: time, now: datetime):
-    if not date_reset_last:
-        return True
-
-    tomorrow = date_reset_last + timedelta(days=1) 
-    date_when_reset = datetime.combine(tomorrow.date(), reset_time)
-    return now >= date_when_reset
 
 
 def is_day_changed_for_user(user: User):
@@ -33,12 +25,6 @@ def is_day_changed_for_user(user: User):
     )
 
 
-def is_due_today(date_done_last: datetime, day_cycle: int, now: datetime):
-    # FIXME: 초기화 시간 고려해서 해야 함
-    days = timedelta(day_cycle)
-    return date_done_last + days <= now
-
-
 def is_due_today_for_habit(habit: Habit):
     return is_due_today(
         habit.last_done_date, 
@@ -47,14 +33,14 @@ def is_due_today_for_habit(habit: Habit):
     )
 
 
-def update_goals_and_due_dates(habit_list: Iterable[Habit]):
+def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
     '''
     오늘이 예정일인 경우,
     이전의 성공/실패 여부를 참고해
     오늘 목표를 조정한다.
     '''
 
-    reset_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    reset_date = datetime.combine(datetime.now().date(), user.standard_reset_time)
     just_a_minute_ago = reset_date - timedelta(minutes=1)
     yesterday = reset_date - timedelta(days=1)
 
