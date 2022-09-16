@@ -27,6 +27,7 @@ class Habit(models.Model):
     today_progress = models.PositiveIntegerField(default=0)
     growth_amount = models.IntegerField(default=0)
     last_done_date = models.DateTimeField(null=True, blank=True)
+    is_due_today = models.BooleanField(default=False)
 
     is_running = models.BooleanField(default=False)
     start_date = models.DateTimeField(null=True, blank=True)

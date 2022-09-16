@@ -1,8 +1,3 @@
-import json
-from typing import Iterable
-
-from django.core import serializers
-from django.db.models import Model
 from django.http import (
     JsonResponse,
     HttpRequest, 
@@ -13,12 +8,11 @@ from django.utils import timezone
 
 from account.models import User
 from .models import Habit, RoundRecord
-
-
-def json_response_wrapper(queryset: Iterable[Model]):
-    queryset_json = serializers.serialize('json', queryset, ensure_ascii=False)
-    queryset_dict = json.loads(queryset_json)
-    return JsonResponse(queryset_dict, safe=False)
+from .views_aux import (
+    json_response_wrapper,
+    is_day_changed_for_user,
+    update_goals_and_due_dates
+) 
 
 
 # Create your views here.
@@ -30,6 +24,10 @@ def index(request: HttpRequest):
 
     if request.method == 'GET':
         habit_list = Habit.objects.filter(user=request.user.pk)
+        if is_day_changed_for_user(request.user):
+            request.user.last_reset_date = timezone.now()
+            # TODO: 자정 후에 미리 다음 날로 넘어가는 기능 추가하기
+            update_goals_and_due_dates(habit_list)
         return json_response_wrapper(habit_list)
     
     elif request.method == 'POST':
