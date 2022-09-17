@@ -92,7 +92,6 @@ def finish_timer(request: HttpRequest):
         habit.start_datetime = None
         habit.is_running = False
         habit.today_progress += record.progress
-        habit.due_date = timezone.now()
         habit.save()
 
         user: User = habit.user
