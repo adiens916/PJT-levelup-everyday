@@ -3,54 +3,35 @@
 => 테스트 대상이 되는 함수를 이쪽으로 옮겨옴.
 '''
 
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, date
 from django.test import TestCase
 
 
 # Create your tests here.
-def is_day_changed(date_reset_last: datetime, reset_time: time, now: datetime):
-    if not date_reset_last:
+def is_day_changed(next_reset_date: date, daily_reset_time: time, now: datetime):
+    if next_reset_date == None:
         return True
 
-    # 최근 갱신 시간이 초기화 시간을 넘은 경우, 이미 지났을 거라고 판단
-    if date_reset_last.time() > reset_time:
-        # 다음 날은 하루 뒤여야 함.
-        tomorrow = date_reset_last + timedelta(days=1) 
-    else:
-        # 초기화 시간을 안 넘은 경우, 초기화는 같은 날에 일어남.
-        tomorrow = date_reset_last
-
-    date_when_reset = datetime.combine(tomorrow.date(), reset_time)
-    return now >= date_when_reset
+    next_reset_datetime = datetime.combine(next_reset_date, daily_reset_time)
+    return next_reset_datetime <= now
 
 
-def test_is_day_changed_for_morning():
-    yesterday_morning = datetime(2022, 9, 1, hour=9)
-    at_dawn = time(5, 30)
-
-    today_midnight = datetime(2022, 9, 2, hour=0)
-    assert False == is_day_changed(yesterday_morning, at_dawn, today_midnight)
-
-    today_dawn = datetime(2022, 9, 2, hour=6)
-    assert True == is_day_changed(yesterday_morning, at_dawn, today_dawn)
+def test_is_day_changed_when_reset_at_night():
+    reset_date = date(2022, 9, 1)
+    reset_hour = time(22, 15)
+    now = datetime(2022, 9, 1, hour=22, minute=30)
+    assert True == is_day_changed(reset_date, reset_hour, now)
 
 
-def test_is_day_changed_for_night():
-    yesterday_morning = datetime(2022, 9, 1, hour=22)
-    at_dawn = time(1, 30)
+def test_is_day_changed_when_reset_at_dawn():
+    reset_date = date(2022, 9, 17)
+    reset_hour = time(6, 0)
 
-    today_midnight = datetime(2022, 9, 2, hour=0)
-    assert False == is_day_changed(yesterday_morning, at_dawn, today_midnight)
+    now = datetime(2022, 9, 17, hour=0)
+    assert False == is_day_changed(reset_date, reset_hour, now)
 
-    today_dawn = datetime(2022, 9, 2, hour=2)
-    assert True == is_day_changed(yesterday_morning, at_dawn, today_dawn)
-
-
-def test_is_day_changed_for_same_day():
-    today_night = datetime(2022, 9, 1, hour=22, minute=0)
-    at_night = time(hour=22, minute=15)
-    today_night_after_minutes = datetime(2022, 9, 1, hour=22, minute=30)
-    assert True == is_day_changed(today_night, at_night, today_night_after_minutes)
+    now = datetime(2022, 9, 17, hour=7)
+    assert True == is_day_changed(reset_date, reset_hour, now)
 
 
 def is_due_today(date_done_last: datetime, day_cycle: int, now: datetime):
