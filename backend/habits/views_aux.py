@@ -19,15 +19,15 @@ def json_response_wrapper(queryset: Iterable[Model]):
 
 def is_day_changed_for_user(user: User):
     return is_day_changed(
-        user.last_reset_date, 
-        user.standard_reset_time, 
+        user.next_reset_date, 
+        user.daily_reset_time, 
         datetime.now()
     )
 
 
 def is_due_today_for_habit(habit: Habit):
     return is_due_today(
-        habit.last_done_date, 
+        habit.due_date, 
         habit.day_cycle, 
         datetime.now()
     )
@@ -40,13 +40,13 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
     오늘 목표를 조정한다.
     '''
 
-    reset_date = datetime.combine(datetime.now().date(), user.standard_reset_time)
+    reset_date = datetime.combine(datetime.now().date(), user.daily_reset_time)
     just_a_minute_ago = reset_date - timedelta(minutes=1)
     yesterday = reset_date - timedelta(days=1)
 
     for habit in habit_list:
         if (
-            habit.is_due_today or
+            habit.is_today_due_date or
             habit.today_progress > 0 or
             habit.is_running
         ):
@@ -54,16 +54,16 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
             if habit.is_running:
                 record = RoundRecord()
                 record.habit = habit
-                record.start_date: datetime = habit.start_date
-                record.end_date = reset_date
+                record.start_datetime: datetime = habit.start_datetime
+                record.end_datetime = reset_date
                 # TIME 유형인 경우, 현재 시각을 끝으로 진행도 결정
-                record.progress = int((record.end_date - record.start_date).total_seconds())
+                record.progress = int((record.end_datetime - record.start_datetime).total_seconds())
                 record.save()
 
-                habit.start_date = None
+                habit.start_datetime = None
                 habit.is_running = False
                 habit.today_progress += record.progress
-                habit.last_done_date = just_a_minute_ago
+                habit.due_date = just_a_minute_ago
 
                 user: User = habit.user
                 user.is_recording = False                
@@ -86,7 +86,7 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
             habit.today_progress = 0
 
         # 오늘 해야 하는지
-        habit.is_due_today = is_due_today_for_habit(habit)
+        habit.is_today_due_date = is_due_today_for_habit(habit)
         habit.save()
 
     # Habit.objects.bulk_update(habit_list, [''])

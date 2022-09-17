@@ -26,13 +26,13 @@ class Habit(models.Model):
     today_goal = models.PositiveIntegerField(default=0)
     today_progress = models.PositiveIntegerField(default=0)
     growth_amount = models.IntegerField(default=0)
-    last_done_date = models.DateTimeField(null=True, blank=True)
-    is_due_today = models.BooleanField(default=False)
+    due_date = models.DateField(null=True, blank=True)
+    is_today_due_date = models.BooleanField(default=False)
 
     is_running = models.BooleanField(default=False)
-    start_date = models.DateTimeField(null=True, blank=True)
+    start_datetime = models.DateTimeField(null=True, blank=True)
     is_paused = models.BooleanField(default=False)
-    paused_date = models.DateTimeField(null=True, blank=True)
+    paused_datetime = models.DateTimeField(null=True, blank=True)
     temporary_progress = models.PositiveIntegerField(default=0)
 
     def __str__(self) -> str:
@@ -40,8 +40,8 @@ class Habit(models.Model):
 
 class RoundRecord(models.Model):
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
     progress = models.PositiveIntegerField()
 
 class DailyRecord(models.Model):

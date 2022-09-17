@@ -1,3 +1,4 @@
+from datetime import date
 from django.http import (
     JsonResponse,
     HttpRequest, 
@@ -27,10 +28,10 @@ def index(request: HttpRequest):
         habit_list = Habit.objects.filter(user=user.pk)
         if is_day_changed_for_user(user):
             print('day changed')
-            if user.last_reset_date:
+            if user.next_reset_date:
                 # TODO: 자정 후에 미리 다음 날로 넘어가는 기능 추가하기
                 update_goals_and_due_dates(habit_list, user)
-            user.last_reset_date = timezone.now()
+            user.next_reset_date = date().today() + 1
             user.save()
         return json_response_wrapper(habit_list)
     
@@ -55,7 +56,7 @@ def start_timer(request: HttpRequest):
         habit_id = request.POST.get('habit_id')
         habit: Habit = Habit.objects.get(id=habit_id)
 
-        habit.start_date = timezone.now()
+        habit.start_datetime = timezone.now()
         habit.is_running = True
         habit.save()
 
@@ -65,7 +66,7 @@ def start_timer(request: HttpRequest):
 
         return JsonResponse({
             'success': True, 
-            'start_date': habit.start_date,
+            'start_date': habit.start_datetime,
             'is_running': habit.is_running
         })
     else:
@@ -83,15 +84,15 @@ def finish_timer(request: HttpRequest):
 
         record = RoundRecord()
         record.habit = habit
-        record.start_date = habit.start_date
-        record.end_date = timezone.now()
+        record.start_datetime = habit.start_datetime
+        record.end_datetime = timezone.now()
         record.progress = int(request.POST.get('progress'))
         record.save()
 
-        habit.start_date = None
+        habit.start_datetime = None
         habit.is_running = False
         habit.today_progress += record.progress
-        habit.last_done_date = timezone.now()
+        habit.due_date = timezone.now()
         habit.save()
 
         user: User = habit.user
