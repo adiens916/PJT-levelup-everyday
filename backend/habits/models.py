@@ -46,7 +46,7 @@ class RoundRecord(models.Model):
 
 class DailyRecord(models.Model):
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
-    date = models.DateTimeField()
+    date = models.DateField()
     goal = models.PositiveIntegerField()
     progress = models.PositiveIntegerField()
     success = models.BooleanField()
