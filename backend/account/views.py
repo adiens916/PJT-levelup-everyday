@@ -35,7 +35,7 @@ def signup(request: HttpRequest):
         # TODO: 정규표현식으로 체크하기
         if standard_reset_time:
             hour, minute = standard_reset_time.split(':')
-            user.standard_reset_time = datetime.time(int(hour), int(minute))
+            user.daily_reset_time = datetime.time(int(hour), int(minute))
             user.save()
 
 
