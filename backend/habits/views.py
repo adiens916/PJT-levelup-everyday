@@ -45,6 +45,10 @@ def index(request: HttpRequest):
         habit.final_goal = int(request.POST.get('final_goal'))
         habit.growth_type = request.POST.get('growth_type')
         habit.day_cycle = int(request.POST.get('day_cycle'))
+
+        # 임시로 초기 목표 & 증감량 설정
+        habit.today_goal = int(habit.final_goal * 0.01)
+        habit.growth_amount = int(habit.final_goal * 0.01)
         
         habit.save()
         return JsonResponse({'id': habit.pk})
