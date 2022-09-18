@@ -8,8 +8,6 @@ This way, you will get used to the habit and finally achieve your great goal.
 
 ## Description
 
-
-
 ### Features
 
 - 
@@ -19,8 +17,6 @@ This way, you will get used to the habit and finally achieve your great goal.
 
 - Django
 - React
-
-
 
 ## Getting started
 
@@ -66,8 +62,6 @@ DATABASES = {
    'PASSWORD': '123456789'
    )
 
-
-
 Django
 
 ```bash
@@ -89,8 +83,6 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-
-
 React
 
 ```bash
@@ -98,8 +90,6 @@ cd frontend
 npm install
 npm run start
 ```
-
-
 
 Mock API (using [JSON Server](https://github.com/typicode/json-server)))
 
@@ -114,13 +104,11 @@ Manual, context-specific tasks not covered in the installation process.
 
 ### Usage
 
-
+[API](./README_API.md)
 
 ### Troubleshooting
 
 Or FAQs, if that's more appropriate.
-
-
 
 ## Back matter
 
