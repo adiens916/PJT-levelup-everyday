@@ -17,16 +17,27 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import { login } from '../../api/api';
+
 const theme = createTheme();
 
 export default function Login() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const body = {
+      username: data.get('username') as string,
+      password: data.get('password') as string,
+    };
+
+    try {
+      const result = await login(body.username, body.password);
+      if (result.id) {
+        alert('로그인 성공!');
+      }
+    } catch (error) {
+      alert('로그인 실패...');
+    }
   };
 
   return (
@@ -57,10 +68,10 @@ export default function Login() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="User ID"
+              name="username"
+              autoComplete="username"
               autoFocus
             />
             <TextField
