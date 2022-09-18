@@ -7,16 +7,11 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-
-interface CustomDrawerType {
-  navItems: string[];
-  mobileOpen: boolean;
-  handleDrawerToggle: () => void;
-}
+import { NavBarType } from '../NavBar';
 
 const drawerWidth = 240;
 
-export default function CustomDrawer(props: CustomDrawerType) {
+export default function CustomDrawer(props: NavBarType) {
   const drawer = (
     <Box onClick={props.handleDrawerToggle} sx={{ textAlign: 'center' }}>
       <Typography variant="h6" sx={{ my: 2 }}>

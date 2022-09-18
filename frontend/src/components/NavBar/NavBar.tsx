@@ -1,5 +1,14 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import Box from '@mui/material/Box';
+import CustomAppBar from './CustomAppBar/CustomAppBar';
+import CustomDrawer from './CustomDrawer/CustomDrawer';
+
+export interface NavBarType {
+  navItems: string[];
+  handleDrawerToggle: () => void;
+  mobileOpen?: boolean;
+}
 
 export default function NavBack() {
   return (
@@ -9,15 +18,6 @@ export default function NavBack() {
     </>
   );
 }
-
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import CustomDrawer from './CustomDrawer/CustomDrawer';
 
 const navItems = ['Home', 'About', 'Contact'];
 
@@ -30,36 +30,10 @@ export function DrawerAppBar() {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar component="nav">
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-
-          {/* By platform, display is changed  */}
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
-          >
-            MUI
-          </Typography>
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            {navItems.map((item) => (
-              <Button key={item} sx={{ color: '#fff' }}>
-                {item}
-              </Button>
-            ))}
-          </Box>
-        </Toolbar>
-      </AppBar>
-
+      <CustomAppBar
+        navItems={navItems}
+        handleDrawerToggle={handleDrawerToggle}
+      />
       <CustomDrawer
         navItems={navItems}
         mobileOpen={mobileOpen}
