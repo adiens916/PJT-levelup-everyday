@@ -10,6 +10,7 @@ colorama==0.4.5
 cryptography==37.0.2
 distlib==0.3.4
 Django==4.0.6
+django-cors-headers==3.13.0
 djangorestframework==3.13.1
 filelock==3.7.1
 git-filter-repo==2.34.0
