@@ -4,24 +4,9 @@ import Box from '@mui/material/Box';
 import CustomAppBar from './CustomAppBar/CustomAppBar';
 import CustomDrawer from './CustomDrawer/CustomDrawer';
 
-export interface NavBarType {
-  navItems: string[];
-  handleDrawerToggle: () => void;
-  mobileOpen?: boolean;
-}
-
-export default function NavBack() {
-  return (
-    <>
-      <DrawerAppBar />
-      <Outlet />
-    </>
-  );
-}
-
 const navItems = ['Home', 'About', 'Contact'];
 
-export function DrawerAppBar() {
+export default function NavBar() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
@@ -29,17 +14,27 @@ export function DrawerAppBar() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CustomAppBar
-        navItems={navItems}
-        handleDrawerToggle={handleDrawerToggle}
-      />
-      <CustomDrawer
-        navItems={navItems}
-        mobileOpen={mobileOpen}
-        handleDrawerToggle={handleDrawerToggle}
-      />
-      <Box component="main" sx={{ p: 3 }}></Box>
-    </Box>
+    <>
+      <Box sx={{ display: 'flex' }}>
+        <CustomAppBar
+          navItems={navItems}
+          handleDrawerToggle={handleDrawerToggle}
+        />
+        <CustomDrawer
+          navItems={navItems}
+          mobileOpen={mobileOpen}
+          handleDrawerToggle={handleDrawerToggle}
+        />
+      </Box>
+      <Box component="main" sx={{ marginTop: 15 }}>
+        <Outlet />
+      </Box>
+    </>
   );
+}
+
+export interface NavBarType {
+  navItems: string[];
+  handleDrawerToggle: () => void;
+  mobileOpen?: boolean;
 }
