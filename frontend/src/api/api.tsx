@@ -1,22 +1,34 @@
+import {
+  SignUpResponseType,
+  LoginResponseType,
+  LogoutResponseType,
+} from './types';
+
 const host = 'http://localhost:8000/api';
 
 export async function signUp(username: string, password: string) {
-  return await request(`${host}/account/signup`, { username, password });
+  return await request<SignUpResponseType>(`${host}/account/signup/`, {
+    username,
+    password,
+  });
 }
 
 export async function login(username: string, password: string) {
-  return await request(`${host}/account/signup`, { username, password });
+  return await request<LoginResponseType>(`${host}/account/login/`, {
+    username,
+    password,
+  });
 }
 
 export async function logout() {
-  return await request(`${host}/account/signup`, {});
+  return await request<LogoutResponseType>(`${host}/account/logout/`, {});
 }
 
 export async function getHabits() {
   return await request(`${host}/habit/`);
 }
 
-async function request(url: string, body?: object) {
+async function request<T>(url: string, body?: object): Promise<T> {
   const options: RequestInit | undefined = getOption(body);
 
   try {
@@ -25,9 +37,11 @@ async function request(url: string, body?: object) {
       return response.json();
     } else {
       console.log('Response not okay: ', response);
+      throw response;
     }
   } catch (error) {
     console.log('Server error: ', error);
+    throw error;
   }
 }
 
