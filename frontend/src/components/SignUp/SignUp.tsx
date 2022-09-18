@@ -35,7 +35,7 @@ export default function SignUp() {
     };
     const result = await signUp(body.username, body.password);
     if (result.id) {
-      alert('로그인 성공');
+      alert('회원가입 성공');
     }
     setLoading(false);
   };

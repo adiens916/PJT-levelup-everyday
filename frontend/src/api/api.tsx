@@ -50,9 +50,10 @@ function getOption(body?: object) {
     return {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        // Content-Type은 굳이 지정하지 않아도 됨.
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(body),
+      body: new URLSearchParams({ ...body }),
     };
   } else {
     return undefined;
