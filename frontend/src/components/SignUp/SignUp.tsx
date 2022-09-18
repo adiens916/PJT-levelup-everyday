@@ -17,16 +17,27 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import { signUp } from '../../api/api';
+
 const theme = createTheme();
 
 export default function SignUp() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [loading, setLoading] = React.useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
+
     const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get('id'),
-      password: data.get('password'),
-    });
+    const body = {
+      username: data.get('id') as string,
+      password: data.get('password') as string,
+    };
+    const result = await signUp(body.username, body.password);
+    if (result.id) {
+      alert('로그인 성공');
+    }
+    setLoading(false);
   };
 
   return (
@@ -107,6 +118,7 @@ export default function SignUp() {
             </Grid>
 
             <Button
+              disabled={loading}
               type="submit"
               fullWidth
               variant="contained"
