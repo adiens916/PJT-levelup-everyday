@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
@@ -20,9 +21,18 @@ export default function CustomDrawer(props: NavBarType) {
       <Divider />
       <List>
         {props.navItems.map((item) => (
-          <ListItem key={item} disablePadding>
+          <ListItem key={item.name} disablePadding>
             <ListItemButton sx={{ textAlign: 'center' }}>
-              <ListItemText primary={item} />
+              <Link
+                to={item.link}
+                onClick={item.onClick}
+                style={{
+                  textDecoration: 'none',
+                  color: 'black',
+                }}
+              >
+                <ListItemText primary={item.name} />
+              </Link>
             </ListItemButton>
           </ListItem>
         ))}
