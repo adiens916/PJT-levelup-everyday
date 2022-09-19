@@ -14,14 +14,30 @@ export async function signUp(username: string, password: string) {
 }
 
 export async function login(username: string, password: string) {
-  return await request<LoginResponseType>(`${host}/account/login/`, {
+  const data = await request<LoginResponseType>(`${host}/account/login/`, {
     username,
     password,
   });
+  saveUserId(data.id);
+  return data;
 }
 
 export async function logout() {
-  return await request<LogoutResponseType>(`${host}/account/logout/`, {});
+  const data = await request<LogoutResponseType>(`${host}/account/logout/`, {});
+  clearUserId();
+  return data;
+}
+
+export function saveUserId(userId: number) {
+  localStorage.setItem('userId', userId.toString());
+}
+
+export function clearUserId() {
+  localStorage.removeItem('userId');
+}
+
+export function getUserId() {
+  return Number(localStorage.getItem('userId'));
 }
 
 export async function getHabits() {
