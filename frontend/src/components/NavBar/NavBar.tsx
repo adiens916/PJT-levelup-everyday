@@ -5,7 +5,7 @@ import CustomAppBar from './CustomAppBar/CustomAppBar';
 import CustomDrawer from './CustomDrawer/CustomDrawer';
 import { getUserId, logout } from '../../api/api';
 
-const navItems = [
+const menusAll = [
   {
     name: '회원가입',
     link: '/signup',
@@ -39,11 +39,12 @@ const navItems = [
   },
 ];
 
+const getFilteredMenus = (isLoggedIn: boolean) =>
+  menusAll.filter((menu) => menu.isLoginRequired === isLoggedIn);
+
 export default function NavBar() {
-  const loggedIn = Boolean(getUserId());
-  const navItemsActive = navItems.filter(
-    (item) => item.isLoginRequired === loggedIn,
-  );
+  const [userId] = React.useState(getUserId());
+  const [menus] = React.useState(getFilteredMenus(Boolean(userId)));
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -55,11 +56,11 @@ export default function NavBar() {
     <>
       <Box sx={{ display: 'flex' }}>
         <CustomAppBar
-          navItems={navItemsActive}
+          navItems={menus}
           handleDrawerToggle={handleDrawerToggle}
         />
         <CustomDrawer
-          navItems={navItemsActive}
+          navItems={menus}
           mobileOpen={mobileOpen}
           handleDrawerToggle={handleDrawerToggle}
         />
