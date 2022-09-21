@@ -1,9 +1,10 @@
 import axios from 'axios';
-
 import {
   SignUpResponseType,
   LoginResponseType,
   LogoutResponseType,
+  HabitType,
+  HabitResponseType,
 } from './types';
 
 const host = 'http://127.0.0.1:8000/api';
@@ -49,22 +50,23 @@ export function getUserId() {
 }
 
 export async function getHabits() {
-  const data = await requestGetByAxios(`${host}/habit/`);
-  console.log(data);
-  return data;
+  const data = await requestGetByAxios<HabitResponseType[]>(`${host}/habit/`);
+  return extractFields(data);
 }
 
-async function requestGetByAxios(url: string) {
-  const response = await axios({
+async function requestGetByAxios<T>(url: string) {
+  const response = await axios.get<T>(url, {
     method: 'GET',
-    headers: {
-      'Access-Control-Allow-Origin': 'http://localhost:3000',
-      // 'Access-Control-Allow-Credentials': true,
-    },
     withCredentials: true,
-    url,
   });
   return response.data;
+}
+
+function extractFields(querySet: HabitResponseType[]): HabitType[] {
+  return querySet.map((instance) => ({
+    id: instance.pk,
+    ...instance.fields,
+  }));
 }
 
 async function requestPostByAxios(url: string, data?: object) {
