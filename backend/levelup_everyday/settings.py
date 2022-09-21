@@ -33,14 +33,14 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000', # frontend
 ]
 
-CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_CREDENTIALS = True
 
-CSRF_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_SECURE = True
+# CSRF_COOKIE_SAMESITE = 'None'
+# CSRF_COOKIE_SECURE = True
 
 # SESSION_COOKIE_DOMAIN = 'http://localhost:3000'
-SESSION_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SECURE = True
+# SESSION_COOKIE_SAMESITE = 'None'
+# SESSION_COOKIE_SECURE = True
 
 
 # https://docs.djangoproject.com/en/2.2/ref/settings/#csrf-trusted-origins
@@ -56,8 +56,9 @@ INSTALLED_APPS = [
     'habits',
 
     # Third-party
-    'rest_framework',
     'corsheaders',
+    'rest_framework',
+    'rest_framework.authtoken',
 
     # Built-in
     'django.contrib.admin',
@@ -67,6 +68,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',)
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
