@@ -33,7 +33,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000', # frontend
 ]
 
-# CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True
 
 # CSRF_COOKIE_SAMESITE = 'None'
 # CSRF_COOKIE_SECURE = True
