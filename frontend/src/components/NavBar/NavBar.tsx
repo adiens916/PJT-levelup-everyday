@@ -6,10 +6,10 @@ import CustomDrawer from './CustomDrawer/CustomDrawer';
 import { logout } from '../../api/api';
 
 import { useRecoilState } from 'recoil';
-import { userIdState } from '../../state/state';
+import { userTokenState } from '../../state/state';
 
 export default function NavBar() {
-  const [userId, setUserId] = useRecoilState(userIdState);
+  const [userToken, setUserToken] = useRecoilState(userTokenState);
 
   const menusAll = [
     {
@@ -44,7 +44,7 @@ export default function NavBar() {
       onClick: async () => {
         const data = await logout();
         if (data.success) {
-          setUserId(0);
+          setUserToken(null);
         }
       },
     },
@@ -53,7 +53,9 @@ export default function NavBar() {
   const getFilteredMenus = (isLoggedIn: boolean) =>
     menusAll.filter((menu) => menu.isLoginRequired === isLoggedIn);
 
-  const [menus, setMenus] = React.useState(getFilteredMenus(Boolean(userId)));
+  const [menus, setMenus] = React.useState(
+    getFilteredMenus(Boolean(userToken)),
+  );
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -62,8 +64,8 @@ export default function NavBar() {
   };
 
   React.useEffect(() => {
-    setMenus(getFilteredMenus(Boolean(userId)));
-  }, [userId]);
+    setMenus(getFilteredMenus(Boolean(userToken)));
+  }, [userToken]);
 
   return (
     <>

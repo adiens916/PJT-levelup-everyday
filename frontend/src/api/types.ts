@@ -3,9 +3,9 @@ export interface SignUpResponseType {
 }
 
 export interface LoginResponseType {
-  id: number;
-  name: string;
-  last_login: string;
+  token: string;
+  user_id: number;
+  name?: string;
 }
 
 export interface LogoutResponseType {

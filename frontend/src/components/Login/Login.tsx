@@ -21,13 +21,13 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { login } from '../../api/api';
 import { useSetRecoilState } from 'recoil';
-import { userIdState } from '../../state/state';
+import { userTokenState } from '../../state/state';
 
 const theme = createTheme();
 
 export default function Login() {
   const navigate = useNavigate();
-  const setUserId = useSetRecoilState(userIdState);
+  const setUserToken = useSetRecoilState(userTokenState);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,9 +39,9 @@ export default function Login() {
 
     try {
       const result = await login(body.username, body.password);
-      if (result.id) {
+      if (result.token) {
         alert('로그인 성공!');
-        setUserId(result.id);
+        setUserToken(result.token);
         navigate('/');
       }
     } catch (error) {

@@ -15,12 +15,18 @@ from django.http import (
     HttpResponseBadRequest,
     HttpResponseNotFound,
 )
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework import status
 
 from .models import User
 
 
 # Create your views here.
 @csrf_exempt
+@permission_classes([AllowAny])
 def signup(request: HttpRequest):
     def create_user(request: HttpRequest) -> User:
         username = request.POST.get('username')
@@ -48,13 +54,19 @@ def signup(request: HttpRequest):
 
 
 @csrf_exempt
-@require_http_methods(['POST'])
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def login(request: HttpRequest):
     username = request.POST['username']
     password = request.POST['password']
     user = authenticate(request, username=username, password=password)
 
     if user:
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+        })
         user_login(request, user)
         return JsonResponse({
             'id': user.pk, 
@@ -67,9 +79,14 @@ def login(request: HttpRequest):
 
 
 @csrf_exempt
-@require_http_methods(['POST'])
+@api_view(['POST'])
 def logout(request: HttpRequest):
     if request.user.is_authenticated:
+        request.user.auth_token.delete()
+        return Response(
+            {'success': True, 'detail': 'Successfully logged out'}, 
+            status=status.HTTP_200_OK
+        )
         user_logout(request)
         return JsonResponse({
             'success': True,

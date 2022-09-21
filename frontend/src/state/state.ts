@@ -1,7 +1,7 @@
-import { atom, selector } from 'recoil';
-import { getUserId } from '../api/api';
+import { atom } from 'recoil';
+import { getUserToken } from '../api/api';
 
-export const userIdState = atom({
+export const userTokenState = atom({
   key: 'userIdState',
-  default: getUserId(),
+  default: getUserToken(),
 });
