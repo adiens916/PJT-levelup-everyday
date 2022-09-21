@@ -1,19 +1,14 @@
 import React from 'react';
 import { Button, Container, Typography } from '@mui/material';
-
-const sampleHabits = [
-  {
-    name: '독서',
-    progress: 0,
-  },
-  {
-    name: '푸시업',
-    progress: 0,
-  },
-];
+import { getHabits } from '../../api/api';
+import { HabitType } from '../../api/types';
 
 export default function HabitList() {
-  const [habits] = React.useState(sampleHabits);
+  const [habits, setHabits] = React.useState<HabitType[]>([]);
+
+  React.useEffect(() => {
+    getHabits().then((data) => setHabits(data));
+  }, []);
 
   return (
     <>
@@ -34,8 +29,8 @@ export default function HabitList() {
             }}
             key={index}
           >
-            <Typography fontSize="1.5rem">{habit.name}</Typography>
-            <Typography fontSize="1.5rem">{habit.progress}%</Typography>
+            <Typography variant="h5">{habit.name}</Typography>
+            <Typography variant="h5">{habit.today_progress}%</Typography>
           </Button>
         ))}
         <Button variant="contained" sx={{ fontSize: '1.5rem' }}>
