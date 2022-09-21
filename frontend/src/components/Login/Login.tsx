@@ -3,6 +3,8 @@
  */
 
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -18,10 +20,15 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { login } from '../../api/api';
+import { useSetRecoilState } from 'recoil';
+import { userIdState } from '../../state/state';
 
 const theme = createTheme();
 
 export default function Login() {
+  const navigate = useNavigate();
+  const setUserId = useSetRecoilState(userIdState);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -34,6 +41,8 @@ export default function Login() {
       const result = await login(body.username, body.password);
       if (result.id) {
         alert('로그인 성공!');
+        setUserId(result.id);
+        navigate('/');
       }
     } catch (error) {
       alert('로그인 실패...');
