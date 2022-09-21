@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import CustomAppBar from './CustomAppBar/CustomAppBar';
 import CustomDrawer from './CustomDrawer/CustomDrawer';
-import { logout } from '../../api/api';
+import { getUserId, logout } from '../../api/api';
 
 const navItems = [
   {
@@ -40,6 +40,11 @@ const navItems = [
 ];
 
 export default function NavBar() {
+  const loggedIn = Boolean(getUserId());
+  const navItemsActive = navItems.filter(
+    (item) => item.isLoginRequired === loggedIn,
+  );
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
@@ -50,11 +55,11 @@ export default function NavBar() {
     <>
       <Box sx={{ display: 'flex' }}>
         <CustomAppBar
-          navItems={navItems}
+          navItems={navItemsActive}
           handleDrawerToggle={handleDrawerToggle}
         />
         <CustomDrawer
-          navItems={navItems}
+          navItems={navItemsActive}
           mobileOpen={mobileOpen}
           handleDrawerToggle={handleDrawerToggle}
         />
