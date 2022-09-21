@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -32,8 +33,17 @@ export default function CustomAppBar(props: NavBarType) {
         </Typography>
         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
           {props.navItems.map((item) => (
-            <Button key={item} sx={{ color: '#fff' }}>
-              {item}
+            <Button key={item.name} sx={{ color: '#fff' }}>
+              <Link
+                to={item.link}
+                onClick={item.onClick}
+                style={{
+                  textDecoration: 'none',
+                  color: 'white',
+                }}
+              >
+                {item.name}
+              </Link>
             </Button>
           ))}
         </Box>
