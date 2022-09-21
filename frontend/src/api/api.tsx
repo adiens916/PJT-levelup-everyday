@@ -16,16 +16,22 @@ export async function signUp(username: string, password: string) {
 }
 
 export async function login(username: string, password: string) {
-  const data = await requestPostByAxios(`${host}/account/login/`, {
-    username,
-    password,
-  });
+  const data: LoginResponseType = await requestPostByAxios(
+    `${host}/account/login/`,
+    {
+      username,
+      password,
+    },
+  );
   saveUserId(data.id);
   return data;
 }
 
 export async function logout() {
-  const data = await requestPostByAxios(`${host}/account/logout/`, {});
+  const data: LogoutResponseType = await requestPostByAxios(
+    `${host}/account/logout/`,
+    {},
+  );
   clearUserId();
   return data;
 }
