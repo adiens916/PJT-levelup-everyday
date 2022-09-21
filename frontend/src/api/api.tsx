@@ -24,7 +24,7 @@ export async function login(username: string, password: string) {
       password,
     },
   );
-  saveUserId(data.id);
+  saveUserToken(data.token);
   return data;
 }
 
@@ -33,20 +33,20 @@ export async function logout() {
     `${host}/account/logout/`,
     {},
   );
-  clearUserId();
+  clearUserToken();
   return data;
 }
 
-export function saveUserId(userId: number) {
-  localStorage.setItem('userId', userId.toString());
+export function saveUserToken(token: string) {
+  localStorage.setItem('token', token);
 }
 
-export function clearUserId() {
-  localStorage.removeItem('userId');
+export function clearUserToken() {
+  localStorage.removeItem('token');
 }
 
-export function getUserId() {
-  return Number(localStorage.getItem('userId'));
+export function getUserToken() {
+  return localStorage.getItem('token');
 }
 
 export async function getHabits() {
@@ -56,7 +56,9 @@ export async function getHabits() {
 
 async function requestGetByAxios<T>(url: string) {
   const response = await axios.get<T>(url, {
-    method: 'GET',
+    headers: {
+      Authorization: `Token ${getUserToken()}`,
+    },
     withCredentials: true,
   });
   return response.data;
@@ -73,6 +75,7 @@ async function requestPostByAxios(url: string, data?: object) {
   const response = await axios({
     method: 'post',
     headers: {
+      Authorization: getUserToken() ? `Token ${getUserToken()}` : '',
       'Content-Type': 'multipart/form-data',
     },
     withCredentials: true,
