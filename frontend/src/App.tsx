@@ -17,7 +17,7 @@ function App() {
           <Route element={<NavBar />}>
             <Route path="/" element={<HabitList />} />
             <Route path="/create" element={<HabitCreate />} />
-            <Route path="/timer" element={<HabitTimer />} />
+            <Route path="/timer/:id" element={<HabitTimer />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
           </Route>

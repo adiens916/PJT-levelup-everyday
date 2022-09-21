@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button, Container, Typography } from '@mui/material';
 import { getHabits } from '../../api/api';
 import { HabitType } from '../../api/types';
@@ -19,19 +20,30 @@ export default function HabitList() {
           {new Date().toLocaleDateString('ko')}
         </Typography>
         {habits.map((habit, index) => (
-          <Button
-            variant="outlined"
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginY: '1rem',
-              padding: '0.5rem',
-            }}
+          <Link
+            to={`/timer/${habit.id}`}
+            style={{ display: 'contents' }}
             key={index}
           >
-            <Typography variant="h5">{habit.name}</Typography>
-            <Typography variant="h5">{habit.today_progress}%</Typography>
-          </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginY: '1rem',
+                padding: '0.5rem',
+                // background: 'linear-gradient(90deg, blue 0%, white 30%)',
+              }}
+            >
+              <Typography
+                // color={getRatio(habit) > 10 ? 'yellow' : 'blue'}
+                variant="h5"
+              >
+                {habit.name}
+              </Typography>
+              <Typography variant="h5">{habit.today_progress}%</Typography>
+            </Button>
+          </Link>
         ))}
         <Button variant="contained" sx={{ fontSize: '1.5rem' }}>
           추가
