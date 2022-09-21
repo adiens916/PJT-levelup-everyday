@@ -28,10 +28,24 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:8000', # backend
-#     'http://localhost:3000', # frontend
+# Access-Control-Allow-Origin 헤더에 주소를 자동으로 추가해줌
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000', # frontend
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+
+# SESSION_COOKIE_DOMAIN = 'http://localhost:3000'
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+
+
+# https://docs.djangoproject.com/en/2.2/ref/settings/#csrf-trusted-origins
+# CSRF_TRUSTED_ORIGINS = [
+#     "http://localhost:3000",
 # ]
 
 # Application definition
