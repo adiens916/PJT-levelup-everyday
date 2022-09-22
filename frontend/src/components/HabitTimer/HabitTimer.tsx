@@ -6,7 +6,9 @@ import CircularProgressWithLabel from './CircularProgress/CircularProgress';
 
 export default function HabitTimer() {
   const { id: habitId } = useParams();
-  const { habit, ratio, progress, StartStopButton } = useTimer(Number(habitId));
+  const { habit, ratio, progress, running, StartStopButton } = useTimer(
+    Number(habitId),
+  );
 
   return (
     <>
@@ -18,6 +20,7 @@ export default function HabitTimer() {
       </Box>
       <StartStopButton
         variant="contained"
+        color={!running ? 'primary' : 'secondary'}
         sx={{
           display: 'block',
           marginLeft: 'auto',
@@ -25,7 +28,7 @@ export default function HabitTimer() {
           marginTop: '5rem',
         }}
       >
-        시작 / 중지
+        {!running ? '시작' : '중지'}
       </StartStopButton>
     </>
   );

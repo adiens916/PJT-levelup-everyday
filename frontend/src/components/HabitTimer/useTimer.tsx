@@ -23,6 +23,7 @@ export default function useTimer(habitId: number) {
         console.log(habits[0]);
         counter.current = new Counter(habits[0]);
         setProgressAndRatio();
+        setRunning(habits[0].fields.is_running);
       });
     }
   }, []);
@@ -44,5 +45,5 @@ export default function useTimer(habitId: number) {
     );
   }
 
-  return { habit, ratio, progress, StartStopButton };
+  return { habit, ratio, progress, running, StartStopButton };
 }
