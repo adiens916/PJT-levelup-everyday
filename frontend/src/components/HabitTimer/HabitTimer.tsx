@@ -1,15 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  CircularProgressProps,
-  IconButton,
-  Stack,
-  Typography,
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { Box, Button, Typography } from '@mui/material';
+
+import CircularProgressWithLabel from './CircularProgress/CircularProgress';
 import { getHabit } from '../../api/api';
 import { HabitResponseType } from '../../api/types';
 
@@ -60,46 +53,5 @@ export default function HabitTimer() {
         시작 / 중지
       </Button>
     </>
-  );
-}
-
-function CircularProgressWithLabel(
-  props: CircularProgressProps & { value: number },
-) {
-  return (
-    <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-      <CircularProgress
-        variant="determinate"
-        size="40vh"
-        thickness={2}
-        {...props}
-      />
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Typography variant="h4" color="text.secondary">
-          {`${Math.round(props.value)}%`}
-        </Typography>
-        <Stack direction="row" alignItems="center">
-          <Typography variant="h5" color="text.secondary">
-            {`${Math.round(props.value / 10)}분`}
-          </Typography>
-          <IconButton>
-            <EditIcon />
-          </IconButton>
-        </Stack>
-      </Box>
-    </Box>
   );
 }
