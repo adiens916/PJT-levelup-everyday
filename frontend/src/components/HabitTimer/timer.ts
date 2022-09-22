@@ -37,7 +37,7 @@ export class Counter {
   getDiff(start_datetime: string) {
     const start = new Date(start_datetime);
     const now = new Date();
-    const seconds = (now.getTime() - start.getTime()) / 1000;
+    const seconds = Math.floor((now.getTime() - start.getTime()) / 1000);
     return seconds;
   }
 
