@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -9,10 +10,21 @@ import {
   Typography,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import { getHabit } from '../../api/api';
+import { HabitResponseType } from '../../api/types';
 
-export default function CircularStatic() {
-  const [progress, setProgress] = useState(10);
-  const [running, setRunning] = useState(true);
+export default function HabitTimer() {
+  const { id: habitId } = useParams();
+  const [habit, setHabit] = useState<HabitResponseType>();
+
+  const [progress, setProgress] = useState(0);
+  const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    if (habitId) {
+      getHabit(Number(habitId)).then((data) => setHabit(data[0]));
+    }
+  }, []);
 
   useEffect(() => {
     if (running) {
@@ -30,7 +42,7 @@ export default function CircularStatic() {
   return (
     <>
       <Typography variant="h4" textAlign="center" marginY={7}>
-        독서
+        {habit?.fields.name}
       </Typography>
       <Box display="flex" justifyContent="center">
         <CircularProgressWithLabel value={progress} />
@@ -58,7 +70,7 @@ function CircularProgressWithLabel(
     <Box sx={{ position: 'relative', display: 'inline-flex' }}>
       <CircularProgress
         variant="determinate"
-        size="70vw"
+        size="40vh"
         thickness={2}
         {...props}
       />

@@ -54,6 +54,13 @@ export async function getHabits() {
   return extractFields(data);
 }
 
+export async function getHabit(habitId: number) {
+  const data = await requestGetByAxios<HabitResponseType[]>(
+    `${host}/habit/${habitId}/`,
+  );
+  return data;
+}
+
 async function requestGetByAxios<T>(url: string) {
   const response = await axios.get<T>(url, {
     headers: {
