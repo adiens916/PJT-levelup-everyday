@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
 
 import CircularProgressWithLabel from './CircularProgress/CircularProgress';
+import { Counter } from './timer';
 import { getHabit } from '../../api/api';
 import { HabitResponseType } from '../../api/types';
 
@@ -19,15 +20,15 @@ export default function HabitTimer() {
     }
   }, []);
 
+  const counter = React.useRef(new Counter());
+
   useEffect(() => {
     if (running) {
-      const timer = setInterval(() => {
-        setProgress((prevProgress) =>
-          prevProgress >= 100 ? 0 : prevProgress + 10,
-        );
-      }, 800);
+      counter.current.start((p) => {
+        setProgress(p);
+      });
       return () => {
-        clearInterval(timer);
+        counter.current.stop();
       };
     }
   }, [running]);
