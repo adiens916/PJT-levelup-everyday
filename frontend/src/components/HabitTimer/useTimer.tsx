@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, ButtonProps } from '@mui/material';
-import { getHabit } from '../../api/api';
+import { getHabit, startTimer, finishTimer } from '../../api/api';
 import { HabitResponseType } from '../../api/types';
 import { Counter } from './timer';
 
@@ -39,7 +39,17 @@ export default function useTimer(habitId: number) {
 
   function StartStopButton(props: ButtonProps) {
     return (
-      <Button onClick={() => setRunning(!running)} {...props}>
+      <Button
+        onClick={() => {
+          if (!running) {
+            startTimer(habitId);
+          } else {
+            finishTimer(habitId, progress);
+          }
+          setRunning(!running);
+        }}
+        {...props}
+      >
         {props.children}
       </Button>
     );

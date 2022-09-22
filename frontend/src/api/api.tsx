@@ -73,9 +73,9 @@ export async function startTimer(habitId: number) {
   return data;
 }
 
-export async function FinishTimer(habitId: number, progress: number) {
+export async function finishTimer(habitId: number, progress: number) {
   const data: FinishTimerType = await requestPostByAxios(
-    `${host}/habit/timer/stop/`,
+    `${host}/habit/timer/finish/`,
     {
       habit_id: habitId,
       progress: progress,
