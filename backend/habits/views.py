@@ -2,10 +2,14 @@ from datetime import date, timedelta
 from django.http import (
     JsonResponse,
     HttpRequest, 
-    HttpResponseNotAllowed,
+    HttpResponse,
 )
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from django.utils import timezone
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework import status
 
 from account.models import User
 from .models import Habit, RoundRecord
@@ -18,10 +22,11 @@ from .views_aux import (
 
 # Create your views here.
 @csrf_exempt
+@api_view(['GET', 'POST'])
 def index(request: HttpRequest):
     if not request.user.is_authenticated:
         result = {'success': False, 'error': 'User not authenticated'}
-        return HttpResponseNotAllowed(result, content_type='application/json')
+        return Response(result, status=status.HTTP_401_UNAUTHORIZED)
 
     if request.method == 'GET':
         user: User = request.user
@@ -55,6 +60,28 @@ def index(request: HttpRequest):
 
 
 @csrf_exempt
+@api_view(['GET'])
+def index_each(request: HttpRequest, habit_id: int):
+    if not request.user.is_authenticated:
+        return Response({
+            'success': False, 
+            'error': 'User not authenticated'
+        }, status=status.HTTP_401_UNAUTHORIZED)
+        
+    user: User = request.user
+    habit = Habit.objects.filter(user=user.pk, pk=habit_id)
+
+    if len(habit) and user.pk == habit[0].user.pk:
+        return json_response_wrapper(habit)
+    else:
+        return Response({
+            'success': False,
+            'detail': "Habit not owned by the user"
+        }, status=status.HTTP_404_NOT_FOUND)
+
+
+@csrf_exempt
+@api_view(['POST'])
 def start_timer(request: HttpRequest):
     if request.method == 'POST':
         habit_id = request.POST.get('habit_id')
@@ -81,6 +108,7 @@ def start_timer(request: HttpRequest):
 
 
 @csrf_exempt
+@api_view(['POST'])
 def finish_timer(request: HttpRequest):
     if request.method == 'POST':
         habit_id = request.POST.get('habit_id')
