@@ -6,7 +6,7 @@ import CircularProgressWithLabel from './CircularProgress/CircularProgress';
 
 export default function HabitTimer() {
   const { id: habitId } = useParams();
-  const { habit, progress, StartStopButton } = useTimer(Number(habitId));
+  const { habit, ratio, progress, StartStopButton } = useTimer(Number(habitId));
 
   return (
     <>
@@ -14,7 +14,7 @@ export default function HabitTimer() {
         {habit?.fields.name}
       </Typography>
       <Box display="flex" justifyContent="center">
-        <CircularProgressWithLabel value={progress} />
+        <CircularProgressWithLabel value={ratio} progress={progress} />
       </Box>
       <StartStopButton
         variant="contained"

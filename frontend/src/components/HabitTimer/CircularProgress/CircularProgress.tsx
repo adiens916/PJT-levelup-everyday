@@ -3,7 +3,7 @@ import { Box, CircularProgress, CircularProgressProps } from '@mui/material';
 import InnerText from '../InnerText/InnerText';
 
 export default function CircularProgressWithLabel(
-  props: CircularProgressProps & { value: number },
+  props: CircularProgressProps & { value: number; progress: number },
 ) {
   return (
     <Box sx={{ position: 'relative', display: 'inline-flex' }}>
@@ -27,7 +27,7 @@ export default function CircularProgressWithLabel(
           justifyContent: 'center',
         }}
       >
-        <InnerText value={props.value} />
+        <InnerText ratio={props.value} progress={props.progress} />
       </Box>
     </Box>
   );

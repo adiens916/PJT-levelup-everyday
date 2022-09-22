@@ -6,11 +6,11 @@ export default function InnerText(props: InnerTextType) {
   return (
     <>
       <Typography variant="h4" color="text.secondary">
-        {`${Math.round(props.value)}%`}
+        {`${Math.round(props.ratio)}%`}
       </Typography>
       <Stack direction="row" alignItems="center">
         <Typography variant="h5" color="text.secondary">
-          {`${Math.round(props.value / 10)}분`}
+          {`${Math.round(props.progress)}초`}
         </Typography>
         <IconButton>
           <EditIcon />
@@ -21,5 +21,6 @@ export default function InnerText(props: InnerTextType) {
 }
 
 interface InnerTextType {
-  value: number;
+  ratio: number;
+  progress: number;
 }
