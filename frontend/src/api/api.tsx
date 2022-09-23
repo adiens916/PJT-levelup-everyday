@@ -7,6 +7,7 @@ import {
   HabitType,
   StartTimerType,
   FinishTimerType,
+  HabitCreateType,
 } from './types';
 
 const host = 'http://127.0.0.1:8000/api';
@@ -61,6 +62,23 @@ export async function getHabit(habitId: number) {
     `${host}/habit/${habitId}/`,
   );
   return extractFields(data)[0];
+}
+
+export async function createHabit(habit: HabitType) {
+  const body = {
+    name: habit.name,
+    estimate_type: habit.estimate_type,
+    estimate_unit: habit.estimate_unit,
+    final_goal: habit.final_goal,
+    growth_type: habit.growth_type,
+    day_cycle: habit.day_cycle,
+  };
+
+  const data: HabitCreateType = await requestPostByAxios(
+    `${host}/habit/`,
+    body,
+  );
+  return data;
 }
 
 export async function startTimer(habitId: number) {
