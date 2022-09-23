@@ -35,7 +35,7 @@ def index(request: HttpRequest):
             print('day changed')
             if user.next_reset_date:
                 # TODO: 자정 후에 미리 다음 날로 넘어가는 기능 추가하기
-                update_goals_and_due_dates(habit_list)
+                update_goals_and_due_dates(habit_list, user)
             user.next_reset_date = date.today() + timedelta(days=1)
             user.save()
         return json_response_wrapper(habit_list)
