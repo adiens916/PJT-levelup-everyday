@@ -42,3 +42,16 @@ export interface HabitType {
   paused_datetime: string | null;
   temporary_progress: number;
 }
+
+export interface StartTimerType {
+  success: boolean;
+  start_date: string;
+  is_running: boolean;
+}
+
+export interface FinishTimerType {
+  id: number;
+  start_datetime: string;
+  end_datetime: string;
+  progress: number;
+}

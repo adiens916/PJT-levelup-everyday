@@ -3,8 +3,10 @@ import {
   SignUpResponseType,
   LoginResponseType,
   LogoutResponseType,
-  HabitType,
   HabitResponseType,
+  HabitType,
+  StartTimerType,
+  FinishTimerType,
 } from './types';
 
 const host = 'http://127.0.0.1:8000/api';
@@ -52,6 +54,34 @@ export function getUserToken() {
 export async function getHabits() {
   const data = await requestGetByAxios<HabitResponseType[]>(`${host}/habit/`);
   return extractFields(data);
+}
+
+export async function getHabit(habitId: number) {
+  const data = await requestGetByAxios<HabitResponseType[]>(
+    `${host}/habit/${habitId}/`,
+  );
+  return extractFields(data)[0];
+}
+
+export async function startTimer(habitId: number) {
+  const data: StartTimerType = await requestPostByAxios(
+    `${host}/habit/timer/start/`,
+    {
+      habit_id: habitId,
+    },
+  );
+  return data;
+}
+
+export async function finishTimer(habitId: number, progress: number) {
+  const data: FinishTimerType = await requestPostByAxios(
+    `${host}/habit/timer/finish/`,
+    {
+      habit_id: habitId,
+      progress: progress,
+    },
+  );
+  return data;
 }
 
 async function requestGetByAxios<T>(url: string) {
