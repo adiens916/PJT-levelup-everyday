@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, time, timedelta
+import re
 from typing import Iterable
 
 from django.core import serializers
@@ -35,18 +36,20 @@ def is_due_today_for_habit(habit: Habit):
     )
 
 
-def get_reset_datetime(habit: Habit):
-    user: User = habit.user
+def get_reset_datetime(user: User):
     reset_datetime = datetime.combine(user.next_reset_date, user.daily_reset_time)
     return reset_datetime
 
 
-def update_goals_and_due_dates(habit_list: Iterable[Habit]):
+def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
     '''
     오늘이 예정일인 경우,
     이전의 성공/실패 여부를 참고해
     오늘 목표를 조정한다.
     '''
+
+    reset_datetime = get_reset_datetime(user)
+    yesterday = reset_datetime.date() - timedelta(days=1)
 
     for habit in habit_list:
         if (
@@ -60,7 +63,7 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit]):
                 record = RoundRecord()
                 record.habit = habit
                 record.start_datetime: datetime = habit.start_datetime
-                record.end_datetime = get_reset_datetime(habit) - timedelta(minutes=1)
+                record.end_datetime = reset_datetime - timedelta(minutes=1)
                 # TIME 유형인 경우, 현재 시각을 끝으로 진행도 결정
                 if habit.estimate_type == 'TIME':
                     record.progress = int((record.end_datetime - record.start_datetime).total_seconds())
@@ -75,6 +78,10 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit]):
                 user: User = habit.user
                 user.is_recording = False                
                 user.save()
+
+            # 예정일이 아니었는데 진행한 경우, None이라 오류 남
+            # => 어제로 예정일을 바꿈
+            habit.due_date = yesterday
 
             # 어제 기록 저장
             daily_record = DailyRecord()
