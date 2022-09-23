@@ -4,6 +4,8 @@ import { Container } from '@mui/system';
 
 import { initialState } from '../HabitTimer/reducer';
 import { HabitType } from '../../api/types';
+import { createHabit } from '../../api/api';
+import { useNavigate } from 'react-router-dom';
 type HabitKeyType = keyof HabitType;
 // interface HabitCreateType extends HabitType {
 //   final_goal: number | null;
@@ -17,6 +19,7 @@ const defaultState: HabitType = {
 };
 
 export default function HabitCreate() {
+  const navigate = useNavigate();
   const [habit, setHabit] = useState(defaultState);
 
   function changeValue(keyword: HabitKeyType, value: string) {
@@ -125,7 +128,19 @@ export default function HabitCreate() {
           <Typography>일마다</Typography>
         </Stack>
 
-        <Button variant="contained" sx={{ fontSize: '1.5rem' }}>
+        <Button
+          onClick={async () => {
+            const isConfirmed = confirm('추가하시겠습니까?');
+            if (isConfirmed) {
+              const result = await createHabit(habit);
+              if (result.id) {
+                navigate('/');
+              }
+            }
+          }}
+          variant="contained"
+          sx={{ fontSize: '1.5rem' }}
+        >
           추가
         </Button>
 
