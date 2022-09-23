@@ -2,29 +2,16 @@ import React, { useState } from 'react';
 import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 
-const sample = {
-  id: '1',
-  name: '운동',
-  estimate_type: 'COUNT',
-  estimate_unit: '개',
-  final_goal: '100',
-  today_goal: '20',
-  today_progress: '0',
-  growth_type: 'INCREASE',
-  growth_delta: '2',
-  day_cycle: '2',
-  last_done_date: '2022-09-07',
-
-  is_paused: 'N',
-  start_date: '',
-  paused_date: '',
-  progress: '',
-};
-
-type HabitKeyType = keyof typeof sample;
+import { initialState } from '../HabitTimer/reducer';
+import { HabitType } from '../../api/types';
+type HabitKeyType = keyof HabitType;
+// interface HabitCreateType extends HabitType {
+//   final_goal: number | null;
+//   day_cycle: number | null;
+// }
 
 export default function HabitCreate() {
-  const [habit, setHabit] = useState(sample);
+  const [habit, setHabit] = useState(initialState);
 
   function changeValue(keyword: HabitKeyType, value: string) {
     setHabit((habit) => ({ ...habit, [keyword]: value }));
@@ -115,6 +102,10 @@ export default function HabitCreate() {
           <Typography>일마다</Typography>
         </Stack>
 
+        <Button variant="contained" sx={{ fontSize: '1.5rem' }}>
+          추가
+        </Button>
+
         <Button
           onClick={() => {
             setOpen(!open);
@@ -129,10 +120,10 @@ export default function HabitCreate() {
           <>
             <TextField
               label="증감치"
-              defaultValue={parseInt(habit.final_goal) * 0.01}
-              value={habit.growth_delta}
+              defaultValue={habit.final_goal * 0.01}
+              value={habit.growth_amount}
               onChange={(event) => {
-                changeValue('growth_delta', event.target.value);
+                changeValue('growth_amount', event.target.value);
               }}
               required
             />
