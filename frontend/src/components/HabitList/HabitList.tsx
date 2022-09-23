@@ -48,9 +48,6 @@ export default function HabitList() {
             </Typography>
           </Button>
         ))}
-        <Button variant="contained" sx={{ fontSize: '1.5rem' }}>
-          추가
-        </Button>
       </Container>
     </>
   );

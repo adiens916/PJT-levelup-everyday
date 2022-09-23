@@ -2,29 +2,25 @@ import React, { useState } from 'react';
 import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 
-const sample = {
-  id: '1',
-  name: '운동',
-  estimate_type: 'COUNT',
-  estimate_unit: '개',
-  final_goal: '100',
-  today_goal: '20',
-  today_progress: '0',
-  growth_type: 'INCREASE',
-  growth_delta: '2',
-  day_cycle: '2',
-  last_done_date: '2022-09-07',
+import { initialState } from '../HabitTimer/reducer';
+import { HabitType } from '../../api/types';
+import { createHabit } from '../../api/api';
+import { useNavigate } from 'react-router-dom';
+type HabitKeyType = keyof HabitType;
+// interface HabitCreateType extends HabitType {
+//   final_goal: number | null;
+//   day_cycle: number | null;
+// }
 
-  is_paused: 'N',
-  start_date: '',
-  paused_date: '',
-  progress: '',
+const defaultState: HabitType = {
+  ...initialState,
+  estimate_unit: 'SECOND',
+  day_cycle: 1,
 };
 
-type HabitKeyType = keyof typeof sample;
-
 export default function HabitCreate() {
-  const [habit, setHabit] = useState(sample);
+  const navigate = useNavigate();
+  const [habit, setHabit] = useState(defaultState);
 
   function changeValue(keyword: HabitKeyType, value: string) {
     setHabit((habit) => ({ ...habit, [keyword]: value }));
@@ -59,7 +55,7 @@ export default function HabitCreate() {
 
         <Stack direction="row">
           <TextField
-            label="목표"
+            label="최종 목표"
             value={habit.final_goal}
             onChange={(event) => {
               changeValue('final_goal', event.target.value);
@@ -67,6 +63,23 @@ export default function HabitCreate() {
             required
             sx={{ flex: 'auto' }}
           />
+
+          {habit.estimate_type === 'TIME' && (
+            <TextField
+              select
+              label="측정 단위"
+              value={habit.estimate_unit}
+              onChange={(event) => {
+                changeValue('estimate_unit', event.target.value);
+              }}
+              required
+              sx={{ width: '30%' }}
+            >
+              <MenuItem value="HOUR">시간</MenuItem>
+              <MenuItem value="MINUTE">분</MenuItem>
+              <MenuItem value="SECOND">초</MenuItem>
+            </TextField>
+          )}
 
           {habit.estimate_type === 'COUNT' && (
             <TextField
@@ -116,6 +129,22 @@ export default function HabitCreate() {
         </Stack>
 
         <Button
+          onClick={async () => {
+            const isConfirmed = confirm('추가하시겠습니까?');
+            if (isConfirmed) {
+              const result = await createHabit(habit);
+              if (result.id) {
+                navigate('/');
+              }
+            }
+          }}
+          variant="contained"
+          sx={{ fontSize: '1.5rem' }}
+        >
+          추가
+        </Button>
+
+        <Button
           onClick={() => {
             setOpen(!open);
           }}
@@ -129,10 +158,10 @@ export default function HabitCreate() {
           <>
             <TextField
               label="증감치"
-              defaultValue={parseInt(habit.final_goal) * 0.01}
-              value={habit.growth_delta}
+              defaultValue={habit.final_goal * 0.01}
+              value={habit.growth_amount}
               onChange={(event) => {
-                changeValue('growth_delta', event.target.value);
+                changeValue('growth_amount', event.target.value);
               }}
               required
             />

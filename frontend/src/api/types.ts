@@ -19,6 +19,10 @@ export interface HabitResponseType {
   fields: HabitType;
 }
 
+export interface HabitCreateType {
+  id: number;
+}
+
 export interface HabitType {
   id?: number;
   user: number;
