@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material';
 
 import useTimer from './useTimer';
 import CircularProgressWithLabel from './CircularProgress/CircularProgress';
-import { ratio } from './utils';
+import { ratio } from '../../utils/utils';
 
 export default function HabitTimer() {
   const { id: habitId } = useParams();

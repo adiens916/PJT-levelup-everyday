@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Container, Typography } from '@mui/material';
+
 import { getHabits } from '../../api/api';
 import { HabitType } from '../../api/types';
+import { ratio } from '../../utils/utils';
 
 export default function HabitList() {
   const [habits, setHabits] = React.useState<HabitType[]>([]);
@@ -41,7 +43,9 @@ export default function HabitList() {
               >
                 {habit.name}
               </Typography>
-              <Typography variant="h5">{habit.today_progress}%</Typography>
+              <Typography variant="h5">
+                {ratio(habit.today_progress, habit.today_goal)}%
+              </Typography>
             </Button>
           </Link>
         ))}
