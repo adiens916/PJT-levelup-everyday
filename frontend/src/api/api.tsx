@@ -60,7 +60,7 @@ export async function getHabit(habitId: number) {
   const data = await requestGetByAxios<HabitResponseType[]>(
     `${host}/habit/${habitId}/`,
   );
-  return data;
+  return extractFields(data)[0];
 }
 
 export async function startTimer(habitId: number) {

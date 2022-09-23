@@ -13,7 +13,7 @@ export default function HabitTimer() {
   return (
     <>
       <Typography variant="h4" textAlign="center" marginY={7}>
-        {habit?.fields.name}
+        {habit?.name}
       </Typography>
       <Box display="flex" justifyContent="center">
         <CircularProgressWithLabel value={ratio} progress={progress} />

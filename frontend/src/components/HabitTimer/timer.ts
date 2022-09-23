@@ -1,4 +1,4 @@
-import { HabitResponseType } from '../../api/types';
+import { HabitType } from '../../api/types';
 
 export class Counter {
   goal = 0;
@@ -7,12 +7,12 @@ export class Counter {
     return;
   });
 
-  constructor(habit?: HabitResponseType) {
+  constructor(habit?: HabitType) {
     if (habit) {
-      this.goal = habit.fields.today_goal;
-      this.progress = habit.fields.today_progress;
-      if (habit.fields.is_running && habit.fields.start_datetime) {
-        this.progress += this.getDiff(habit.fields.start_datetime);
+      this.goal = habit.today_goal;
+      this.progress = habit.today_progress;
+      if (habit.is_running && habit.start_datetime) {
+        this.progress += this.getDiff(habit.start_datetime);
       }
       // habit.fields.estimate_type
       // habit.fields.growth_type

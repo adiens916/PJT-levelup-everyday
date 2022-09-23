@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Button, ButtonProps } from '@mui/material';
 import { getHabit, startTimer, finishTimer } from '../../api/api';
-import { HabitResponseType } from '../../api/types';
+import { HabitType } from '../../api/types';
 import { Counter } from './timer';
 
 export default function useTimer(habitId: number) {
-  const [habit, setHabit] = useState<HabitResponseType>();
+  const [habit, setHabit] = useState<HabitType>();
   const [progress, setProgress] = useState(0);
   const [ratio, setRatio] = useState(0);
   const [running, setRunning] = useState(false);
@@ -18,12 +18,12 @@ export default function useTimer(habitId: number) {
 
   useEffect(() => {
     if (habitId) {
-      getHabit(habitId).then((habits) => {
-        setHabit(habits[0]);
-        console.log(habits[0]);
-        counter.current = new Counter(habits[0]);
+      getHabit(habitId).then((habit) => {
+        setHabit(habit);
+        console.log(habit);
+        counter.current = new Counter(habit);
         setProgressAndRatio();
-        setRunning(habits[0].fields.is_running);
+        setRunning(habit.is_running);
       });
     }
   }, []);
