@@ -10,8 +10,14 @@ type HabitKeyType = keyof HabitType;
 //   day_cycle: number | null;
 // }
 
+const defaultState: HabitType = {
+  ...initialState,
+  estimate_unit: 'SECOND',
+  day_cycle: 1,
+};
+
 export default function HabitCreate() {
-  const [habit, setHabit] = useState(initialState);
+  const [habit, setHabit] = useState(defaultState);
 
   function changeValue(keyword: HabitKeyType, value: string) {
     setHabit((habit) => ({ ...habit, [keyword]: value }));
@@ -46,7 +52,7 @@ export default function HabitCreate() {
 
         <Stack direction="row">
           <TextField
-            label="목표"
+            label="최종 목표"
             value={habit.final_goal}
             onChange={(event) => {
               changeValue('final_goal', event.target.value);
@@ -54,6 +60,23 @@ export default function HabitCreate() {
             required
             sx={{ flex: 'auto' }}
           />
+
+          {habit.estimate_type === 'TIME' && (
+            <TextField
+              select
+              label="측정 단위"
+              value={habit.estimate_unit}
+              onChange={(event) => {
+                changeValue('estimate_unit', event.target.value);
+              }}
+              required
+              sx={{ width: '30%' }}
+            >
+              <MenuItem value="HOUR">시간</MenuItem>
+              <MenuItem value="MINUTE">분</MenuItem>
+              <MenuItem value="SECOND">초</MenuItem>
+            </TextField>
+          )}
 
           {habit.estimate_type === 'COUNT' && (
             <TextField

@@ -74,6 +74,20 @@ export async function createHabit(habit: HabitType) {
     day_cycle: habit.day_cycle,
   };
 
+  if (habit.estimate_type === 'TIME') {
+    switch (habit.estimate_unit) {
+      case 'HOUR':
+        habit.final_goal *= 3600;
+        break;
+      case 'MINUTE':
+        habit.final_goal *= 60;
+        break;
+      default:
+        break;
+    }
+    habit.estimate_unit = undefined;
+  }
+
   const data: HabitCreateType = await requestPostByAxios(
     `${host}/habit/`,
     body,
