@@ -1,27 +1,29 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
+
 import useTimer from './useTimer';
 import CircularProgressWithLabel from './CircularProgress/CircularProgress';
+import { ratio } from './utils';
 
 export default function HabitTimer() {
   const { id: habitId } = useParams();
-  const { counter, running, StartStopButton } = useTimer(Number(habitId));
+  const { habit, StartStopButton } = useTimer(Number(habitId));
 
   return (
     <>
       <Typography variant="h4" textAlign="center" marginY={7}>
-        달리기
+        {habit.name}
       </Typography>
       <Box display="flex" justifyContent="center">
         <CircularProgressWithLabel
-          value={counter.ratio}
-          progress={counter.progress}
+          value={ratio(habit.today_progress, habit.today_goal)}
+          progress={habit.today_progress}
         />
       </Box>
       <StartStopButton
         variant="contained"
-        color={!running ? 'primary' : 'secondary'}
+        color={!habit.is_running ? 'primary' : 'secondary'}
         sx={{
           display: 'block',
           marginLeft: 'auto',
@@ -29,7 +31,7 @@ export default function HabitTimer() {
           marginTop: '5rem',
         }}
       >
-        {!running ? '시작' : '중지'}
+        {!habit.is_running ? '시작' : '중지'}
       </StartStopButton>
     </>
   );

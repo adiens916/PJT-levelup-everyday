@@ -1,40 +1,43 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useReducer } from 'react';
 import { Button, ButtonProps } from '@mui/material';
 import { getHabit, startTimer, finishTimer } from '../../api/api';
-import { Counter } from './timer';
+import { reducer, initialState } from './habitReducer';
 
 export default function useTimer(habitId: number) {
-  const [counter, setCounter] = useState(new Counter());
-  const [running, setRunning] = useState(false);
+  const [habit, dispatch] = useReducer(reducer, initialState);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    if (habitId) {
+    if (habitId && !loaded) {
       getHabit(habitId).then((habit) => {
-        setCounter(new Counter(habit));
-        setRunning(habit.is_running);
+        dispatch({ type: 'LOAD', state: habit });
+        dispatch({ type: 'CONTINUE' });
+        setLoaded(true);
       });
     }
   }, []);
 
   useEffect(() => {
-    if (running) {
-      counter.start();
+    if (habit.is_running) {
+      const timer = setInterval(() => {
+        dispatch({ type: 'PROCEED' });
+      }, 1000);
       return () => {
-        counter.stop();
+        clearInterval(timer);
       };
     }
-  }, [running]);
+  }, [habit.is_running]);
 
   function StartStopButton(props: ButtonProps) {
     return (
       <Button
         onClick={() => {
-          if (!running) {
+          if (!habit.is_running) {
             startTimer(habitId);
           } else {
-            finishTimer(habitId, counter.progress);
+            finishTimer(habitId, habit.today_progress);
           }
-          setRunning(!running);
+          dispatch({ type: 'RUN_OR_STOP' });
         }}
         {...props}
       >
@@ -43,5 +46,5 @@ export default function useTimer(habitId: number) {
     );
   }
 
-  return { counter, running, StartStopButton };
+  return { habit, StartStopButton };
 }
