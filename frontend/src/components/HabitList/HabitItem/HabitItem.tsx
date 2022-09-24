@@ -5,17 +5,20 @@ import { Button, Stack, Typography } from '@mui/material';
 import { HabitType } from '../../../api/types';
 import { ratio as getRatio } from '../../../utils/utils';
 
-export default function HabitItem({ habit }: { habit: HabitType }) {
+export default function HabitItem(props: HabitItemType) {
   const navigate = useNavigate();
-  const level = Math.floor((habit.today_goal / habit.final_goal) * 100);
-  const ratio = getRatio(habit.today_progress, habit.today_goal);
+  const level = Math.floor(
+    (props.habit.today_goal / props.habit.final_goal) * 100,
+  );
+  const ratio = getRatio(props.habit.today_progress, props.habit.today_goal);
 
   return (
     <>
       <Button
         onClick={() => {
-          navigate(`/timer/${habit.id}`);
+          navigate(`/timer/${props.habit.id}`);
         }}
+        // disabled={props.disabled}
         variant="outlined"
         sx={{
           display: 'flex',
@@ -25,6 +28,7 @@ export default function HabitItem({ habit }: { habit: HabitType }) {
           background: `linear-gradient(90deg, ${
             ratio >= 50 ? 'dodgerblue' : 'aqua'
           } 0%, white ${ratio}%)`,
+          // opacity: props.disabled ? '0.2' : '1',
         }}
       >
         <Stack direction="row" alignItems="center" spacing={2}>
@@ -33,7 +37,7 @@ export default function HabitItem({ habit }: { habit: HabitType }) {
           </Typography>
           {/* 습관 이름 */}
           <Typography color={ratio > 30 ? 'yellow' : 'turquoise'} variant="h5">
-            {habit.name}
+            {props.habit.name}
           </Typography>
         </Stack>
 
@@ -44,4 +48,10 @@ export default function HabitItem({ habit }: { habit: HabitType }) {
       </Button>
     </>
   );
+}
+
+interface HabitItemType {
+  habit: HabitType;
+  transparent?: boolean;
+  disabled?: boolean;
 }
