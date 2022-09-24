@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Container, Typography } from '@mui/material';
+import { Button, Container, Stack, Typography } from '@mui/material';
 
 import { getHabits } from '../../api/api';
 import { HabitType } from '../../api/types';
@@ -26,6 +26,7 @@ export default function HabitList() {
 
         {/* 습관 목록 */}
         {habits.map((habit, index) => {
+          const level = Math.floor((habit.today_goal / habit.final_goal) * 100);
           const _ratio = ratio(habit.today_progress, habit.today_goal);
           return (
             <Button
@@ -44,13 +45,18 @@ export default function HabitList() {
               }}
               key={index}
             >
-              {/* 습관 이름 */}
-              <Typography
-                color={_ratio > 10 ? 'yellow' : 'turquoise'}
-                variant="h5"
-              >
-                {habit.name}
-              </Typography>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Typography color={_ratio > 30 ? 'yellow' : 'turquoise'}>
+                  Lv. {level}
+                </Typography>
+                {/* 습관 이름 */}
+                <Typography
+                  color={_ratio > 30 ? 'yellow' : 'turquoise'}
+                  variant="h5"
+                >
+                  {habit.name}
+                </Typography>
+              </Stack>
 
               {/* 현재 달성률 */}
               <Typography
