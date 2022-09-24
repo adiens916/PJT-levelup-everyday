@@ -19,35 +19,49 @@ export default function HabitList() {
       <Container
         sx={{ display: 'flex', flexDirection: 'column', width: '70%' }}
       >
+        {/* 오늘 날짜 */}
         <Typography textAlign="center" fontSize="1.5rem">
           {new Date().toLocaleDateString('ko')}
         </Typography>
-        {habits.map((habit, index) => (
-          <Button
-            onClick={() => {
-              navigate(`/timer/${habit.id}`);
-            }}
-            variant="outlined"
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginY: '1rem',
-              padding: '0.5rem',
-              // background: 'linear-gradient(90deg, blue 0%, white 30%)',
-            }}
-            key={index}
-          >
-            <Typography
-              // color={getRatio(habit) > 10 ? 'yellow' : 'blue'}
-              variant="h5"
+
+        {/* 습관 목록 */}
+        {habits.map((habit, index) => {
+          const _ratio = ratio(habit.today_progress, habit.today_goal);
+          return (
+            <Button
+              onClick={() => {
+                navigate(`/timer/${habit.id}`);
+              }}
+              variant="outlined"
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginY: '1rem',
+                padding: '0.5rem',
+                background: `linear-gradient(90deg, ${
+                  _ratio >= 50 ? 'dodgerblue' : 'aqua'
+                } 0%, white ${_ratio}%)`,
+              }}
+              key={index}
             >
-              {habit.name}
-            </Typography>
-            <Typography variant="h5">
-              {ratio(habit.today_progress, habit.today_goal)}%
-            </Typography>
-          </Button>
-        ))}
+              {/* 습관 이름 */}
+              <Typography
+                color={_ratio > 10 ? 'yellow' : 'turquoise'}
+                variant="h5"
+              >
+                {habit.name}
+              </Typography>
+
+              {/* 현재 달성률 */}
+              <Typography
+                color={_ratio >= 100 ? 'yellow' : 'aquamarine'}
+                variant="h5"
+              >
+                {_ratio}%
+              </Typography>
+            </Button>
+          );
+        })}
       </Container>
     </>
   );
