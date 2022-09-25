@@ -1,4 +1,6 @@
 from datetime import date, timedelta
+from typing import Iterable
+
 from django.http import (
     JsonResponse,
     HttpRequest,
@@ -12,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from account.models import User
-from .models import Habit, RoundRecord
+from .models import DailyRecord, Habit, RoundRecord
 from .views_aux import (
     json_response_wrapper,
     is_day_changed_for_user,
@@ -135,3 +137,24 @@ def finish_timer(request: HttpRequest):
         #     'start_date': habit.start_date,
         #     'is_running': habit.is_running
         # })
+
+
+@csrf_exempt
+@api_view(["GET"])
+def get_daily_records(request: HttpRequest, habit_id: int):
+    if not request.user.is_authenticated:
+        return Response(
+            {"success": False, "detail": "User not authenticated"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    records: Iterable[DailyRecord] = DailyRecord.objects.filter(habit=habit_id)
+
+    user: User = request.user
+    if len(records) and records[0].is_owned_by_user(user):
+        return json_response_wrapper(records)
+    else:
+        return Response(
+            {"success": False, "detail": "No daily records"},
+            status=status.HTTP_404_NOT_FOUND,
+        )

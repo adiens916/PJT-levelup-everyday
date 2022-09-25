@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from account.models import User
 
 ESTIMATE_TYPE_CHOICES = [("TIME", "TIME"), ("COUNT", "COUNT")]
 GROWTH_TYPE_CHOICES = [("INCREASE", "INCREASE"), ("DECREASE", "DECREASE")]
@@ -30,6 +31,9 @@ class Habit(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    def is_owned_by_user(self, given_user: User):
+        return self.user.pk == given_user.pk
 
     def is_today_successful(self) -> bool:
         if self.growth_type == "INCREASE":
@@ -66,3 +70,6 @@ class DailyRecord(models.Model):
             self.progress = habit.today_progress
             self.excess = 0
         self.save()
+
+    def is_owned_by_user(self, given_user: User):
+        return self.habit.is_owned_by_user(given_user)
