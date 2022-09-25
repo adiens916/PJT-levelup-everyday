@@ -73,12 +73,7 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
 
             # 어제 기록 저장
             daily_record = DailyRecord()
-            daily_record.habit = habit
-            daily_record.date = habit.due_date
-            daily_record.goal = habit.today_goal
-            daily_record.progress = habit.today_progress
-            daily_record.success = habit.today_goal <= habit.today_progress
-            daily_record.save()
+            daily_record.save_from_habit(habit)
 
             # 오늘 기록 갱신
             if daily_record.success:
