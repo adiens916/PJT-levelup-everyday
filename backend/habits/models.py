@@ -1,15 +1,8 @@
 from django.conf import settings
 from django.db import models
 
-ESTIMATE_TYPE_CHOICES = [
-    ('TIME', 'TIME'),
-    ('COUNT', 'COUNT')
-]
-
-GROWTH_TYPE_CHOICES = [
-    ('INCREASE', 'INCREASE'),
-    ('DECREASE', 'DECREASE')
-]
+ESTIMATE_TYPE_CHOICES = [("TIME", "TIME"), ("COUNT", "COUNT")]
+GROWTH_TYPE_CHOICES = [("INCREASE", "INCREASE"), ("DECREASE", "DECREASE")]
 
 # Create your models here.
 class Habit(models.Model):
@@ -22,7 +15,7 @@ class Habit(models.Model):
     final_goal = models.PositiveIntegerField()
     growth_type = models.CharField(max_length=10, choices=GROWTH_TYPE_CHOICES)
     day_cycle = models.PositiveSmallIntegerField(default=0)
-    
+
     today_goal = models.PositiveIntegerField(default=0)
     today_progress = models.PositiveIntegerField(default=0)
     growth_amount = models.IntegerField(default=0)
@@ -38,11 +31,13 @@ class Habit(models.Model):
     def __str__(self) -> str:
         return self.name
 
+
 class RoundRecord(models.Model):
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
     progress = models.PositiveIntegerField()
+
 
 class DailyRecord(models.Model):
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
