@@ -83,6 +83,27 @@ def index_each(request: HttpRequest, habit_id: int):
 
 
 @csrf_exempt
+@api_view(["GET"])
+def get_daily_records(request: HttpRequest, habit_id: int):
+    if not request.user.is_authenticated:
+        return Response(
+            {"success": False, "detail": "User not authenticated"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    records: Iterable[DailyRecord] = DailyRecord.objects.filter(habit=habit_id)
+
+    user: User = request.user
+    if len(records) and records[0].is_owned_by_user(user):
+        return json_response_wrapper(records)
+    else:
+        return Response(
+            {"success": False, "detail": "No daily records"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+
+@csrf_exempt
 @api_view(["POST"])
 def start_timer(request: HttpRequest):
     if request.method == "POST":
@@ -137,24 +158,3 @@ def finish_timer(request: HttpRequest):
         #     'start_date': habit.start_date,
         #     'is_running': habit.is_running
         # })
-
-
-@csrf_exempt
-@api_view(["GET"])
-def get_daily_records(request: HttpRequest, habit_id: int):
-    if not request.user.is_authenticated:
-        return Response(
-            {"success": False, "detail": "User not authenticated"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
-    records: Iterable[DailyRecord] = DailyRecord.objects.filter(habit=habit_id)
-
-    user: User = request.user
-    if len(records) and records[0].is_owned_by_user(user):
-        return json_response_wrapper(records)
-    else:
-        return Response(
-            {"success": False, "detail": "No daily records"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
