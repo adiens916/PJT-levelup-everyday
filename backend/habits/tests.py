@@ -1,7 +1,7 @@
-'''
+"""
 모델 관련한 테스트는 Django 설정이 필요하므로 pytest로 검사하면 오류 남.
 => 테스트 대상이 되는 함수를 이쪽으로 옮겨옴.
-'''
+"""
 
 from datetime import datetime, time, timedelta, date
 from django.test import TestCase
@@ -60,13 +60,13 @@ def test_is_due_today():
     next_due_date = due_date + timedelta(days=day_cycle)
 
     now = datetime(2022, 9, 3, hour=6, minute=0)
-    assert True == is_due_today(next_due_date, reset_hour,  now)
+    assert True == is_due_today(next_due_date, reset_hour, now)
 
 
 def test_is_due_today_when_border_values():
     due_date = date(2022, 9, 1)
     reset_hour = time(6, 0)
-    
+
     day_cycle = 2
     next_due_date = due_date + timedelta(days=day_cycle)
 
@@ -85,4 +85,4 @@ def test_is_due_today_when_after_due():
     next_due_date = due_date + timedelta(days=day_cycle)
 
     now = datetime(2022, 9, 7, hour=6, minute=0)
-    assert False == is_due_today(next_due_date, reset_hour,  now)
+    assert False == is_due_today(next_due_date, reset_hour, now)
