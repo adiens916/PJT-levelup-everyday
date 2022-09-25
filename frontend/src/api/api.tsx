@@ -8,6 +8,8 @@ import {
   StartTimerType,
   FinishTimerType,
   HabitCreateType,
+  DailyRecordResponseType,
+  DailyRecordType,
 } from './types';
 
 const host = 'http://127.0.0.1:8000/api';
@@ -95,6 +97,13 @@ export async function createHabit(habit: HabitType) {
   return data;
 }
 
+export async function getRecords(habitId: number) {
+  const data = await requestGetByAxios<DailyRecordResponseType[]>(
+    `${host}/habit/${habitId}/record/`,
+  );
+  return extractRecordFields(data);
+}
+
 export async function startTimer(habitId: number) {
   const data: StartTimerType = await requestPostByAxios(
     `${host}/habit/timer/start/`,
@@ -130,6 +139,15 @@ function extractFields(querySet: HabitResponseType[]): HabitType[] {
   return querySet.map((instance) => ({
     id: instance.pk,
     ...instance.fields,
+  }));
+}
+
+function extractRecordFields(
+  querySet: DailyRecordResponseType[],
+): DailyRecordType[] {
+  return querySet.map((instance) => ({
+    ...instance.fields,
+    id: instance.pk,
   }));
 }
 
