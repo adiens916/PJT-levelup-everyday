@@ -31,6 +31,12 @@ class Habit(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    def is_today_successful(self) -> bool:
+        if self.growth_type == "INCREASE":
+            return self.today_goal <= self.today_progress
+        elif self.growth_type == "DECREASE":
+            return self.today_goal >= self.today_progress
+
 
 class RoundRecord(models.Model):
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
@@ -42,6 +48,21 @@ class RoundRecord(models.Model):
 class DailyRecord(models.Model):
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
     date = models.DateField()
+    success = models.BooleanField()
     goal = models.PositiveIntegerField()
     progress = models.PositiveIntegerField()
-    success = models.BooleanField()
+    excess = models.PositiveIntegerField()
+
+    def save_from_habit(self, habit: Habit):
+        self.habit = habit
+        self.date = habit.due_date
+        self.success = habit.is_today_successful()
+        if self.success:
+            self.goal = habit.today_goal
+            self.progress = habit.today_goal
+            self.excess = habit.today_progress
+        else:
+            self.goal = habit.today_goal
+            self.progress = habit.today_progress
+            self.excess = 0
+        self.save()
