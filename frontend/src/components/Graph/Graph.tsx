@@ -11,7 +11,6 @@ import {
   ChartOptions,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
-import { faker } from '@faker-js/faker';
 
 ChartJS.register(
   CategoryScale,
@@ -39,20 +38,34 @@ const options: ChartOptions<'bar'> = {
   },
 };
 
-const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+const labels = Array.from(Array(10).keys());
+const goals = [10, 12, 14, 16, 18, 20, 22, 24, 26, 28];
+const progresses = [10, 10, 14, 16, 18, 20, 22, 24, 26, 28];
+const excesses = [12, 0, 18, 24, 18, 20, 22, 30, 26, 28];
 
 const data: ChartData<'bar'> = {
   labels,
   datasets: [
     {
-      label: 'Dataset 1',
-      data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      label: 'Progress',
+      data: progresses,
+      backgroundColor: '#00FFFF80', // Aqua
+      // backgroundColor: '#6495ED80', // CornflowerBlue
+      // backgroundColor: '#00BFFF80', // DeepSkyBlue
     },
     {
-      label: 'Dataset 2',
-      data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
-      backgroundColor: 'rgba(53, 162, 235, 0.5)',
+      label: 'Goal',
+      data: goals,
+      backgroundColor: 'rgba(255, 255, 255, 0.5)', // White, transparent
+      borderColor: 'blue',
+      borderWidth: { top: 1, left: 1, right: 1 },
+    },
+    {
+      label: 'Excess',
+      data: excesses,
+      backgroundColor: '#FF149366', // DeepPink, transparent
+      borderColor: '#FF1493',
+      borderWidth: 1,
     },
   ],
 };
