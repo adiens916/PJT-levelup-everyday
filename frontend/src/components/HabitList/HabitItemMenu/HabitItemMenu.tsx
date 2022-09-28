@@ -1,13 +1,15 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Link } from 'react-router-dom';
+import AutoGraphIcon from '@mui/icons-material/AutoGraph';
+import { ListItemIcon, ListItemText } from '@mui/material';
 
 const ITEM_HEIGHT = 48;
 
-export default function HabitItemMenu() {
+export default function HabitItemMenu({ habitId }: HabitItemMenuType) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -41,14 +43,22 @@ export default function HabitItemMenu() {
         PaperProps={{
           style: {
             maxHeight: ITEM_HEIGHT * 4.5,
-            width: '20ch',
           },
         }}
       >
-        <MenuItem onClick={handleClose}>
-          <Link to="#">그래프</Link>
-        </MenuItem>
+        <Link to={`/record/${habitId}`} style={{ textDecoration: 'none' }}>
+          <MenuItem onClick={handleClose}>
+            <ListItemIcon sx={{ minWidth: 0, marginRight: 1 }}>
+              <AutoGraphIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>기록</ListItemText>
+          </MenuItem>
+        </Link>
       </Menu>
     </div>
   );
+}
+
+interface HabitItemMenuType {
+  habitId: number | undefined;
 }
