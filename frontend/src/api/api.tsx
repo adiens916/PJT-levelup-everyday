@@ -101,7 +101,8 @@ export async function getRecords(habitId: number) {
   const data = await requestGetByAxios<DailyRecordResponseType[]>(
     `${host}/habit/${habitId}/record/`,
   );
-  return extractRecordFields(data);
+  const records = extractRecordFields(data);
+  return convertRecordsForChart(records);
 }
 
 export async function startTimer(habitId: number) {
@@ -149,6 +150,29 @@ function extractRecordFields(
     ...instance.fields,
     id: instance.pk,
   }));
+}
+
+function convertRecordsForChart(dailyRecords: DailyRecordType[]) {
+  const labels = [];
+  const goals = [];
+  const progresses = [];
+  const excesses = [];
+
+  for (const record of dailyRecords) {
+    labels.push(record.date);
+    goals.push(record.goal);
+    progresses.push(record.progress);
+    excesses.push(record.excess);
+  }
+
+  const dailyRecordsForChart = {
+    labels,
+    goals,
+    progresses,
+    excesses,
+  };
+
+  return dailyRecordsForChart;
 }
 
 async function requestPostByAxios(url: string, data?: object) {

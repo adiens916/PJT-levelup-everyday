@@ -1,5 +1,6 @@
 import { ChartData, ChartDataset } from 'chart.js';
 import { useEffect, useState } from 'react';
+import { getRecords } from '../../api/api';
 
 const initialState: DailyRecordsForChartType = {
   labels: [],
@@ -8,7 +9,7 @@ const initialState: DailyRecordsForChartType = {
   excesses: [],
 };
 
-function useDailyRecords(habitId: number) {
+export function useDailyRecords(habitId: number) {
   const [dailyRecords, setDailyRecords] =
     useState<DailyRecordsForChartType>(initialState);
 
@@ -40,6 +41,10 @@ function useDailyRecords(habitId: number) {
     labels: dailyRecords.labels,
     datasets: [datasetOfProgress, datasetOfGoal, datasetOfExcess],
   };
+
+  useEffect(() => {
+    getRecords(habitId).then((data) => setDailyRecords(data));
+  }, []);
 
   return data;
 }
