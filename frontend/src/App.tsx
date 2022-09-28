@@ -8,6 +8,7 @@ import HabitTimer from './components/HabitTimer/HabitTimer';
 import SignUp from './components/SignUp/SignUp';
 import Login from './components/Login/Login';
 import NavBar from './components/NavBar/NavBar';
+import { DailyGraph } from './components/Graph/Graph';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route element={<NavBar />}>
             <Route path="/" element={<HabitList />} />
+            <Route path="/record/:id" element={<DailyGraph />} />
             <Route path="/create" element={<HabitCreate />} />
             <Route path="/timer/:id" element={<HabitTimer />} />
             <Route path="/signup" element={<SignUp />} />

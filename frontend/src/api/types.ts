@@ -47,6 +47,22 @@ export interface HabitType {
   temporary_progress: number;
 }
 
+export interface DailyRecordResponseType {
+  model: string;
+  pk: number;
+  fields: DailyRecordType;
+}
+
+export interface DailyRecordType {
+  id: number;
+  habit: number;
+  date: string;
+  success: boolean;
+  goal: number;
+  progress: number;
+  excess: number;
+}
+
 export interface StartTimerType {
   success: boolean;
   start_date: string;
