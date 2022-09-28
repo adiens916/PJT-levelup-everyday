@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 
 import { HabitType } from '../../../api/types';
 import { ratio as getRatio } from '../../../utils/utils';
+import HabitItemMenu from '../HabitItemMenu/HabitItemMenu';
 
 export default function HabitItem(props: HabitItemType) {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export default function HabitItem(props: HabitItemType) {
   const ratio = getRatio(props.habit.today_progress, props.habit.today_goal);
 
   return (
-    <>
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Button
         onClick={() => {
           navigate(`/timer/${props.habit.id}`);
@@ -23,6 +24,7 @@ export default function HabitItem(props: HabitItemType) {
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
+          flexGrow: 1,
           marginY: '1rem',
           padding: '0.5rem',
           background: `linear-gradient(90deg, ${
@@ -46,7 +48,8 @@ export default function HabitItem(props: HabitItemType) {
           {ratio}%
         </Typography>
       </Button>
-    </>
+      <HabitItemMenu habitId={props.habit.id} />
+    </Box>
   );
 }
 
