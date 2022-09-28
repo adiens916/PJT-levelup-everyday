@@ -96,9 +96,12 @@ def get_daily_records(request: HttpRequest, habit_id: int):
     user: User = request.user
     if len(records) and records[0].is_owned_by_user(user):
         return json_response_wrapper(records)
+    # 아직 기록이 없을 때
+    elif len(records) == 0:
+        return json_response_wrapper([])
     else:
         return Response(
-            {"success": False, "detail": "No daily records"},
+            {"success": False, "detail": "Not owned by user"},
             status=status.HTTP_404_NOT_FOUND,
         )
 
