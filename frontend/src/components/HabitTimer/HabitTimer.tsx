@@ -17,8 +17,11 @@ export default function HabitTimer() {
       </Typography>
       <Box display="flex" justifyContent="center">
         <CircularProgressWithLabel
-          value={ratio(habit.today_progress, habit.today_goal)}
-          progress={habit.today_progress}
+          value={ratio(
+            habit.today_progress + habit.temporary_progress,
+            habit.today_goal,
+          )}
+          progress={habit.today_progress + habit.temporary_progress}
         />
       </Box>
       <StartStopButton
