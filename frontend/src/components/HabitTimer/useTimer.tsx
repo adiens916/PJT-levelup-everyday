@@ -35,7 +35,7 @@ export default function useTimer(habitId: number) {
           if (!habit.is_running) {
             startTimer(habitId);
           } else {
-            finishTimer(habitId, habit.today_progress);
+            finishTimer(habitId, habit.temporary_progress);
           }
           dispatch({ type: 'RUN_OR_STOP' });
         }}

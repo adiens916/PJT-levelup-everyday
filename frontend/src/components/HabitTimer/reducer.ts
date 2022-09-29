@@ -39,7 +39,7 @@ export function reducer(state = initialState, action: ActionType): HabitType {
         const start = new Date(state.start_datetime);
         const now = new Date();
         const seconds = Math.floor((now.getTime() - start.getTime()) / 1000);
-        return { ...state, today_progress: state.today_progress + seconds };
+        return { ...state, temporary_progress: seconds };
       } else {
         return state;
       }
@@ -49,9 +49,9 @@ export function reducer(state = initialState, action: ActionType): HabitType {
 
     case 'PROCEED':
       if (state.growth_type === 'INCREASE') {
-        return { ...state, today_progress: state.today_progress + 1 };
+        return { ...state, temporary_progress: state.temporary_progress + 1 };
       } else {
-        return { ...state, today_progress: state.today_progress - 1 };
+        return { ...state, temporary_progress: state.temporary_progress - 1 };
       }
 
     default:
