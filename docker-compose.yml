@@ -6,7 +6,7 @@ volumes:
 
 services:
   db:
-    container_name: mysql
+    container_name: db
     image: mysql:8.0.30
     volumes:
       - db-data:/var/lib/mysql/
@@ -17,8 +17,8 @@ services:
     ports:
       - ${DJANGO_DB_PORT}:3306
 
-  django:
-    container_name: django
+  backend:
+    container_name: backend
     depends_on:
       - db
     build:
@@ -35,13 +35,18 @@ services:
       - DJANGO_DB_NAME=${DJANGO_DB_NAME}
       - DJANGO_DB_HOST=${DJANGO_DB_HOST}
       - DJANGO_DB_PORT=${DJANGO_DB_PORT}
-    command: python manage.py runserver 0:8000
+    entrypoint: ["/bin/bash", "-c"]
+    command: 
+      - |
+        python manage.py makemigrations
+        python manage.py migrate
+        python manage.py runserver 0:8000
     ports:
       - '8000:8000'
     restart: always
 
-  react:
-    container_name: react
+  frontend:
+    container_name: frontend
     build:
       context: ./frontend/
       dockerfile: Dockerfile
