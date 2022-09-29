@@ -39,3 +39,11 @@ services:
     ports:
       - '8000:8000'
     restart: always
+
+  react:
+    container_name: react
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
