@@ -42,10 +42,8 @@ export default function NavBar() {
       link: '/',
       isLoginRequired: true,
       onClick: async () => {
-        const data = await logout();
-        if (data.success) {
-          setUserToken(null);
-        }
+        await logout();
+        setUserToken(null);
       },
     },
   ];
