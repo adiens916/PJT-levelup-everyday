@@ -1,0 +1,41 @@
+version: '3'
+
+volumes:
+  db-data:
+  db-socket: 
+
+services:
+  db:
+    container_name: mysql
+    image: mysql:8.0.30
+    volumes:
+      - db-data:/var/lib/mysql/
+      - db-socket:/var/run/mysqld/
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DJANGO_DB_PASSWORD}
+      - MYSQL_DATABASE=${DJANGO_DB_NAME}
+    ports:
+      - ${DJANGO_DB_PORT}:3306
+
+  django:
+    container_name: django
+    depends_on:
+      - db
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    volumes:
+      # - ./backend/:/app/
+      - db-socket:/var/run/mysqld/
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DB_USER=${DJANGO_DB_USER}
+      - DJANGO_DB_PASSWORD=${DJANGO_DB_PASSWORD}
+      - DJANGO_DB_ENGINE=${DJANGO_DB_ENGINE}
+      - DJANGO_DB_NAME=${DJANGO_DB_NAME}
+      - DJANGO_DB_HOST=${DJANGO_DB_HOST}
+      - DJANGO_DB_PORT=${DJANGO_DB_PORT}
+    command: python manage.py runserver 0:8000
+    ports:
+      - '8000:8000'
+    restart: always
