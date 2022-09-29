@@ -32,20 +32,18 @@ export default function NavBar() {
       link: '/create',
       isLoginRequired: true,
     },
-    {
-      name: '진행 중인 습관',
-      link: '/timer',
-      isLoginRequired: true,
-    },
+    // {
+    //   name: '진행 중인 습관',
+    //   link: '/timer',
+    //   isLoginRequired: true,
+    // },
     {
       name: '로그아웃',
       link: '/',
       isLoginRequired: true,
       onClick: async () => {
-        const data = await logout();
-        if (data.success) {
-          setUserToken(null);
-        }
+        await logout();
+        setUserToken(null);
       },
     },
   ];
