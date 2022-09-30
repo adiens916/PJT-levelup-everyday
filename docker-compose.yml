@@ -28,6 +28,11 @@ services:
       - ./backend/:/app/
       - db-socket:/var/run/mysqld/
     environment:
+      - BACKEND_HOST=${BACKEND_HOST}
+      - BACKEND_WITH_DOMAIN=${BACKEND_WITH_DOMAIN}
+      - FRONTEND_PORT=${FRONTEND_PORT}
+      - FRONTEND_WITH_DOMAIN=${FRONTEND_WITH_DOMAIN}
+      
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_DB_USER=${DJANGO_DB_USER}
       - DJANGO_DB_PASSWORD=${DJANGO_DB_PASSWORD}
