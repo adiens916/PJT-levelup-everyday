@@ -26,39 +26,39 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+backend_host = os.environ.get("BACKEND_HOST")
+backend_domain = os.environ.get("BACKEND_WITH_DOMAIN")
+frontend_domain = os.environ.get("FRONTEND_WITH_DOMAIN")
+
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    os.environ.get("BACKEND_HOST"),
 ]
+if backend_host:
+    ALLOWED_HOSTS.append(backend_host)
 
 # Access-Control-Allow-Origin 헤더에 주소를 자동으로 추가해줌
 CORS_ALLOWED_ORIGINS = [
     f"http://localhost:{os.environ.get('FRONTEND_PORT')}",
     f"http://127.0.0.1:{os.environ.get('FRONTEND_PORT')}",
-    os.environ.get("FRONTEND_WITH_DOMAIN"),
 ]
+if frontend_domain:
+    CORS_ALLOWED_ORIGINS.append(frontend_domain)
 
 CORS_ALLOW_CREDENTIALS = True
 
-# CSRF_COOKIE_SAMESITE = 'None'
-# CSRF_COOKIE_SECURE = True
-
-# SESSION_COOKIE_DOMAIN = 'http://localhost:3000'
-# SESSION_COOKIE_SAMESITE = 'None'
-# SESSION_COOKIE_SECURE = True
-
-
-# https://docs.djangoproject.com/en/2.2/ref/settings/#csrf-trusted-origins
 CSRF_TRUSTED_ORIGINS = [
     # for frontend
     f"http://localhost:{os.environ.get('FRONTEND_PORT')}",
     f"http://127.0.0.1:{os.environ.get('FRONTEND_PORT')}",
-    os.environ.get("FRONTEND_WITH_DOMAIN"),
+]
+if frontend_domain:
+    CSRF_TRUSTED_ORIGINS.append(frontend_domain)
+if backend_domain:
     # for admin page on the web server
     # (not needed on localhost)
-    os.environ.get("BACKEND_WITH_DOMAIN"),
-]
+    CSRF_TRUSTED_ORIGINS.append(backend_domain)
+
 
 # Application definition
 
