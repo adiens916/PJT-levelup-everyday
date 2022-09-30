@@ -1,6 +1,7 @@
 # Custom
 env_vars.py
 migrations/
+.collected_static/
 
 # Created by https://www.toptal.com/developers/gitignore/api/django
 # Edit at https://www.toptal.com/developers/gitignore?templates=django

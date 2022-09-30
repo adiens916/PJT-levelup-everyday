@@ -26,6 +26,7 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./backend/:/app/
+      - ./backend/.collected_static/:/app/.collected_static/
       - db-socket:/var/run/mysqld/
     environment:
       - BACKEND_HOST=${BACKEND_HOST}
