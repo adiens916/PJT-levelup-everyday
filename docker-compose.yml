@@ -23,9 +23,9 @@ services:
       - db
     build:
       context: ./backend/
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     volumes:
-      # - ./backend/:/app/
+      - ./backend/:/app/
       - db-socket:/var/run/mysqld/
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
