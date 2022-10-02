@@ -12,7 +12,14 @@ import {
   DailyRecordType,
 } from './types';
 
-const host = 'http://127.0.0.1:8000/api';
+// Set host by an environment variable.
+let host = process.env.BACKEND_WITH_DOMAIN;
+if (host) {
+  // Add postfix
+  host += '/api';
+} else {
+  host = 'http://127.0.0.1:8000/api';
+}
 
 export async function signUp(username: string, password: string) {
   return await request<SignUpResponseType>(`${host}/account/signup/`, {
