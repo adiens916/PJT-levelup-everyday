@@ -34,16 +34,14 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
 ]
-if backend_host:
-    ALLOWED_HOSTS.append(backend_host)
+ALLOWED_HOSTS.append(backend_host) if backend_host else None
 
 # Access-Control-Allow-Origin 헤더에 주소를 자동으로 추가해줌
 CORS_ALLOWED_ORIGINS = [
     f"http://localhost:{os.environ.get('FRONTEND_PORT')}",
     f"http://127.0.0.1:{os.environ.get('FRONTEND_PORT')}",
 ]
-if frontend_domain:
-    CORS_ALLOWED_ORIGINS.append(frontend_domain)
+CORS_ALLOWED_ORIGINS.append(frontend_domain) if frontend_domain else None
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -52,12 +50,9 @@ CSRF_TRUSTED_ORIGINS = [
     f"http://localhost:{os.environ.get('FRONTEND_PORT')}",
     f"http://127.0.0.1:{os.environ.get('FRONTEND_PORT')}",
 ]
-if frontend_domain:
-    CSRF_TRUSTED_ORIGINS.append(frontend_domain)
-if backend_domain:
-    # for admin page on the web server
-    # (not needed on localhost)
-    CSRF_TRUSTED_ORIGINS.append(backend_domain)
+CSRF_TRUSTED_ORIGINS.append(frontend_domain) if frontend_domain else None
+# for admin page on the web server (not needed on localhost)
+CSRF_TRUSTED_ORIGINS.append(backend_domain) if backend_domain else None
 
 
 # Application definition
@@ -169,7 +164,7 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "api/static/"
 STATIC_ROOT = BASE_DIR / ".collected_static"
 
 # Default primary key field type
