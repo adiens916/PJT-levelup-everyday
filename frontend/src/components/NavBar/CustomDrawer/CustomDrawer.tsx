@@ -10,13 +10,13 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { NavBarType } from '../NavBar';
 
-const drawerWidth = 240;
+const drawerWidth = 180;
 
 export default function CustomDrawer(props: NavBarType) {
   const drawer = (
     <Box onClick={props.handleDrawerToggle} sx={{ textAlign: 'center' }}>
       <Typography variant="h6" sx={{ my: 2 }}>
-        MUI
+        메뉴
       </Typography>
       <Divider />
       <List>
@@ -45,6 +45,7 @@ export default function CustomDrawer(props: NavBarType) {
       <Box component="nav">
         <Drawer
           variant="temporary"
+          anchor="right"
           open={props.mobileOpen}
           onClose={props.handleDrawerToggle}
           ModalProps={{
