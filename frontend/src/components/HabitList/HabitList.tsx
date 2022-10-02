@@ -8,6 +8,12 @@ import { HabitType } from '../../api/types';
 export default function HabitList() {
   const [habits, setHabits] = React.useState<HabitType[]>([]);
 
+  const formatDateMMDD = () => {
+    const today = new Date();
+    const formatted = `${today.getMonth() + 1}월 ${today.getDate()}일`;
+    return formatted;
+  };
+
   const is_exist_habit_due_date = () =>
     habits.some((habit) => habit.is_today_due_date);
 
@@ -25,11 +31,12 @@ export default function HabitList() {
   return (
     <>
       <Container
-        sx={{ display: 'flex', flexDirection: 'column', width: '70%' }}
+        maxWidth="sm"
+        sx={{ display: 'flex', flexDirection: 'column' }}
       >
         {/* 오늘 날짜 */}
         <Typography textAlign="center" fontSize="1.5rem">
-          {new Date().toLocaleDateString('ko')}
+          {formatDateMMDD()}
         </Typography>
 
         {is_exist_habit_due_date() ? (
