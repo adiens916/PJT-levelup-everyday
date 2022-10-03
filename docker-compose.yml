@@ -57,6 +57,6 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
     environment:
-      - BACKEND_WITH_DOMAIN=${BACKEND_WITH_DOMAIN}
+      - REACT_APP_BACKEND_HOST=${BACKEND_WITH_DOMAIN}
     ports:
       - '3000:3000'

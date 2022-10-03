@@ -30,6 +30,7 @@ export default function useHabitList() {
             setErrorCode(403);
             break;
           default:
+            setIsError(true);
             break;
         }
       });

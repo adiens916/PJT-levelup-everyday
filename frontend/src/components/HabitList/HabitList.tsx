@@ -43,7 +43,7 @@ export default function HabitList() {
             새로운 습관을 만들어봅시다 ٩(ˊᗜˋ*)و
           </Typography>
         ) : (
-          <></>
+          isError && <>서버 연결 불가 (´；ω；｀)</>
         )}
 
         {is_exist_habit_due_date() ? (
