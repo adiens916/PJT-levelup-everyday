@@ -28,6 +28,7 @@ DEBUG = True
 
 backend_host = os.environ.get("BACKEND_HOST")
 backend_domain = os.environ.get("BACKEND_WITH_DOMAIN")
+frontend_port = os.environ.get("FRONTEND_PORT")
 frontend_domain = os.environ.get("FRONTEND_WITH_DOMAIN")
 
 ALLOWED_HOSTS = [
@@ -38,8 +39,8 @@ ALLOWED_HOSTS.append(backend_host) if backend_host else None
 
 # Access-Control-Allow-Origin 헤더에 주소를 자동으로 추가해줌
 CORS_ALLOWED_ORIGINS = [
-    f"http://localhost:{os.environ.get('FRONTEND_PORT')}",
-    f"http://127.0.0.1:{os.environ.get('FRONTEND_PORT')}",
+    f"http://localhost:{frontend_port}",
+    f"http://127.0.0.1:{frontend_port}",
 ]
 CORS_ALLOWED_ORIGINS.append(frontend_domain) if frontend_domain else None
 
@@ -47,8 +48,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     # for frontend
-    f"http://localhost:{os.environ.get('FRONTEND_PORT')}",
-    f"http://127.0.0.1:{os.environ.get('FRONTEND_PORT')}",
+    f"http://localhost:{frontend_port}",
+    f"http://127.0.0.1:{frontend_port}",
 ]
 CSRF_TRUSTED_ORIGINS.append(frontend_domain) if frontend_domain else None
 # for admin page on the web server (not needed on localhost)
