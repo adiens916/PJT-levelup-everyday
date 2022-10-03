@@ -3,8 +3,10 @@ import { Container, Typography } from '@mui/material';
 
 import HabitItem from './HabitItem/HabitItem';
 import useHabitList from './useHabitList';
+import useDocumentTitle from '../../hook/useDocumentTitle';
 
 export default function HabitList() {
+  useDocumentTitle('습관 목록');
   const { habits, isError, errorCode } = useHabitList();
 
   const formatDateMMDD = () => {

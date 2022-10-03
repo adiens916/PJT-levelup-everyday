@@ -6,6 +6,7 @@ import { initialState } from '../HabitTimer/reducer';
 import { HabitType } from '../../api/types';
 import { createHabit } from '../../api/api';
 import { useNavigate } from 'react-router-dom';
+import useDocumentTitle from '../../hook/useDocumentTitle';
 type HabitKeyType = keyof HabitType;
 // interface HabitCreateType extends HabitType {
 //   final_goal: number | null;
@@ -19,6 +20,8 @@ const defaultState: HabitType = {
 };
 
 export default function HabitCreate() {
+  useDocumentTitle('습관 생성');
+
   const navigate = useNavigate();
   const [habit, setHabit] = useState(defaultState);
 
