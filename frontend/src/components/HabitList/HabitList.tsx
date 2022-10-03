@@ -2,11 +2,10 @@ import React from 'react';
 import { Container, Typography } from '@mui/material';
 
 import HabitItem from './HabitItem/HabitItem';
-import { getHabits } from '../../api/api';
-import { HabitType } from '../../api/types';
+import useHabitList from './useHabitList';
 
 export default function HabitList() {
-  const [habits, setHabits] = React.useState<HabitType[]>([]);
+  const { habits, isError, errorCode } = useHabitList();
 
   const formatDateMMDD = () => {
     const today = new Date();
@@ -24,10 +23,6 @@ export default function HabitList() {
         habit.is_today_due_date && habit.today_progress >= habit.today_goal,
     );
 
-  React.useEffect(() => {
-    getHabits().then((data) => setHabits(data));
-  }, []);
-
   return (
     <>
       <Container
@@ -38,6 +33,18 @@ export default function HabitList() {
         <Typography textAlign="center" fontSize="1.5rem">
           {formatDateMMDD()}
         </Typography>
+
+        {isError && errorCode === 401 ? (
+          <Typography textAlign="center" marginTop="2rem">
+            로그인을 해주세요 (・-・)
+          </Typography>
+        ) : errorCode === 403 ? (
+          <Typography textAlign="center" marginTop="2rem">
+            새로운 습관을 만들어봅시다 ٩(ˊᗜˋ*)و
+          </Typography>
+        ) : (
+          <></>
+        )}
 
         {is_exist_habit_due_date() ? (
           <>
