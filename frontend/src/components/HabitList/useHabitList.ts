@@ -18,6 +18,7 @@ export default function useHabitList() {
           default:
             break;
         }
+        setLoading(false);
       })
       .catch((err) => {
         switch (err.response.status) {
@@ -33,8 +34,8 @@ export default function useHabitList() {
             setIsError(true);
             break;
         }
+        setLoading(false);
       });
-    setLoading(false);
   }, []);
 
   return { habits, loading, isError, errorCode };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Typography } from '@mui/material';
+import { CircularProgress, Container, Typography } from '@mui/material';
 
 import HabitItem from './HabitItem/HabitItem';
 import useHabitList from './useHabitList';
@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 
 export default function HabitList() {
   useDocumentTitle('습관 목록');
-  const { habits, isError, errorCode } = useHabitList();
+  const { habits, loading, isError, errorCode } = useHabitList();
 
   const formatDateMMDD = () => {
     const today = new Date();
@@ -38,7 +38,9 @@ export default function HabitList() {
         </Typography>
 
         {/* 안내 메시지 */}
-        {errorCode === 403 || (!isError && habits.length === 0) ? (
+        {loading ? (
+          <CircularProgress sx={{ alignSelf: 'center', marginTop: '1.5rem' }} />
+        ) : errorCode === 403 || (!isError && habits.length === 0) ? (
           <Typography textAlign="center" marginTop="2rem">
             <Link to="/create">새로운 습관</Link>을 만들어봅시다 ٩(ˊᗜˋ*)و
           </Typography>
@@ -47,7 +49,11 @@ export default function HabitList() {
             <Link to="/login">로그인</Link>을 해주세요 (・-・)
           </Typography>
         ) : (
-          isError && <>서버 연결 불가 (´；ω；｀)</>
+          isError && (
+            <Typography textAlign="center" marginTop="2rem">
+              서버 연결 불가 (´；ω；｀)
+            </Typography>
+          )
         )}
 
         {is_exist_habit_due_date() ? (
