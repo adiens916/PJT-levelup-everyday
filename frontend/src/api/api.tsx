@@ -110,6 +110,10 @@ export async function createHabit(habit: HabitType) {
   return data;
 }
 
+export async function deleteHabit(habitId: number) {
+  return await requestPostByAxios(`${host}/habit/${habitId}/`);
+}
+
 export async function getRecords(habitId: number) {
   const response = await requestGetByAxios<DailyRecordResponseType[]>(
     `${host}/habit/${habitId}/record/`,

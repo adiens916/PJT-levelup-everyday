@@ -62,7 +62,7 @@ def index(request: HttpRequest):
 
 
 @csrf_exempt
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def index_each(request: HttpRequest, habit_id: int):
     if not request.user.is_authenticated:
         return Response(
@@ -70,15 +70,24 @@ def index_each(request: HttpRequest, habit_id: int):
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
-    user: User = request.user
-    habit = Habit.objects.filter(user=user.pk, pk=habit_id)
+    if request.method == "GET":
+        user: User = request.user
+        habit = Habit.objects.filter(user=user.pk, pk=habit_id)
 
-    if len(habit) and user.pk == habit[0].user.pk:
-        return json_response_wrapper(habit)
-    else:
+        if len(habit) and user.pk == habit[0].user.pk:
+            return json_response_wrapper(habit)
+        else:
+            return Response(
+                {"success": False, "detail": "Habit not owned by the user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+    else:  # request.method == 'DELETE
+        habit = Habit.objects.get(pk=habit_id)
+        habit.delete()
         return Response(
-            {"success": False, "detail": "Habit not owned by the user"},
-            status=status.HTTP_404_NOT_FOUND,
+            {"success": True, "detail": "the habit's successfully deleted"},
+            status=status.HTTP_200_OK,
         )
 
 
