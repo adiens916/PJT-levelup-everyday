@@ -2,11 +2,16 @@ import React from 'react';
 import { Container, Typography } from '@mui/material';
 
 import HabitItem from './HabitItem/HabitItem';
-import { getHabits } from '../../api/api';
-import { HabitType } from '../../api/types';
+import useHabitList from './useHabitList';
 
 export default function HabitList() {
-  const [habits, setHabits] = React.useState<HabitType[]>([]);
+  const { habits, isError, errorCode } = useHabitList();
+
+  const formatDateMMDD = () => {
+    const today = new Date();
+    const formatted = `${today.getMonth() + 1}월 ${today.getDate()}일`;
+    return formatted;
+  };
 
   const is_exist_habit_due_date = () =>
     habits.some((habit) => habit.is_today_due_date);
@@ -18,19 +23,28 @@ export default function HabitList() {
         habit.is_today_due_date && habit.today_progress >= habit.today_goal,
     );
 
-  React.useEffect(() => {
-    getHabits().then((data) => setHabits(data));
-  }, []);
-
   return (
     <>
       <Container
-        sx={{ display: 'flex', flexDirection: 'column', width: '70%' }}
+        maxWidth="sm"
+        sx={{ display: 'flex', flexDirection: 'column' }}
       >
         {/* 오늘 날짜 */}
         <Typography textAlign="center" fontSize="1.5rem">
-          {new Date().toLocaleDateString('ko')}
+          {formatDateMMDD()}
         </Typography>
+
+        {isError && errorCode === 401 ? (
+          <Typography textAlign="center" marginTop="2rem">
+            로그인을 해주세요 (・-・)
+          </Typography>
+        ) : errorCode === 403 ? (
+          <Typography textAlign="center" marginTop="2rem">
+            새로운 습관을 만들어봅시다 ٩(ˊᗜˋ*)و
+          </Typography>
+        ) : (
+          <></>
+        )}
 
         {is_exist_habit_due_date() ? (
           <>

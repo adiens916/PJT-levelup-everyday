@@ -62,15 +62,21 @@ export function getUserToken() {
 }
 
 export async function getHabits() {
-  const data = await requestGetByAxios<HabitResponseType[]>(`${host}/habit/`);
-  return extractFields(data);
+  const response = await requestGetByAxios<HabitResponseType[]>(
+    `${host}/habit/`,
+  );
+  return response;
+  // if (response.status === 200) {
+  //   return extractFields(response.data);
+  // } else {
+  // }
 }
 
 export async function getHabit(habitId: number) {
-  const data = await requestGetByAxios<HabitResponseType[]>(
+  const response = await requestGetByAxios<HabitResponseType[]>(
     `${host}/habit/${habitId}/`,
   );
-  return extractFields(data)[0];
+  return extractFields(response.data)[0];
 }
 
 export async function createHabit(habit: HabitType) {
@@ -105,10 +111,10 @@ export async function createHabit(habit: HabitType) {
 }
 
 export async function getRecords(habitId: number) {
-  const data = await requestGetByAxios<DailyRecordResponseType[]>(
+  const response = await requestGetByAxios<DailyRecordResponseType[]>(
     `${host}/habit/${habitId}/record/`,
   );
-  const records = extractRecordFields(data);
+  const records = extractRecordFields(response.data);
   return convertRecordsForChart(records);
 }
 
@@ -140,10 +146,10 @@ async function requestGetByAxios<T>(url: string) {
     },
     withCredentials: true,
   });
-  return response.data;
+  return response;
 }
 
-function extractFields(querySet: HabitResponseType[]): HabitType[] {
+export function extractFields(querySet: HabitResponseType[]): HabitType[] {
   return querySet.map((instance) => ({
     id: instance.pk,
     ...instance.fields,
