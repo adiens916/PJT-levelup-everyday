@@ -5,7 +5,9 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { ListItemIcon, ListItemText } from '@mui/material';
+import { deleteHabit } from '../../../api/api';
 
 const ITEM_HEIGHT = 48;
 
@@ -54,6 +56,27 @@ export default function HabitItemMenu({ habitId }: HabitItemMenuType) {
             <ListItemText>기록</ListItemText>
           </MenuItem>
         </Link>
+
+        <MenuItem
+          onClick={() => {
+            const isAgreed = confirm('해당 습관을 완전히 삭제하시겠습니까?');
+            if (isAgreed && habitId) {
+              deleteHabit(habitId)
+                .then(() => {
+                  alert('삭제 완료!');
+                  location.reload();
+                })
+                .catch(() => {
+                  alert('삭제 실패...');
+                });
+            }
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 0, marginRight: 1 }}>
+            <DeleteIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>삭제</ListItemText>
+        </MenuItem>
       </Menu>
     </div>
   );
