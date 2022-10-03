@@ -57,7 +57,7 @@ CSRF_TRUSTED_ORIGINS.append(backend_domain) if backend_domain else None
 
 # Cache
 # https://docs.djangoproject.com/en/4.1/topics/cache/#the-per-site-cache
-CACHE_MIDDLEWARE_SECONDS = 60
+CACHE_MIDDLEWARE_SECONDS = 0
 
 
 # Application definition
