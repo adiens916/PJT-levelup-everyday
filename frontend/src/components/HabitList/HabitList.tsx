@@ -4,6 +4,7 @@ import { Container, Typography } from '@mui/material';
 import HabitItem from './HabitItem/HabitItem';
 import useHabitList from './useHabitList';
 import useDocumentTitle from '../../hook/useDocumentTitle';
+import { Link } from 'react-router-dom';
 
 export default function HabitList() {
   useDocumentTitle('습관 목록');
@@ -36,13 +37,14 @@ export default function HabitList() {
           {formatDateMMDD()}
         </Typography>
 
-        {isError && errorCode === 401 ? (
+        {/* 안내 메시지 */}
+        {errorCode === 403 || (!isError && habits.length === 0) ? (
           <Typography textAlign="center" marginTop="2rem">
-            로그인을 해주세요 (・-・)
+            <Link to="/create">새로운 습관</Link>을 만들어봅시다 ٩(ˊᗜˋ*)و
           </Typography>
-        ) : errorCode === 403 ? (
+        ) : errorCode === 401 ? (
           <Typography textAlign="center" marginTop="2rem">
-            새로운 습관을 만들어봅시다 ٩(ˊᗜˋ*)و
+            <Link to="/login">로그인</Link>을 해주세요 (・-・)
           </Typography>
         ) : (
           isError && <>서버 연결 불가 (´；ω；｀)</>
