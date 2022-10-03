@@ -45,6 +45,7 @@ export async function logout() {
     {},
   );
   clearUserToken();
+  location.replace('/');
   return data;
 }
 
@@ -61,8 +62,6 @@ export function getUserToken() {
 }
 
 export async function getHabits() {
-  console.log(host);
-
   const response = await requestGetByAxios<HabitResponseType[]>(
     `${host}/habit/`,
   );
