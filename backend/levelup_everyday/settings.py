@@ -55,6 +55,10 @@ CSRF_TRUSTED_ORIGINS.append(frontend_domain) if frontend_domain else None
 # for admin page on the web server (not needed on localhost)
 CSRF_TRUSTED_ORIGINS.append(backend_domain) if backend_domain else None
 
+# Cache
+# https://docs.djangoproject.com/en/4.1/topics/cache/#the-per-site-cache
+CACHE_MIDDLEWARE_SECONDS = 60
+
 
 # Application definition
 
@@ -86,7 +90,9 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django.middleware.cache.FetchFromCacheMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
