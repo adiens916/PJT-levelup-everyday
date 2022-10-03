@@ -13,9 +13,8 @@ import {
 } from './types';
 
 // Set host by an environment variable.
-let host = process.env.BACKEND_WITH_DOMAIN;
+let host = process.env.REACT_APP_BACKEND_HOST;
 if (host) {
-  // Add postfix
   host += '/api';
 } else {
   host = 'http://127.0.0.1:8000/api';
@@ -62,6 +61,8 @@ export function getUserToken() {
 }
 
 export async function getHabits() {
+  console.log(host);
+
   const response = await requestGetByAxios<HabitResponseType[]>(
     `${host}/habit/`,
   );
