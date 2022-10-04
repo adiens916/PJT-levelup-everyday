@@ -48,14 +48,7 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
             if habit.is_running:
                 record = RoundRecord()
                 record.save_from_habit_running(habit)
-
-                habit.start_datetime = None
-                habit.is_running = False
-                habit.today_progress += record.progress
-
-                user: User = habit.user
-                user.is_recording = False
-                user.save()
+                habit.add_progress_and_init(record.progress, save=False)
 
             # 예정일이 아니었는데 진행한 경우, None이라 오류 남
             # => 어제로 예정일을 바꿈

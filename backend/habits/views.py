@@ -137,16 +137,8 @@ def get_daily_records(request: HttpRequest, habit_id: int):
 def start_timer(request: HttpRequest):
     if request.method == "POST":
         habit_id = request.POST.get("habit_id")
-        habit: Habit = Habit.objects.get(id=habit_id)
-
-        habit.start_datetime = timezone.now()
-        habit.is_running = True
-        habit.save()
-
-        user: User = habit.user
-        user.is_recording = True
-        user.save()
-
+        habit = Habit.objects.get(id=habit_id)
+        habit.save_start_datetime()
         return JsonResponse(
             {
                 "success": True,
@@ -168,15 +160,7 @@ def finish_timer(request: HttpRequest):
 
         record = RoundRecord()
         record.save_from_habit_finished(habit, progress)
-
-        habit.start_datetime = None
-        habit.is_running = False
-        habit.today_progress += record.progress
-        habit.save()
-
-        user: User = habit.user
-        user.is_recording = False
-        user.save()
+        habit.add_progress_and_init(record.progress)
 
         return json_response_wrapper([record])
         # return JsonResponse({

@@ -59,6 +59,26 @@ class Habit(models.Model):
             self.growth_amount = int((self.today_goal - self.final_goal) * 0.01)
         self.save()
 
+    def save_start_datetime(self):
+        self.start_datetime = timezone.now()
+        self.is_running = True
+        self.save()
+
+        user: User = self.user
+        user.is_recording = True
+        user.save()
+
+    def add_progress_and_init(self, progress: int, save=True):
+        self.start_datetime = None
+        self.is_running = False
+        self.today_progress += progress
+        if save:
+            self.save()
+
+        user: User = self.user
+        user.is_recording = False
+        user.save()
+
     def is_owned_by_user(self, given_user: User):
         return self.user.pk == given_user.pk
 
