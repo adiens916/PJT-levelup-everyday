@@ -8,10 +8,11 @@ import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ListItemIcon, ListItemText } from '@mui/material';
 import { deleteHabit } from '../../../api/api';
+import { HabitType } from '../../../api/types';
 
 const ITEM_HEIGHT = 48;
 
-export default function HabitItemMenu({ habitId }: HabitItemMenuType) {
+export default function HabitItemMenu({ habit }: HabitItemMenuType) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -48,7 +49,7 @@ export default function HabitItemMenu({ habitId }: HabitItemMenuType) {
           },
         }}
       >
-        <Link to={`/record/${habitId}`} style={{ textDecoration: 'none' }}>
+        <Link to={`/record/${habit.id}`} style={{ textDecoration: 'none' }}>
           <MenuItem onClick={handleClose}>
             <ListItemIcon sx={{ minWidth: 0, marginRight: 1 }}>
               <AutoGraphIcon fontSize="small" />
@@ -60,8 +61,8 @@ export default function HabitItemMenu({ habitId }: HabitItemMenuType) {
         <MenuItem
           onClick={() => {
             const isAgreed = confirm('해당 습관을 완전히 삭제하시겠습니까?');
-            if (isAgreed && habitId) {
-              deleteHabit(habitId)
+            if (isAgreed && habit.id) {
+              deleteHabit(habit.id)
                 .then(() => {
                   alert('삭제 완료!');
                   location.reload();
@@ -83,5 +84,5 @@ export default function HabitItemMenu({ habitId }: HabitItemMenuType) {
 }
 
 interface HabitItemMenuType {
-  habitId: number | undefined;
+  habit: HabitType;
 }

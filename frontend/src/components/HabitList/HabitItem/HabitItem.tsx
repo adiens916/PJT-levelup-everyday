@@ -48,7 +48,7 @@ export default function HabitItem(props: HabitItemType) {
           {ratio}%
         </Typography>
       </Button>
-      <HabitItemMenu habitId={props.habit.id} />
+      <HabitItemMenu habit={props.habit} />
     </Box>
   );
 }
