@@ -6,8 +6,9 @@ import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import DeleteIcon from '@mui/icons-material/Delete';
+import LowPriorityIcon from '@mui/icons-material/LowPriority';
 import { ListItemIcon, ListItemText } from '@mui/material';
-import { deleteHabit } from '../../../api/api';
+import { deleteHabit, updateImportance } from '../../../api/api';
 import { HabitType } from '../../../api/types';
 
 const ITEM_HEIGHT = 48;
@@ -57,6 +58,29 @@ export default function HabitItemMenu({ habit }: HabitItemMenuType) {
             <ListItemText>기록</ListItemText>
           </MenuItem>
         </Link>
+
+        <MenuItem
+          onClick={() => {
+            const importance = prompt(
+              `중요도에 따라 내림차순으로 정렬합니다. \n\n중요도를 설정해주세요.\n-범위   : 1 ~ 10000 (기본값: 100)\n-현재   : ${habit.importance}`,
+            );
+            if (importance && habit.id) {
+              updateImportance(habit.id, Number(importance))
+                .then(() => {
+                  alert('설정 완료!');
+                  location.reload();
+                })
+                .catch(() => {
+                  alert('설정 실패...');
+                });
+            }
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 0, marginRight: 1 }}>
+            <LowPriorityIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>중요도</ListItemText>
+        </MenuItem>
 
         <MenuItem
           onClick={() => {
