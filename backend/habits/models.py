@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.core.validators import MaxValueValidator
 from account.models import User
 
 ESTIMATE_TYPE_CHOICES = [("TIME", "TIME"), ("COUNT", "COUNT")]
@@ -16,6 +17,9 @@ class Habit(models.Model):
     final_goal = models.PositiveIntegerField()
     growth_type = models.CharField(max_length=10, choices=GROWTH_TYPE_CHOICES)
     day_cycle = models.PositiveSmallIntegerField(default=0)
+    importance = models.PositiveSmallIntegerField(
+        default=100, validators=[MaxValueValidator(10000)]
+    )
 
     today_goal = models.PositiveIntegerField(default=0)
     today_progress = models.PositiveIntegerField(default=0)
