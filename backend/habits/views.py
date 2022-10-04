@@ -84,6 +84,12 @@ def index_each(request: HttpRequest, habit_id: int):
 
     else:  # request.method == 'DELETE
         habit = Habit.objects.get(pk=habit_id)
+        if not habit.is_owned_by_user(request.user):
+            return Response(
+                {"success": False, "detail": "Habit not owned by the user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
         habit.delete()
         return Response(
             {"success": True, "detail": "the habit's successfully deleted"},
