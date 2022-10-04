@@ -114,6 +114,12 @@ export async function deleteHabit(habitId: number) {
   return await requestPostByAxios(`${host}/habit/${habitId}/`);
 }
 
+export async function updateImportance(habitId: number, importance: number) {
+  return await requestPostByAxios(`${host}/habit/${habitId}/importance`, {
+    importance,
+  });
+}
+
 export async function getRecords(habitId: number) {
   const response = await requestGetByAxios<DailyRecordResponseType[]>(
     `${host}/habit/${habitId}/record/`,
