@@ -32,7 +32,7 @@ def index(request: HttpRequest):
 
     if request.method == "GET":
         user: User = request.user
-        habit_list = Habit.objects.filter(user=user.pk)
+        habit_list = Habit.objects.filter(user=user.pk).order_by("-importance")
         if is_day_changed_for_user(user):
             print("day changed")
             if user.next_reset_date:
