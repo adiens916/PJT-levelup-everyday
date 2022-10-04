@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button, Stack, Typography } from '@mui/material';
 
 import { HabitType } from '../../../api/types';
-import { ratio as getRatio } from '../../../utils/utils';
+import { ratio as getRatio, getTimeWithUnit } from '../../../utils/utils';
 import HabitItemMenu from '../HabitItemMenu/HabitItemMenu';
 
 export default function HabitItem(props: HabitItemType) {
@@ -11,7 +11,18 @@ export default function HabitItem(props: HabitItemType) {
   const level = Math.floor(
     (props.habit.today_goal / props.habit.final_goal) * 100,
   );
-  const ratio = getRatio(props.habit.today_progress, props.habit.today_goal);
+
+  const ratio = getRatio(
+    props.habit.today_progress + props.habit.temporary_progress,
+    props.habit.today_goal,
+  );
+  const getGoalWithUnit = () => {
+    if (props.habit.estimate_type === 'TIME') {
+      return getTimeWithUnit(props.habit.today_goal);
+    } else {
+      return `${props.habit.today_goal}${props.habit.estimate_unit}`;
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -43,10 +54,15 @@ export default function HabitItem(props: HabitItemType) {
           </Typography>
         </Stack>
 
-        {/* 현재 달성률 */}
+        {/* 현재 목표 */}
         <Typography color={ratio >= 100 ? 'yellow' : 'aquamarine'} variant="h5">
-          {ratio}%
+          {getGoalWithUnit()}
         </Typography>
+
+        {/* 현재 달성률 */}
+        {/* <Typography color={ratio >= 100 ? 'yellow' : 'aquamarine'} variant="h5">
+          {ratio}%
+        </Typography> */}
       </Button>
       <HabitItemMenu habit={props.habit} />
     </Box>
