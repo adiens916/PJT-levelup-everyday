@@ -33,6 +33,7 @@ export interface HabitType {
   final_goal: number;
   growth_amount: number;
   growth_type: 'INCREASE' | 'DECREASE';
+  importance: number;
 
   day_cycle: number;
   due_date: string | null;
