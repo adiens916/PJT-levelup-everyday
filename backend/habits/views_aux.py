@@ -1,6 +1,5 @@
 import json
-from datetime import datetime, time, timedelta
-import re
+from datetime import datetime, timedelta
 from typing import Iterable
 
 from django.core import serializers
@@ -27,11 +26,6 @@ def is_due_today_for_habit(habit: Habit):
     return is_due_today(habit.due_date, user.daily_reset_time, datetime.now())
 
 
-def get_reset_datetime(user: User):
-    reset_datetime = datetime.combine(user.next_reset_date, user.daily_reset_time)
-    return reset_datetime
-
-
 def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
     """
     오늘이 예정일인 경우,
@@ -39,8 +33,7 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
     오늘 목표를 조정한다.
     """
 
-    reset_datetime = get_reset_datetime(user)
-    yesterday = reset_datetime.date() - timedelta(days=1)
+    yesterday = user.get_reset_datetime().date() - timedelta(days=1)
 
     for habit in habit_list:
         if habit.is_today_due_date or habit.today_progress > 0 or habit.is_running:

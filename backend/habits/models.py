@@ -1,10 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator
 from django.http import HttpRequest
 from django.utils import timezone
-from habits.views_aux import get_reset_datetime
 from account.models import User
 
 ESTIMATE_TYPE_CHOICES = [("TIME", "TIME"), ("COUNT", "COUNT")]
@@ -107,7 +106,8 @@ class RoundRecord(models.Model):
         self.habit = habit
         self.start_datetime = habit.start_datetime
 
-        reset_datetime = get_reset_datetime(self.habit.user)
+        user: User = self.habit.user
+        reset_datetime = user.get_reset_datetime()
         self.end_datetime = reset_datetime - timedelta(minutes=1)
 
         # TIME 유형인 경우, 현재 시각을 끝으로 진행도 결정
