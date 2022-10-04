@@ -41,23 +41,12 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
                 record.save_from_habit_running(habit)
                 habit.add_progress_and_init(record.progress, save=False)
 
-            # 예정일이 아니었는데 진행한 경우, None이라 오류 남
-            # => 어제로 예정일을 바꿈
-            habit.due_date = user.get_yesterday()
-
             # 어제 기록 저장
             daily_record = DailyRecord()
             daily_record.save_from_habit(habit)
 
-            # 오늘 기록 갱신
-            if daily_record.success:
-                habit.today_goal += habit.growth_amount
-            else:
-                habit.today_goal -= habit.growth_amount
-            habit.today_progress = 0
-            # 성공했을 때만 다음 날짜 예약
-            if daily_record.success:
-                habit.due_date += timedelta(days=habit.day_cycle)
+            # 어제 기록에 따라 목표 조정
+            habit.adjust_goal_and_due_date_by_success(daily_record.success)
 
         # 오늘 해야 하는지
         habit.is_today_due_date = is_due_today_for_habit(habit)

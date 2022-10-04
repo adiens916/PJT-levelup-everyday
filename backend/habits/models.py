@@ -78,6 +78,24 @@ class Habit(models.Model):
         user.is_recording = False
         user.save()
 
+    def adjust_goal_and_due_date_by_success(self, success: bool):
+        if self.growth_type == "INCREASE":
+            growth_amount = self.growth_amount
+        elif self.growth_type == "DECREASE":
+            growth_amount = -self.growth_amount
+
+        if success:
+            self.today_goal += growth_amount
+        else:
+            self.today_goal -= growth_amount
+
+        self.today_progress = 0
+
+        # 예정일이 아니었는데 진행한 경우, 원래는 None이라 오류 남
+        # => 어제로 예정일을 바꿈
+        self.due_date = self.user.get_yesterday()
+        self.due_date += timedelta(days=self.day_cycle)
+
     def is_owned_by_user(self, given_user: User):
         return self.user.pk == given_user.pk
 
