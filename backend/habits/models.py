@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator
+from django.http import HttpRequest
 from account.models import User
 
 ESTIMATE_TYPE_CHOICES = [("TIME", "TIME"), ("COUNT", "COUNT")]
@@ -35,6 +36,25 @@ class Habit(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    def save_from_request(self, request: HttpRequest):
+        self.user = request.user
+        self.name = request.POST.get("name")
+
+        self.estimate_type = request.POST.get("estimate_type")
+        self.estimate_unit = request.POST.get("estimate_unit")
+        self.final_goal = int(request.POST.get("final_goal"))
+        self.growth_type = request.POST.get("growth_type")
+        self.day_cycle = int(request.POST.get("day_cycle"))
+
+        # 임시로 초기 목표 & 증감량 설정
+        if self.growth_type == "INCREASE":
+            self.today_goal = int(self.final_goal * 0.01)
+            self.growth_amount = int(self.final_goal * 0.01)
+        elif self.growth_type == "DECREASE":
+            self.today_goal = int(request.POST.get("today_goal"))
+            self.growth_amount = int((self.today_goal - self.final_goal) * 0.01)
+        self.save()
 
     def is_owned_by_user(self, given_user: User):
         return self.user.pk == given_user.pk

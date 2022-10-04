@@ -44,20 +44,7 @@ def index(request: HttpRequest):
 
     elif request.method == "POST":
         habit = Habit()
-
-        habit.user = request.user
-        habit.name = request.POST.get("name")
-        habit.estimate_type = request.POST.get("estimate_type")
-        habit.estimate_unit = request.POST.get("estimate_unit")
-        habit.final_goal = int(request.POST.get("final_goal"))
-        habit.growth_type = request.POST.get("growth_type")
-        habit.day_cycle = int(request.POST.get("day_cycle"))
-
-        # 임시로 초기 목표 & 증감량 설정
-        habit.today_goal = int(habit.final_goal * 0.01)
-        habit.growth_amount = int(habit.final_goal * 0.01)
-
-        habit.save()
+        habit.save_from_request(request)
         return JsonResponse({"id": habit.pk})
 
 
