@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button, Stack, Typography } from '@mui/material';
 
 import { HabitType } from '../../../api/types';
-import { ratio as getRatio, getTimeWithUnit } from '../../../utils/utils';
+import { ratio as getRatio, getValueWithUnit } from '../../../utils/utils';
 import HabitItemMenu from '../HabitItemMenu/HabitItemMenu';
 
 export default function HabitItem(props: HabitItemType) {
@@ -16,13 +16,7 @@ export default function HabitItem(props: HabitItemType) {
     props.habit.today_progress + props.habit.temporary_progress,
     props.habit.today_goal,
   );
-  const getGoalWithUnit = () => {
-    if (props.habit.estimate_type === 'TIME') {
-      return getTimeWithUnit(props.habit.today_goal);
-    } else {
-      return `${props.habit.today_goal}${props.habit.estimate_unit}`;
-    }
-  };
+  const goalWithUnit = getValueWithUnit(props.habit, props.habit.today_goal);
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -56,7 +50,7 @@ export default function HabitItem(props: HabitItemType) {
 
         {/* 현재 목표 */}
         <Typography color={ratio >= 100 ? 'yellow' : 'aquamarine'} variant="h5">
-          {getGoalWithUnit()}
+          {goalWithUnit}
         </Typography>
 
         {/* 현재 달성률 */}

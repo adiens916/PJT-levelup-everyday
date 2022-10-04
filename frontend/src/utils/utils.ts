@@ -1,8 +1,18 @@
+import { HabitType } from '../api/types';
+
 export function ratio(numerator: number, denominator: number): number {
   if (denominator !== 0) {
     return Math.floor((numerator / denominator) * 100);
   } else {
     return 0;
+  }
+}
+
+export function getValueWithUnit(habit: HabitType, value: number) {
+  if (habit.estimate_type === 'TIME') {
+    return getTimeWithUnit(value);
+  } else {
+    return `${value}${habit.estimate_unit}`;
   }
 }
 
