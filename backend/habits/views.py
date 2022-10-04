@@ -92,6 +92,30 @@ def index_each(request: HttpRequest, habit_id: int):
 
 
 @csrf_exempt
+@api_view(["POST"])
+def update_importance(request: HttpRequest, habit_id: int):
+    if not request.user.is_authenticated:
+        return Response(
+            {"success": False, "detail": "User not authenticated"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    habit = Habit.objects.get(pk=habit_id)
+    if not habit.is_owned_by_user(request.user):
+        return Response(
+            {"success": False, "detail": "Habit not owned by the user"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    habit.importance = request.POST.get("importance")
+    habit.save()
+    return Response(
+        {"success": True, "detail": "Updated successfully"},
+        status=status.HTTP_200_OK,
+    )
+
+
+@csrf_exempt
 @api_view(["GET"])
 def get_daily_records(request: HttpRequest, habit_id: int):
     if not request.user.is_authenticated:
