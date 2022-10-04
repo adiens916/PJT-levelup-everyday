@@ -12,11 +12,21 @@ export default function HabitItem(props: HabitItemType) {
     (props.habit.today_goal / props.habit.final_goal) * 100,
   );
 
-  const ratio = getRatio(
-    props.habit.today_progress + props.habit.temporary_progress,
-    props.habit.today_goal,
-  );
+  const currentProgress =
+    props.habit.today_progress + props.habit.temporary_progress;
+  const ratio = getRatio(currentProgress, props.habit.today_goal);
   const goalWithUnit = getValueWithUnit(props.habit, props.habit.today_goal);
+  const progressRemainingWithUnit = () => {
+    if (currentProgress === 0 || ratio >= 100) {
+      return '';
+    } else {
+      const remains = getValueWithUnit(
+        props.habit,
+        props.habit.today_goal - currentProgress,
+      );
+      return ` (${remains} 남음)`;
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -51,6 +61,7 @@ export default function HabitItem(props: HabitItemType) {
         {/* 현재 목표 */}
         <Typography color={ratio >= 100 ? 'yellow' : 'aquamarine'} variant="h5">
           {goalWithUnit}
+          {progressRemainingWithUnit()}
         </Typography>
 
         {/* 현재 달성률 */}
