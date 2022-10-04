@@ -37,7 +37,7 @@ def index(request: HttpRequest):
 
     elif request.method == "POST":
         habit = Habit()
-        habit.save_from_request(request)
+        habit.create_from_request(request)
         return JsonResponse({"id": habit.pk})
 
 
@@ -148,7 +148,7 @@ def finish_timer(request: HttpRequest):
     progress = int(request.POST.get("progress"))
 
     record = RoundRecord()
-    record.save_from_habit_finished(habit, progress)
+    record.create_from_habit_finished(habit, progress)
     habit.add_progress_and_init(record.progress)
 
     return json_response_wrapper([record])

@@ -39,7 +39,7 @@ class Habit(models.Model):
     def __str__(self) -> str:
         return self.name
 
-    def save_from_request(self, request: HttpRequest):
+    def create_from_request(self, request: HttpRequest):
         self.user = request.user
         self.name = request.POST.get("name")
 
@@ -84,7 +84,7 @@ class Habit(models.Model):
     def save_round_record_if_running(self):
         if self.is_running:
             round_record = RoundRecord()
-            round_record.save_from_habit_running(self)
+            round_record.create_from_habit_running(self)
             self.add_progress_and_init(round_record.progress, save=False)
 
     def adjust_goal_and_due_date_by_success(self, success: bool):
@@ -127,14 +127,14 @@ class Habit(models.Model):
             # 밀린 게 쌓였을 수 있으므로, 부담을 줄이기 위해 예정에서 빼놓기
             return False
 
-    def is_owned_by_user(self, given_user: User):
-        return self.user.pk == given_user.pk
-
     def is_today_successful(self) -> bool:
         if self.growth_type == "INCREASE":
             return self.today_goal <= self.today_progress
         elif self.growth_type == "DECREASE":
             return self.today_goal >= self.today_progress
+
+    def is_owned_by_user(self, given_user: User):
+        return self.user.pk == given_user.pk
 
 
 class RoundRecord(models.Model):
@@ -143,7 +143,7 @@ class RoundRecord(models.Model):
     end_datetime = models.DateTimeField()
     progress = models.PositiveIntegerField()
 
-    def save_from_habit_finished(self, habit: Habit, progress: int | float):
+    def create_from_habit_finished(self, habit: Habit, progress: int | float):
         self.habit = habit
         self.start_datetime = habit.start_datetime
 
@@ -151,7 +151,7 @@ class RoundRecord(models.Model):
         self.progress = int(progress)
         self.save()
 
-    def save_from_habit_running(self, habit: Habit):
+    def create_from_habit_running(self, habit: Habit):
         self.habit = habit
         self.start_datetime = habit.start_datetime
 
@@ -176,7 +176,7 @@ class DailyRecord(models.Model):
     progress = models.PositiveIntegerField()
     excess = models.PositiveIntegerField()
 
-    def save_from_habit(self, habit: Habit):
+    def create_from_habit(self, habit: Habit):
         user: User = habit.user
 
         self.habit = habit

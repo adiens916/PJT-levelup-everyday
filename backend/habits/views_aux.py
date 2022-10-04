@@ -28,7 +28,7 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
 
             # 어제 기록 저장
             daily_record = DailyRecord()
-            daily_record.save_from_habit(habit)
+            daily_record.create_from_habit(habit)
 
             # 어제 기록에 따라 목표 조정
             habit.adjust_goal_and_due_date_by_success(daily_record.success)
