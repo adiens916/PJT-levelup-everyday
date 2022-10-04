@@ -1,5 +1,4 @@
 import json
-from datetime import datetime, timedelta
 from typing import Iterable
 
 from django.core import serializers
@@ -7,23 +6,13 @@ from django.db.models import Model
 from django.http import JsonResponse
 
 from account.models import User
-from .models import DailyRecord, Habit, RoundRecord
-from .tests import is_day_changed, is_due_today
+from .models import DailyRecord, Habit
 
 
 def json_response_wrapper(queryset: Iterable[Model]):
     queryset_json = serializers.serialize("json", queryset, ensure_ascii=False)
     queryset_dict = json.loads(queryset_json)
     return JsonResponse(queryset_dict, safe=False)
-
-
-def is_day_changed_for_user(user: User):
-    return is_day_changed(user.next_reset_date, user.daily_reset_time, datetime.now())
-
-
-def is_due_today_for_habit(habit: Habit):
-    user: User = habit.user
-    return is_due_today(habit.due_date, user.daily_reset_time, datetime.now())
 
 
 def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):

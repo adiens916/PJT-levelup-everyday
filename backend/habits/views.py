@@ -1,15 +1,9 @@
 from datetime import date, timedelta
 from typing import Iterable
 
-from django.http import (
-    JsonResponse,
-    HttpRequest,
-    HttpResponse,
-)
+from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-from django.utils import timezone
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -17,7 +11,6 @@ from account.models import User
 from .models import DailyRecord, Habit, RoundRecord
 from .views_aux import (
     json_response_wrapper,
-    is_day_changed_for_user,
     update_goals_and_due_dates,
 )
 
@@ -135,36 +128,27 @@ def get_daily_records(request: HttpRequest, habit_id: int):
 @csrf_exempt
 @api_view(["POST"])
 def start_timer(request: HttpRequest):
-    if request.method == "POST":
-        habit_id = request.POST.get("habit_id")
-        habit = Habit.objects.get(id=habit_id)
-        habit.save_start_datetime()
-        return JsonResponse(
-            {
-                "success": True,
-                "start_date": habit.start_datetime,
-                "is_running": habit.is_running,
-            }
-        )
-    else:
-        return JsonResponse({"success": False, "error": "POST method only allowed"})
+    habit_id = request.POST.get("habit_id")
+    habit = Habit.objects.get(id=habit_id)
+    habit.save_start_datetime()
+    return JsonResponse(
+        {
+            "success": True,
+            "start_date": habit.start_datetime,
+            "is_running": habit.is_running,
+        }
+    )
 
 
 @csrf_exempt
 @api_view(["POST"])
 def finish_timer(request: HttpRequest):
-    if request.method == "POST":
-        habit_id = request.POST.get("habit_id")
-        habit: Habit = Habit.objects.get(id=habit_id)
-        progress = int(request.POST.get("progress"))
+    habit_id = request.POST.get("habit_id")
+    habit: Habit = Habit.objects.get(id=habit_id)
+    progress = int(request.POST.get("progress"))
 
-        record = RoundRecord()
-        record.save_from_habit_finished(habit, progress)
-        habit.add_progress_and_init(record.progress)
+    record = RoundRecord()
+    record.save_from_habit_finished(habit, progress)
+    habit.add_progress_and_init(record.progress)
 
-        return json_response_wrapper([record])
-        # return JsonResponse({
-        #     'success': True,
-        #     'start_date': habit.start_date,
-        #     'is_running': habit.is_running
-        # })
+    return json_response_wrapper([record])
