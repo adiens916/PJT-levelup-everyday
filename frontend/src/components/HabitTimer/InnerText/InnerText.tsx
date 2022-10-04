@@ -10,7 +10,7 @@ export default function InnerText(props: InnerTextType) {
       </Typography>
       <Stack direction="row" alignItems="center">
         <Typography variant="h5" color="text.secondary">
-          {`${Math.round(props.progress)}초`}
+          {props.progress}
         </Typography>
         <IconButton>
           <EditIcon />
@@ -22,5 +22,5 @@ export default function InnerText(props: InnerTextType) {
 
 interface InnerTextType {
   ratio: number;
-  progress: number;
+  progress: string;
 }
