@@ -5,3 +5,16 @@ export function ratio(numerator: number, denominator: number): number {
     return 0;
   }
 }
+
+export function getTimeWithUnit(seconds: number): string {
+  if (seconds < 60) {
+    return `${seconds}초`;
+  } else if (seconds < 3600) {
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes}분 ${seconds % 60}초`;
+  } else {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor(seconds / 60);
+    return `${hours}시간 ${minutes}분 ${seconds % 60}초`;
+  }
+}
