@@ -4,7 +4,7 @@ import { Box, CircularProgress, Typography } from '@mui/material';
 
 import useTimer from './useTimer';
 import CircularProgressWithLabel from './CircularProgress/CircularProgress';
-import { ratio } from '../../utils/utils';
+import { getValueWithUnit, ratio } from '../../utils/utils';
 import useDocumentTitle from '../../hook/useDocumentTitle';
 
 export default function HabitTimer() {
@@ -13,6 +13,8 @@ export default function HabitTimer() {
   const { id: habitId } = useParams();
   const { habit, StartStopButton } = useTimer(Number(habitId));
 
+  const currentProgress = habit.today_progress + habit.temporary_progress;
+
   return (
     <>
       <Typography fontSize="2rem" textAlign="center" marginY={7}>
@@ -20,11 +22,8 @@ export default function HabitTimer() {
       </Typography>
       <Box display="flex" justifyContent="center">
         <CircularProgressWithLabel
-          value={ratio(
-            habit.today_progress + habit.temporary_progress,
-            habit.today_goal,
-          )}
-          progress={habit.today_progress + habit.temporary_progress}
+          value={ratio(currentProgress, habit.today_goal)}
+          progress={getValueWithUnit(habit, currentProgress)}
         />
       </Box>
       <StartStopButton
