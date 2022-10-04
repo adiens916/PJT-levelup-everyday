@@ -34,12 +34,8 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
     """
 
     for habit in habit_list:
-        if habit.is_today_due_date or habit.today_progress > 0 or habit.is_running:
-            # 측정 중인 경우 측정 종료
-            if habit.is_running:
-                record = RoundRecord()
-                record.save_from_habit_running(habit)
-                habit.add_progress_and_init(record.progress, save=False)
+        if habit.is_due_or_done():
+            habit.save_round_record_if_running()
 
             # 어제 기록 저장
             daily_record = DailyRecord()
@@ -49,7 +45,7 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
             habit.adjust_goal_and_due_date_by_success(daily_record.success)
 
         # 오늘 해야 하는지
-        habit.is_today_due_date = is_due_today_for_habit(habit)
+        habit.set_is_today_due_date()
         habit.save()
 
     # Habit.objects.bulk_update(habit_list, [''])
