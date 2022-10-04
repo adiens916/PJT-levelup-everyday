@@ -33,8 +33,6 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
     오늘 목표를 조정한다.
     """
 
-    yesterday = user.get_reset_datetime().date() - timedelta(days=1)
-
     for habit in habit_list:
         if habit.is_today_due_date or habit.today_progress > 0 or habit.is_running:
             # 측정 중인 경우 측정 종료
@@ -45,7 +43,7 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
 
             # 예정일이 아니었는데 진행한 경우, None이라 오류 남
             # => 어제로 예정일을 바꿈
-            habit.due_date = yesterday
+            habit.due_date = user.get_yesterday()
 
             # 어제 기록 저장
             daily_record = DailyRecord()

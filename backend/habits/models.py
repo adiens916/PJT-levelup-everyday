@@ -128,8 +128,10 @@ class DailyRecord(models.Model):
     excess = models.PositiveIntegerField()
 
     def save_from_habit(self, habit: Habit):
+        user: User = habit.user
+
         self.habit = habit
-        self.date = habit.due_date
+        self.date = user.get_yesterday()
         self.success = habit.is_today_successful()
         if self.success:
             self.goal = habit.today_goal
