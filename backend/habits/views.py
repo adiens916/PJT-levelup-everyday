@@ -164,13 +164,10 @@ def finish_timer(request: HttpRequest):
     if request.method == "POST":
         habit_id = request.POST.get("habit_id")
         habit: Habit = Habit.objects.get(id=habit_id)
+        progress = int(request.POST.get("progress"))
 
         record = RoundRecord()
-        record.habit = habit
-        record.start_datetime = habit.start_datetime
-        record.end_datetime = timezone.now()
-        record.progress = int(request.POST.get("progress"))
-        record.save()
+        record.save_from_habit_finished(habit, progress)
 
         habit.start_datetime = None
         habit.is_running = False

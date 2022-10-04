@@ -47,17 +47,7 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
             # 측정 중인 경우 측정 종료
             if habit.is_running:
                 record = RoundRecord()
-                record.habit = habit
-                record.start_datetime: datetime = habit.start_datetime
-                record.end_datetime = reset_datetime - timedelta(minutes=1)
-                # TIME 유형인 경우, 현재 시각을 끝으로 진행도 결정
-                if habit.estimate_type == "TIME":
-                    record.progress = int(
-                        (record.end_datetime - record.start_datetime).total_seconds()
-                    )
-                else:
-                    record.progress = habit.temporary_progress
-                record.save()
+                record.save_from_habit_running(habit)
 
                 habit.start_datetime = None
                 habit.is_running = False

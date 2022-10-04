@@ -1,7 +1,10 @@
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator
 from django.http import HttpRequest
+from django.utils import timezone
+from habits.views_aux import get_reset_datetime
 from account.models import User
 
 ESTIMATE_TYPE_CHOICES = [("TIME", "TIME"), ("COUNT", "COUNT")]
@@ -71,6 +74,29 @@ class RoundRecord(models.Model):
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
     progress = models.PositiveIntegerField()
+
+    def save_from_habit_finished(self, habit: Habit, progress: int | float):
+        self.habit = habit
+        self.start_datetime = habit.start_datetime
+
+        self.end_datetime = timezone.now()
+        self.progress = int(progress)
+        self.save()
+
+    def save_from_habit_running(self, habit: Habit):
+        self.habit = habit
+        self.start_datetime = habit.start_datetime
+
+        reset_datetime = get_reset_datetime(self.habit.user)
+        self.end_datetime = reset_datetime - timedelta(minutes=1)
+
+        # TIME 유형인 경우, 현재 시각을 끝으로 진행도 결정
+        if habit.estimate_type == "TIME":
+            diff: timedelta = self.end_datetime - self.start_datetime
+            self.progress = int(diff.total_seconds())
+        elif habit.estimate_type == "COUNT":
+            self.progress = habit.temporary_progress
+        self.save()
 
 
 class DailyRecord(models.Model):
