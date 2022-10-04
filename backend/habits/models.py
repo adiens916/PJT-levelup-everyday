@@ -54,7 +54,7 @@ class Habit(models.Model):
             self.today_goal = int(self.final_goal * 0.01)
             self.growth_amount = int(self.final_goal * 0.01)
         elif self.growth_type == "DECREASE":
-            self.today_goal = int(request.POST.get("today_goal"))
+            self.today_goal = int(self.final_goal * 10)
             self.growth_amount = int((self.today_goal - self.final_goal) * 0.01)
         self.save()
 
