@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -127,12 +127,12 @@ AUTH_USER_MODEL = "account.User"
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ["DJANGO_DB_ENGINE"],
-        "NAME": os.environ["DJANGO_DB_NAME"],
-        "USER": os.environ["DJANGO_DB_USER"],
-        "PASSWORD": os.environ["DJANGO_DB_PASSWORD"],
-        "HOST": os.environ["DJANGO_DB_HOST"],
-        "PORT": os.environ["DJANGO_DB_PORT"],
+        "ENGINE": os.environ.get("DJANGO_DB_ENGINE"),
+        "NAME": os.environ.get("DJANGO_DB_NAME"),
+        "USER": os.environ.get("DJANGO_DB_USER"),
+        "PASSWORD": os.environ.get("DJANGO_DB_PASSWORD"),
+        "HOST": os.environ.get("DJANGO_DB_HOST"),
+        "PORT": os.environ.get("DJANGO_DB_PORT"),
     }
 }
 
