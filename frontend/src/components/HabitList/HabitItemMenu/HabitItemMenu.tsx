@@ -6,12 +6,14 @@ import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import DeleteIcon from '@mui/icons-material/Delete';
+import LowPriorityIcon from '@mui/icons-material/LowPriority';
 import { ListItemIcon, ListItemText } from '@mui/material';
-import { deleteHabit } from '../../../api/api';
+import { deleteHabit, updateImportance } from '../../../api/api';
+import { HabitType } from '../../../api/types';
 
 const ITEM_HEIGHT = 48;
 
-export default function HabitItemMenu({ habitId }: HabitItemMenuType) {
+export default function HabitItemMenu({ habit }: HabitItemMenuType) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -48,7 +50,7 @@ export default function HabitItemMenu({ habitId }: HabitItemMenuType) {
           },
         }}
       >
-        <Link to={`/record/${habitId}`} style={{ textDecoration: 'none' }}>
+        <Link to={`/record/${habit.id}`} style={{ textDecoration: 'none' }}>
           <MenuItem onClick={handleClose}>
             <ListItemIcon sx={{ minWidth: 0, marginRight: 1 }}>
               <AutoGraphIcon fontSize="small" />
@@ -59,9 +61,32 @@ export default function HabitItemMenu({ habitId }: HabitItemMenuType) {
 
         <MenuItem
           onClick={() => {
+            const importance = prompt(
+              `중요도에 따라 내림차순으로 정렬합니다. \n\n중요도를 설정해주세요.\n-범위   : 1 ~ 10000 (기본값: 100)\n-현재   : ${habit.importance}`,
+            );
+            if (importance && habit.id) {
+              updateImportance(habit.id, Number(importance))
+                .then(() => {
+                  alert('설정 완료!');
+                  location.reload();
+                })
+                .catch(() => {
+                  alert('설정 실패...');
+                });
+            }
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 0, marginRight: 1 }}>
+            <LowPriorityIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>중요도</ListItemText>
+        </MenuItem>
+
+        <MenuItem
+          onClick={() => {
             const isAgreed = confirm('해당 습관을 완전히 삭제하시겠습니까?');
-            if (isAgreed && habitId) {
-              deleteHabit(habitId)
+            if (isAgreed && habit.id) {
+              deleteHabit(habit.id)
                 .then(() => {
                   alert('삭제 완료!');
                   location.reload();
@@ -83,5 +108,5 @@ export default function HabitItemMenu({ habitId }: HabitItemMenuType) {
 }
 
 interface HabitItemMenuType {
-  habitId: number | undefined;
+  habit: HabitType;
 }

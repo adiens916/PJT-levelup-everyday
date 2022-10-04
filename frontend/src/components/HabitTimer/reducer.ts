@@ -10,6 +10,7 @@ export const initialState: HabitType = {
   growth_amount: 0,
   growth_type: 'INCREASE',
   day_cycle: 0,
+  importance: 0,
 
   due_date: null,
   is_today_due_date: false,
