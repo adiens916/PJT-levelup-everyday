@@ -33,7 +33,7 @@ def index(request: HttpRequest):
     if request.method == "GET":
         user: User = request.user
         habit_list = Habit.objects.filter(user=user.pk).order_by("-importance")
-        if is_day_changed_for_user(user):
+        if user.is_day_changed():
             print("day changed")
             if user.next_reset_date:
                 # TODO: 자정 후에 미리 다음 날로 넘어가는 기능 추가하기

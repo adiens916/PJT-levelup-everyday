@@ -8,6 +8,12 @@ class User(AbstractUser):
     daily_reset_time = models.TimeField(default=time(hour=0, minute=0))
     is_recording = models.BooleanField(default=False)
 
+    def is_day_changed(self):
+        if self.next_reset_date == None:
+            return True
+
+        return self.get_reset_datetime() <= datetime.now()
+
     def get_yesterday(self):
         return self.get_reset_datetime().date() - timedelta(days=1)
 
