@@ -182,15 +182,30 @@ class DailyRecord(models.Model):
         self.habit = habit
         self.date = user.get_yesterday()
         self.success = habit.is_today_successful()
-        if self.success:
-            self.goal = habit.today_goal
-            self.progress = habit.today_goal
-            self.excess = habit.today_progress
-        else:
-            self.goal = habit.today_goal
-            self.progress = habit.today_progress
-            self.excess = 0
+        self.set_record_by_success_and_growth_type(habit)
         self.save()
+
+    def set_record_by_success_and_growth_type(self, habit: Habit):
+        if self.success:
+            if habit.growth_type == "INCREASE":
+                self.set_for_excess(habit)
+            elif habit.growth_type == "DECREASE":
+                self.set_for_lack(habit)
+        else:
+            if habit.growth_type == "INCREASE":
+                self.set_for_lack(habit)
+            elif habit.growth_type == "DECREASE":
+                self.set_for_excess(habit)
+
+    def set_for_excess(self, habit: Habit):
+        self.goal = habit.today_goal
+        self.progress = habit.today_goal
+        self.excess = habit.today_progress
+
+    def set_for_lack(self, habit: Habit):
+        self.goal = habit.today_goal
+        self.progress = habit.today_progress
+        self.excess = 0
 
     def is_owned_by_user(self, given_user: User):
         return self.habit.is_owned_by_user(given_user)
