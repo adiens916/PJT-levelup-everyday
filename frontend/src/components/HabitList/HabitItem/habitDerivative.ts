@@ -1,6 +1,5 @@
 import { initialState } from '../../HabitTimer/reducer';
 import { HabitType } from '../../../api/types';
-import { getValueWithUnit, ratio as getRatio } from '../../../utils/utils';
 
 export class HabitDerivative {
   habit = initialState;
@@ -9,31 +8,52 @@ export class HabitDerivative {
     this.habit = habit;
   }
 
-  get level() {
-    return Math.floor((this.habit.today_goal / this.habit.final_goal) * 100);
-  }
-
   get currentProgress() {
     return this.habit.today_progress + this.habit.temporary_progress;
   }
 
   get ratio() {
-    return getRatio(this.currentProgress, this.habit.today_goal);
+    if (this.habit.today_goal === 0) return 0;
+    return Math.floor((this.currentProgress / this.habit.today_goal) * 100);
+  }
+
+  get level() {
+    return this.ratio;
   }
 
   get goalWithUnit() {
-    return getValueWithUnit(this.habit, this.habit.today_goal);
+    return this.getValueWithUnit(this.habit, this.habit.today_goal);
   }
 
-  get progressRemainingWithUnit() {
+  get goalLeftWithUnit() {
     if (this.currentProgress === 0 || this.ratio >= 100) {
       return '';
+    }
+
+    return this.getValueWithUnit(
+      this.habit,
+      this.habit.today_goal - this.currentProgress,
+    );
+  }
+
+  getValueWithUnit(habit: HabitType, value: number) {
+    if (habit.estimate_type === 'COUNT') {
+      return `${value}${habit.estimate_unit}`;
     } else {
-      const remains = getValueWithUnit(
-        this.habit,
-        this.habit.today_goal - this.currentProgress,
-      );
-      return ` (${remains} 남음)`;
+      return this.getTimeWithUnit(value);
+    }
+  }
+
+  getTimeWithUnit(seconds: number): string {
+    if (seconds < 60) {
+      return `${seconds}초`;
+    } else if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60);
+      return `${minutes}분 ${seconds % 60}초`;
+    } else {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return `${hours}시간 ${minutes}분 ${seconds % 60}초`;
     }
   }
 }
