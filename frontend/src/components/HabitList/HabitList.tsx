@@ -87,7 +87,11 @@ export default function HabitList() {
           <>
             {/* 습관 목록 */}
             {habits.map((habit, index) => (
-              <HabitItem habit={habit} key={index} />
+              <HabitItem
+                habit={habit}
+                opacity={1 - 0.7 * (index / habits.length)}
+                key={index}
+              />
             ))}
           </>
         )}
