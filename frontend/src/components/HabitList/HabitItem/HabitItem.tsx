@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Stack } from '@mui/material';
+import { Box, Button } from '@mui/material';
 
 import HabitItemMenu from '../HabitItemMenu/HabitItemMenu';
 import { HabitDerivative } from '../../../utils/habitDerivative';
 import { HabitType } from '../../../api/types';
-import { TypographyByRatio } from './style';
+import { ResponsiveStack, TypographyByRatio } from './style';
 
 export default function HabitItem(props: HabitItemType) {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ export default function HabitItem(props: HabitItemType) {
           // opacity: props.disabled ? '0.2' : '1',
         }}
       >
-        <Stack direction="row" alignItems="center" spacing={2}>
+        <ResponsiveStack>
           {/* 습관 숙련도 */}
           <TypographyByRatio ratio={habitDerivative.ratio}>
             Lv. {habitDerivative.level}
@@ -41,14 +41,9 @@ export default function HabitItem(props: HabitItemType) {
           <TypographyByRatio ratio={habitDerivative.ratio} variant="h5">
             {props.habit.name}
           </TypographyByRatio>
-        </Stack>
+        </ResponsiveStack>
 
-        <Stack
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          spacing={1}
-        >
+        <ResponsiveStack>
           {/* 현재 목표 */}
           <TypographyByRatio
             ratio={habitDerivative.ratio}
@@ -66,7 +61,7 @@ export default function HabitItem(props: HabitItemType) {
           >
             {habitDerivative.goalLeftWithUnitAndMessage}
           </TypographyByRatio>
-        </Stack>
+        </ResponsiveStack>
       </Button>
       <HabitItemMenu habit={props.habit} />
     </Box>
