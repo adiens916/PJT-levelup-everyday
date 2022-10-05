@@ -43,7 +43,6 @@ export default function NavBar() {
       isLoginRequired: true,
       onClick: async () => {
         await logout();
-        setUserToken(null);
       },
     },
   ];
