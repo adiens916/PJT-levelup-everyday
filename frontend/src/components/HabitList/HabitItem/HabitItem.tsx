@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button, Stack, Typography } from '@mui/material';
 
 import HabitItemMenu from '../HabitItemMenu/HabitItemMenu';
-import { HabitDerivative } from './habitDerivative';
+import { HabitDerivative } from '../../../utils/habitDerivative';
 import { HabitType } from '../../../api/types';
 
 export default function HabitItem(props: HabitItemType) {

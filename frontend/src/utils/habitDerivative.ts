@@ -1,5 +1,5 @@
-import { initialState } from '../../HabitTimer/reducer';
-import { HabitType } from '../../../api/types';
+import { initialState } from '../components/HabitTimer/reducer';
+import { HabitType } from '../api/types';
 
 export class HabitDerivative {
   habit = initialState;
