@@ -61,7 +61,14 @@ export class HabitDerivative {
     if (this.currentProgress === 0 || this.ratio >= 100) {
       return '';
     }
-    return ` (${this.goalLeftWithUnit} 남음)`;
+    switch (this.habit.growth_type) {
+      case 'INCREASE':
+        return ` (${this.goalLeftWithUnit} 남음)`;
+      case 'DECREASE':
+        return ` (${this.currentProgressWithUnit} 했음)`;
+      default:
+        return '';
+    }
   }
 
   getValueWithUnit(habit: HabitType, value: number) {
@@ -81,7 +88,7 @@ export class HabitDerivative {
     } else {
       const hours = Math.floor(seconds / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
-      return `${hours}시간 ${minutes}분 ${seconds % 60}초`;
+      return `${hours}시간 ${minutes}분`;
     }
   }
 }
