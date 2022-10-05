@@ -12,7 +12,13 @@ export default function HabitItem(props: HabitItemType) {
   const habitDerivative = new HabitDerivative(props.habit);
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        opacity: props.opacity ? props.opacity : 1,
+      }}
+    >
       <Button
         onClick={() => {
           navigate(`/timer/${props.habit.id}`);
@@ -72,6 +78,6 @@ export default function HabitItem(props: HabitItemType) {
 
 interface HabitItemType {
   habit: HabitType;
-  transparent?: boolean;
   disabled?: boolean;
+  opacity?: number;
 }
