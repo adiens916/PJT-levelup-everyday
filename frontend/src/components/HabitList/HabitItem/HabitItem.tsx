@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button } from '@mui/material';
 
 import HabitItemMenu from '../HabitItemMenu/HabitItemMenu';
 import { HabitDerivative } from '../../../utils/habitDerivative';
 import { HabitType } from '../../../api/types';
+import { ResponsiveStack, TypographyByRatio } from './style';
 
 export default function HabitItem(props: HabitItemType) {
   const navigate = useNavigate();
@@ -30,34 +31,37 @@ export default function HabitItem(props: HabitItemType) {
           // opacity: props.disabled ? '0.2' : '1',
         }}
       >
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <Typography
-            color={habitDerivative.ratio > 30 ? 'yellow' : 'turquoise'}
-          >
+        <ResponsiveStack>
+          {/* 습관 숙련도 */}
+          <TypographyByRatio ratio={habitDerivative.ratio}>
             Lv. {habitDerivative.level}
-          </Typography>
+          </TypographyByRatio>
+
           {/* 습관 이름 */}
-          <Typography
-            color={habitDerivative.ratio > 30 ? 'yellow' : 'turquoise'}
+          <TypographyByRatio ratio={habitDerivative.ratio} variant="h5">
+            {props.habit.name}
+          </TypographyByRatio>
+        </ResponsiveStack>
+
+        <ResponsiveStack>
+          {/* 현재 목표 */}
+          <TypographyByRatio
+            ratio={habitDerivative.ratio}
+            ratioThreshold={80}
+            colorBefore="aquamarine"
             variant="h5"
           >
-            {props.habit.name}
-          </Typography>
-        </Stack>
-
-        {/* 현재 목표 */}
-        <Typography
-          color={habitDerivative.ratio >= 100 ? 'yellow' : 'aquamarine'}
-          variant="h5"
-        >
-          {habitDerivative.goalWithUnit}
-          {habitDerivative.goalLeftWithUnitAndMessage}
-        </Typography>
-
-        {/* 현재 달성률 */}
-        {/* <Typography color={ratio >= 100 ? 'yellow' : 'aquamarine'} variant="h5">
-          {ratio}%
-        </Typography> */}
+            {habitDerivative.goalWithUnit}
+          </TypographyByRatio>
+          <TypographyByRatio
+            ratio={habitDerivative.ratio}
+            ratioThreshold={80}
+            colorBefore="aquamarine"
+            variant="h5"
+          >
+            {habitDerivative.goalLeftWithUnitAndMessage}
+          </TypographyByRatio>
+        </ResponsiveStack>
       </Button>
       <HabitItemMenu habit={props.habit} />
     </Box>
