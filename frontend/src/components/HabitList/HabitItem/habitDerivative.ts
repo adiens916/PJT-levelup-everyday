@@ -18,7 +18,12 @@ export class HabitDerivative {
   }
 
   get level() {
-    return this.ratio;
+    if (this.habit.final_goal === 0) return 0;
+    return Math.floor((this.habit.today_goal / this.habit.final_goal) * 100);
+  }
+
+  get currentProgressWithUnit() {
+    return this.getValueWithUnit(this.habit, this.currentProgress);
   }
 
   get goalWithUnit() {
@@ -26,14 +31,17 @@ export class HabitDerivative {
   }
 
   get goalLeftWithUnit() {
-    if (this.currentProgress === 0 || this.ratio >= 100) {
-      return '';
-    }
-
     return this.getValueWithUnit(
       this.habit,
       this.habit.today_goal - this.currentProgress,
     );
+  }
+
+  get goalLeftWithUnitAndMessage() {
+    if (this.currentProgress === 0 || this.ratio >= 100) {
+      return '';
+    }
+    return ` (${this.goalLeftWithUnit} 남음)`;
   }
 
   getValueWithUnit(habit: HabitType, value: number) {

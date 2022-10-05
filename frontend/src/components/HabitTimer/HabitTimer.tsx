@@ -2,18 +2,17 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, CircularProgress, Typography } from '@mui/material';
 
-import useTimer from './useTimer';
 import CircularProgressWithLabel from './CircularProgress/CircularProgress';
-import { getValueWithUnit, ratio } from '../../utils/utils';
 import useDocumentTitle from '../../hook/useDocumentTitle';
+import useTimer from './useTimer';
+import { HabitDerivative } from '../HabitList/HabitItem/habitDerivative';
 
 export default function HabitTimer() {
   useDocumentTitle('습관 측정');
 
   const { id: habitId } = useParams();
   const { habit, StartStopButton } = useTimer(Number(habitId));
-
-  const currentProgress = habit.today_progress + habit.temporary_progress;
+  const habitDerivative = new HabitDerivative(habit);
 
   return (
     <>
@@ -22,8 +21,8 @@ export default function HabitTimer() {
       </Typography>
       <Box display="flex" justifyContent="center">
         <CircularProgressWithLabel
-          value={ratio(currentProgress, habit.today_goal)}
-          progress={getValueWithUnit(habit, currentProgress)}
+          value={habitDerivative.ratio}
+          progress={habitDerivative.currentProgressWithUnit}
         />
       </Box>
       <StartStopButton
