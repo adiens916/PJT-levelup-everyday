@@ -77,7 +77,7 @@ export default function NavBar() {
           handleDrawerToggle={handleDrawerToggle}
         />
       </Box>
-      <Box component="main" sx={{ marginTop: 15 }}>
+      <Box component="main" sx={{ marginTop: '5rem' }}>
         <Outlet />
       </Box>
     </>
