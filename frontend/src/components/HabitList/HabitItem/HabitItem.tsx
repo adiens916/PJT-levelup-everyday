@@ -43,16 +43,30 @@ export default function HabitItem(props: HabitItemType) {
           </TypographyByRatio>
         </Stack>
 
-        {/* 현재 목표 */}
-        <TypographyByRatio
-          ratio={habitDerivative.ratio}
-          ratioThreshold={100}
-          colorBefore="aquamarine"
-          variant="h5"
+        <Stack
+          direction="row"
+          justifyContent="center"
+          alignItems="center"
+          spacing={1}
         >
-          {habitDerivative.goalWithUnit}
-          {habitDerivative.goalLeftWithUnitAndMessage}
-        </TypographyByRatio>
+          {/* 현재 목표 */}
+          <TypographyByRatio
+            ratio={habitDerivative.ratio}
+            ratioThreshold={80}
+            colorBefore="aquamarine"
+            variant="h5"
+          >
+            {habitDerivative.goalWithUnit}
+          </TypographyByRatio>
+          <TypographyByRatio
+            ratio={habitDerivative.ratio}
+            ratioThreshold={80}
+            colorBefore="aquamarine"
+            variant="h5"
+          >
+            {habitDerivative.goalLeftWithUnitAndMessage}
+          </TypographyByRatio>
+        </Stack>
       </Button>
       <HabitItemMenu habit={props.habit} />
     </Box>
