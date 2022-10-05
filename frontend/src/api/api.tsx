@@ -40,13 +40,14 @@ export async function login(username: string, password: string) {
 }
 
 export async function logout() {
-  const data: LogoutResponseType = await requestPostByAxios(
-    `${host}/account/logout/`,
-    {},
-  );
-  clearUserToken();
-  location.replace('/');
-  return data;
+  let data: LogoutResponseType | null = null;
+  try {
+    data = await requestPostByAxios(`${host}/account/logout/`, {});
+  } finally {
+    clearUserToken();
+    location.replace('/');
+    return data;
+  }
 }
 
 export function saveUserToken(token: string) {
