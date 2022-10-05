@@ -16,6 +16,7 @@ services:
       - MYSQL_DATABASE=${DJANGO_DB_NAME}
     ports:
       - ${DJANGO_DB_PORT}:3306
+    restart: always
 
   backend:
     container_name: backend
