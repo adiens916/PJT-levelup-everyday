@@ -49,6 +49,7 @@ export function reducer(state = initialState, action: ActionType): HabitType {
       return { ...state, is_running: !state.is_running };
 
     case 'PROCEED':
+      return { ...state, temporary_progress: state.temporary_progress + 1 };
       if (state.growth_type === 'INCREASE') {
         return { ...state, temporary_progress: state.temporary_progress + 1 };
       } else {

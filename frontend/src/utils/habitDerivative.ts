@@ -14,12 +14,32 @@ export class HabitDerivative {
 
   get ratio() {
     if (this.habit.today_goal === 0) return 0;
-    return Math.floor((this.currentProgress / this.habit.today_goal) * 100);
+    const ratio = (this.currentProgress / this.habit.today_goal) * 100;
+
+    switch (this.habit.growth_type) {
+      case 'INCREASE':
+        return Math.floor(ratio);
+      case 'DECREASE':
+        return 100 - Math.ceil(ratio);
+      default:
+        return 0;
+    }
   }
 
   get level() {
-    if (this.habit.final_goal === 0) return 0;
-    return Math.floor((this.habit.today_goal / this.habit.final_goal) * 100);
+    switch (this.habit.growth_type) {
+      case 'INCREASE':
+        if (this.habit.final_goal === 0) return 0;
+        return Math.floor(
+          (this.habit.today_goal / this.habit.final_goal) * 100,
+        );
+      case 'DECREASE':
+        const growth = this.habit.final_goal * 10 - this.habit.today_goal;
+        const level = Math.floor(growth / this.habit.growth_amount) + 1;
+        return level;
+      default:
+        return '';
+    }
   }
 
   get currentProgressWithUnit() {
