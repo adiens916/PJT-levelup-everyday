@@ -13,11 +13,18 @@ export const TypographyByRatio = styled(Typography)<TypographyByRatioType>(
 
   {
     wordBreak: 'keep-all',
-    [customMediaQuery(500)]: {
+    [customMediaQuery(550)]: {
       fontSize: '1.25rem',
+      // 요소가 두 개인 경우, 첫 번째 요소 크기를 줄임
+      ':nth-last-child(2)': {
+        fontSize: '1rem',
+      },
     },
-    [customMediaQuery(350)]: {
+    [customMediaQuery(400)]: {
       fontSize: '1rem',
+      ':nth-last-child(2)': {
+        fontSize: '0.75rem',
+      },
     },
   },
 );

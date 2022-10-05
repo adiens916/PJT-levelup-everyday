@@ -33,7 +33,7 @@ export default function HabitList() {
         sx={{ display: 'flex', flexDirection: 'column' }}
       >
         {/* 오늘 날짜 */}
-        <Typography textAlign="center" fontSize="1.5rem">
+        <Typography textAlign="center" fontSize="1.25rem">
           {formatDateMMDD()}
         </Typography>
 
