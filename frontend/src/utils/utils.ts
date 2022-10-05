@@ -24,7 +24,7 @@ export function getTimeWithUnit(seconds: number): string {
     return `${minutes}분 ${seconds % 60}초`;
   } else {
     const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor(seconds / 60);
+    const minutes = Math.floor((seconds % 3600) / 60);
     return `${hours}시간 ${minutes}분 ${seconds % 60}초`;
   }
 }
