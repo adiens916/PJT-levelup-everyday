@@ -44,7 +44,7 @@ export default function HabitItem(props: HabitItemType) {
           </TypographyByRatio>
 
           {/* 습관 이름 */}
-          <TypographyByRatio ratio={habitDerivative.ratio} variant="h5">
+          <TypographyByRatio ratio={habitDerivative.ratio}>
             {props.habit.name}
           </TypographyByRatio>
         </ResponsiveStack>
@@ -55,7 +55,6 @@ export default function HabitItem(props: HabitItemType) {
             ratio={habitDerivative.ratio}
             ratioThreshold={80}
             colorBefore="aquamarine"
-            variant="h5"
           >
             {habitDerivative.goalWithUnit}
           </TypographyByRatio>
@@ -64,7 +63,6 @@ export default function HabitItem(props: HabitItemType) {
               ratio={habitDerivative.ratio}
               ratioThreshold={80}
               colorBefore="aquamarine"
-              variant="h5"
             >
               {habitDerivative.goalLeftWithUnitAndMessage}
             </TypographyByRatio>
