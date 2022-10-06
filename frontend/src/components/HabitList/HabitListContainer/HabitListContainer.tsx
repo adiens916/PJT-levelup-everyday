@@ -1,12 +1,7 @@
 import React from 'react';
-import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
-} from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
-import { LoadingCircle } from '../style';
+import { TypographyCentered } from '../style';
 
 export default function HabitListContainer(props: HabitListContainerType) {
   const [expanded, setExpanded] = React.useState(props.expanded ? true : false);
@@ -22,12 +17,12 @@ export default function HabitListContainer(props: HabitListContainerType) {
       sx={{ opacity: props.opacity ? props.opacity : 1 }}
     >
       <AccordionSummary expandIcon={<ExpandMore />}>
-        <Typography>{props.summary}</Typography>
+        <TypographyCentered fontWeight="bold">
+          {props.summary}
+        </TypographyCentered>
       </AccordionSummary>
 
-      <AccordionDetails>
-        {props.details ? props.details : <LoadingCircle />}
-      </AccordionDetails>
+      <AccordionDetails>{props.details}</AccordionDetails>
     </Accordion>
   );
 }
