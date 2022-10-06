@@ -1,9 +1,12 @@
 import styled from '@emotion/styled';
+import isPropValid from '@emotion/is-prop-valid';
 import { Typography, Stack } from '@mui/material';
-import { customMediaQuery, get } from '../../../utils/utils';
+import { customMediaQuery, get, mediaQueryMin } from '../../../utils/utils';
 import type * as CSS from 'csstype';
 
-export const TypographyByRatio = styled(Typography)<TypographyByRatioType>(
+export const TypographyByRatio = styled(Typography, {
+  shouldForwardProp: (prop) => isPropValid(prop),
+})<TypographyByRatioType>(
   (props) => ({
     color:
       props.ratio > get(props.ratioThreshold, 30)
@@ -13,16 +16,19 @@ export const TypographyByRatio = styled(Typography)<TypographyByRatioType>(
 
   {
     wordBreak: 'keep-all',
+    [mediaQueryMin(550)]: {
+      fontSize: '1.25rem',
+    },
     [customMediaQuery(550)]: {
       fontSize: '1.25rem',
       // 요소가 두 개인 경우, 첫 번째 요소 크기를 줄임
-      ':nth-last-child(2)': {
+      ':nth-last-of-type(2)': {
         fontSize: '1rem',
       },
     },
     [customMediaQuery(400)]: {
       fontSize: '1rem',
-      ':nth-last-child(2)': {
+      ':nth-last-of-type(2)': {
         fontSize: '0.75rem',
       },
     },
