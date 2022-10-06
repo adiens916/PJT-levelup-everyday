@@ -22,7 +22,9 @@ export default function HabitListContainer(props: HabitListContainerType) {
         </TypographyCentered>
       </AccordionSummary>
 
-      <AccordionDetails>{props.details}</AccordionDetails>
+      <AccordionDetails>
+        {props.details.length ? props.details : props.detailsIfEmpty}
+      </AccordionDetails>
     </Accordion>
   );
 }
@@ -30,6 +32,7 @@ export default function HabitListContainer(props: HabitListContainerType) {
 interface HabitListContainerType {
   summary: string;
   details: JSX.Element[];
+  detailsIfEmpty?: JSX.Element;
   expanded?: boolean;
   opacity?: number;
 }

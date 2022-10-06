@@ -63,6 +63,11 @@ export default function HabitList() {
                   key={index}
                 />
               ))}
+              detailsIfEmpty={
+                <Typography textAlign="center" color="GrayText">
+                  전부 끝! 　(๑˃̵ᴗ˂̵)و
+                </Typography>
+              }
             />
             <HabitListContainer
               opacity={0.5}
@@ -70,6 +75,11 @@ export default function HabitList() {
               details={habitsDone.map((habit, index) => (
                 <HabitItem habit={habit} key={index} />
               ))}
+              detailsIfEmpty={
+                <Typography textAlign="center" color="GrayText">
+                  없음 　(:3) ×)〆～～～
+                </Typography>
+              }
             />
             <HabitListContainer
               opacity={0.5}
@@ -77,6 +87,11 @@ export default function HabitList() {
               details={habitsNotDue.map((habit, index) => (
                 <HabitItem habit={habit} key={index} />
               ))}
+              detailsIfEmpty={
+                <Typography textAlign="center" color="GrayText">
+                  없음 　(:3) ×)〆～～～
+                </Typography>
+              }
             />
           </>
         )}
