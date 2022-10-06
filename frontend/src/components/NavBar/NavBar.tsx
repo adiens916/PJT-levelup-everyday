@@ -5,11 +5,11 @@ import CustomAppBar from './CustomAppBar/CustomAppBar';
 import CustomDrawer from './CustomDrawer/CustomDrawer';
 import { logout } from '../../api/api';
 
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { userTokenState } from '../../state/state';
 
 export default function NavBar() {
-  const [userToken, setUserToken] = useRecoilState(userTokenState);
+  const userToken = useRecoilValue(userTokenState);
 
   const menusAll = [
     {
@@ -32,11 +32,6 @@ export default function NavBar() {
       link: '/create',
       isLoginRequired: true,
     },
-    // {
-    //   name: '진행 중인 습관',
-    //   link: '/timer',
-    //   isLoginRequired: true,
-    // },
     {
       name: '로그아웃',
       link: '/',
