@@ -1,14 +1,17 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { CircularProgress, Container, Typography } from '@mui/material';
 
 import HabitItem from './HabitItem/HabitItem';
 import useHabitList from './useHabitList';
 import useDocumentTitle from '../../hook/useDocumentTitle';
-import { Link } from 'react-router-dom';
+import { HabitDerivative } from '../../utils/habitDerivative';
 
 export default function HabitList() {
   useDocumentTitle('습관 목록');
   const { habits, loading, isError, errorCode } = useHabitList();
+  const { habitsToDo, habitsDone, habitsNotDue } =
+    HabitDerivative.splitHabitsByStatus(habits);
 
   const formatDateMMDD = () => {
     const today = new Date();
@@ -36,7 +39,6 @@ export default function HabitList() {
         <Typography textAlign="center" fontSize="1.25rem">
           {formatDateMMDD()}
         </Typography>
-
         {/* 안내 메시지 */}
         {loading ? (
           <CircularProgress sx={{ alignSelf: 'center', marginTop: '1.5rem' }} />
@@ -55,8 +57,24 @@ export default function HabitList() {
             </Typography>
           )
         )}
-
-        {is_exist_habit_due_date() ? (
+        {/* 상태별로 정렬 */}
+        To do
+        {habitsToDo.map((habit, index) => (
+          <HabitItem
+            habit={habit}
+            opacity={1 - 0.7 * (index / habitsToDo.length)}
+            key={index}
+          />
+        ))}
+        Done
+        {habitsDone.map((habit, index) => (
+          <HabitItem habit={habit} key={index} />
+        ))}
+        May not to do
+        {habitsNotDue.map((habit, index) => (
+          <HabitItem habit={habit} key={index} />
+        ))}
+        {false ? (
           <>
             <Typography textAlign="center" fontSize="1.5rem">
               오늘의 습관
@@ -86,13 +104,13 @@ export default function HabitList() {
         ) : (
           <>
             {/* 습관 목록 */}
-            {habits.map((habit, index) => (
+            {/* {habits.map((habit, index) => (
               <HabitItem
                 habit={habit}
                 opacity={1 - 0.7 * (index / habits.length)}
                 key={index}
               />
-            ))}
+            ))} */}
           </>
         )}
       </Container>
