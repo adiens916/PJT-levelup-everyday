@@ -8,6 +8,43 @@ export class HabitDerivative {
     this.habit = habit;
   }
 
+  static splitHabitsByStatus(habits: HabitType[]) {
+    const habitsDone = habits.filter((habit) => this.isDone(habit));
+    const habitsDoneSet = new Set(habitsDone);
+    const habitsNotDone = habits.filter((e) => !habitsDoneSet.has(e));
+
+    const habitsToDo = habitsNotDone.filter((habit) => this.isToDo(habit));
+    const habitsToDoSet = new Set(habitsToDo);
+
+    const habitsNotDue = habitsNotDone.filter((e) => !habitsToDoSet.has(e));
+    return { habitsToDo, habitsDone, habitsNotDue };
+  }
+
+  static isDone(habit: HabitType) {
+    switch (habit.growth_type) {
+      case 'INCREASE':
+        return habit.today_progress >= habit.today_goal;
+      case 'DECREASE':
+        return habit.today_progress === 0;
+      default:
+        return;
+    }
+  }
+
+  static isToDo(habit: HabitType) {
+    switch (habit.growth_type) {
+      case 'INCREASE':
+        return (
+          habit.is_today_due_date ||
+          habit.today_progress + habit.temporary_progress > 0
+        );
+      case 'DECREASE':
+        return false;
+      default:
+        return;
+    }
+  }
+
   get currentProgress() {
     return this.habit.today_progress + this.habit.temporary_progress;
   }
