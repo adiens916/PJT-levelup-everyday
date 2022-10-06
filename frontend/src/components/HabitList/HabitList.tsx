@@ -6,6 +6,7 @@ import HabitItem from './HabitItem/HabitItem';
 import useHabitList from './useHabitList';
 import useDocumentTitle from '../../hook/useDocumentTitle';
 import { HabitDerivative } from '../../utils/habitDerivative';
+import HabitListContainer from './HabitListContainer/HabitListContainer';
 
 export default function HabitList() {
   useDocumentTitle('습관 목록');
@@ -57,23 +58,37 @@ export default function HabitList() {
             </Typography>
           )
         )}
+
         {/* 상태별로 정렬 */}
-        To do
-        {habitsToDo.map((habit, index) => (
-          <HabitItem
-            habit={habit}
-            opacity={1 - 0.7 * (index / habitsToDo.length)}
-            key={index}
-          />
-        ))}
-        Done
-        {habitsDone.map((habit, index) => (
-          <HabitItem habit={habit} key={index} />
-        ))}
-        May not to do
-        {habitsNotDue.map((habit, index) => (
-          <HabitItem habit={habit} key={index} />
-        ))}
+        {!loading && (
+          <>
+            <HabitListContainer
+              expanded={true}
+              summary="To do"
+              details={habitsToDo.map((habit, index) => (
+                <HabitItem
+                  habit={habit}
+                  opacity={1 - 0.7 * (index / habitsToDo.length)}
+                  key={index}
+                />
+              ))}
+            />
+            <HabitListContainer
+              opacity={0.5}
+              summary="Done"
+              details={habitsDone.map((habit, index) => (
+                <HabitItem habit={habit} key={index} />
+              ))}
+            />
+            <HabitListContainer
+              opacity={0.5}
+              summary="Do not have to do"
+              details={habitsNotDue.map((habit, index) => (
+                <HabitItem habit={habit} key={index} />
+              ))}
+            />
+          </>
+        )}
         {false ? (
           <>
             <Typography textAlign="center" fontSize="1.5rem">
