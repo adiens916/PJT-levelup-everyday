@@ -22,7 +22,7 @@ export default function HabitListContainer(props: HabitListContainerType) {
         </TypographyCentered>
       </AccordionSummary>
 
-      <AccordionDetails>
+      <AccordionDetails sx={{ padding: '0px 8px 8px' }}>
         {props.details.length ? props.details : props.detailsIfEmpty}
       </AccordionDetails>
     </Accordion>

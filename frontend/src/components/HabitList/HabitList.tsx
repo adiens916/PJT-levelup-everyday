@@ -55,7 +55,7 @@ export default function HabitList() {
           <>
             <HabitListContainer
               expanded={true}
-              summary={'오늘의 습관 　ヾ(≧▽≦*)o'}
+              summary={'✨ 오늘의 습관'}
               details={habitsToDo.map((habit, index) => (
                 <HabitItem
                   habit={habit}
@@ -71,7 +71,7 @@ export default function HabitList() {
             />
             <HabitListContainer
               opacity={0.5}
-              summary="달성한 습관 　( •̀ ω •́ )✧"
+              summary="🎉 달성한 습관"
               details={habitsDone.map((habit, index) => (
                 <HabitItem habit={habit} key={index} />
               ))}
@@ -83,7 +83,7 @@ export default function HabitList() {
             />
             <HabitListContainer
               opacity={0.5}
-              summary="나중에 할 습관 　(ﾉ*･ω･)ﾉ"
+              summary="🎵 나중에 할 습관"
               details={habitsNotDue.map((habit, index) => (
                 <HabitItem habit={habit} key={index} />
               ))}
