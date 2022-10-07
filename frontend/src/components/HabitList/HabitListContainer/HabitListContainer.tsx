@@ -4,16 +4,9 @@ import { ExpandMore } from '@mui/icons-material';
 import { TypographyCentered } from '../style';
 
 export default function HabitListContainer(props: HabitListContainerType) {
-  const [expanded, setExpanded] = React.useState(props.expanded ? true : false);
-
-  const handleChange = () => {
-    setExpanded(!expanded);
-  };
-
   return (
     <Accordion
-      expanded={expanded}
-      onChange={handleChange}
+      defaultExpanded={props.expanded}
       sx={{ opacity: props.opacity ? props.opacity : 1 }}
     >
       <AccordionSummary expandIcon={<ExpandMore />}>
