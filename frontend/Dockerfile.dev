@@ -5,10 +5,8 @@ WORKDIR /app
 
 COPY package*.json ./
 RUN npm install --force
-RUN npm install -g serve
 
 COPY . .
-RUN npm run build
-CMD [ "serve", "build" ]
+CMD [ "npm", "start" ]
 
 EXPOSE 3000
