@@ -8,7 +8,7 @@ RUN npm install --force
 RUN npm install -g serve
 
 COPY . .
-RUN npm run build
+RUN npm run build:on-server
 CMD [ "serve", "build" ]
 
 EXPOSE 3000
