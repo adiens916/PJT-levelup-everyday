@@ -2,6 +2,12 @@ export function get<T>(a: T | undefined, b: T) {
   return a ? a : b;
 }
 
+export function formatDateMmDd() {
+  const today = new Date();
+  const formatted = `${today.getMonth() + 1}월 ${today.getDate()}일`;
+  return formatted;
+}
+
 export function customMediaQuery(point: number) {
   return `@media (max-width: ${point}px)`;
 }

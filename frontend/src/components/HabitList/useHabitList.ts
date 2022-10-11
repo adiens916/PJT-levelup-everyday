@@ -1,41 +1,31 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { extractFields, getHabits } from '../../api/api';
 import { HabitType } from '../../api/types';
 
 export default function useHabitList() {
-  const [habits, setHabits] = useState<HabitType[]>([]);
+  const [habits, setHabits] = useState<HabitType[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [errorCode, setErrorCode] = useState(0);
 
+  const fetchHabits = async () => {
+    try {
+      const response = await getHabits();
+      const convertedHabits = extractFields(response.data);
+      setHabits(convertedHabits);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        setIsError(true);
+        setErrorCode(error.response.status);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    getHabits()
-      .then((response) => {
-        switch (response.status) {
-          case 200:
-            setHabits(extractFields(response.data));
-            break;
-          default:
-            break;
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        switch (err.response.status) {
-          case 401:
-            setIsError(true);
-            setErrorCode(401);
-            break;
-          case 403:
-            setIsError(true);
-            setErrorCode(403);
-            break;
-          default:
-            setIsError(true);
-            break;
-        }
-        setLoading(false);
-      });
+    fetchHabits();
   }, []);
 
   return { habits, loading, isError, errorCode };
