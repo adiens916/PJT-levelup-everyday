@@ -19,6 +19,10 @@ export default function ErrorGuide({
     return <EmptyHabitList />;
   }
 
+  if (!isError) {
+    return <></>;
+  }
+
   switch (errorCode) {
     case 500:
       return <ConnectionError />;
@@ -58,7 +62,7 @@ function EmptyHabitList() {
 function UnexpectedError() {
   return (
     <Typography textAlign="center" marginTop="2rem">
-      모르는 데숭...
+      모르는 에러 (＃°Д°)Σ
     </Typography>
   );
 }
