@@ -39,7 +39,7 @@ export class HabitDerivative {
           habit.today_progress + habit.temporary_progress > 0
         );
       case 'DECREASE':
-        return false;
+        return habit.today_progress !== 0;
       default:
         return;
     }
