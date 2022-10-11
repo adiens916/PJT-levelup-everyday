@@ -31,7 +31,7 @@ export default function HabitList() {
         />
 
         {/* 상태별로 정렬 */}
-        {!loading && habits && habits.length && (
+        {!loading && habits && habits.length !== 0 && (
           <HabitListContainerGroup habits={habits} />
         )}
       </Container>
