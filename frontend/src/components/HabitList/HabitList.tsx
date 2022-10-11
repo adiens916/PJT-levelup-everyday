@@ -5,16 +5,11 @@ import { CircularProgress, Container, Typography } from '@mui/material';
 import useDocumentTitle from '../../hook/useDocumentTitle';
 import useHabitList from './useHabitList';
 import HabitListContainerGroup from './HabitListContainerGroup/HabitListContainerGroup';
+import { formatDateMmDd } from '../../utils/utils';
 
 export default function HabitList() {
   useDocumentTitle('습관 목록');
   const { habits, loading, isError, errorCode } = useHabitList();
-
-  const formatDateMMDD = () => {
-    const today = new Date();
-    const formatted = `${today.getMonth() + 1}월 ${today.getDate()}일`;
-    return formatted;
-  };
 
   return (
     <>
@@ -24,7 +19,7 @@ export default function HabitList() {
       >
         {/* 오늘 날짜 */}
         <Typography textAlign="center" fontSize="1.25rem">
-          {formatDateMMDD()}
+          {formatDateMmDd()}
         </Typography>
 
         {/* 안내 메시지 */}
