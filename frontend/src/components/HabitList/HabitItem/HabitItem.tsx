@@ -1,20 +1,24 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button } from '@mui/material';
 
-import { HabitType } from '../../../api/types';
-import { ratio as getRatio } from '../../../utils/utils';
 import HabitItemMenu from '../HabitItemMenu/HabitItemMenu';
+import { HabitDerivative } from '../../../utils/habitDerivative';
+import { HabitType } from '../../../api/types';
+import { ResponsiveStack, TypographyByRatio } from './style';
 
 export default function HabitItem(props: HabitItemType) {
   const navigate = useNavigate();
-  const level = Math.floor(
-    (props.habit.today_goal / props.habit.final_goal) * 100,
-  );
-  const ratio = getRatio(props.habit.today_progress, props.habit.today_goal);
+  const habitDerivative = new HabitDerivative(props.habit);
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        opacity: props.opacity ? props.opacity : 1,
+      }}
+    >
       <Button
         onClick={() => {
           navigate(`/timer/${props.habit.id}`);
@@ -28,33 +32,50 @@ export default function HabitItem(props: HabitItemType) {
           marginY: '1rem',
           padding: '0.5rem',
           background: `linear-gradient(90deg, ${
-            ratio >= 50 ? 'dodgerblue' : 'aqua'
-          } 0%, white ${ratio}%)`,
+            habitDerivative.ratio >= 50 ? 'dodgerblue' : 'aqua'
+          } 0%, white ${habitDerivative.ratio}%)`,
           // opacity: props.disabled ? '0.2' : '1',
         }}
       >
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <Typography color={ratio > 30 ? 'yellow' : 'turquoise'}>
-            Lv. {level}
-          </Typography>
-          {/* 습관 이름 */}
-          <Typography color={ratio > 30 ? 'yellow' : 'turquoise'} variant="h5">
-            {props.habit.name}
-          </Typography>
-        </Stack>
+        <ResponsiveStack>
+          {/* 습관 숙련도 */}
+          <TypographyByRatio ratio={habitDerivative.ratio}>
+            Lv. {habitDerivative.level}
+          </TypographyByRatio>
 
-        {/* 현재 달성률 */}
-        <Typography color={ratio >= 100 ? 'yellow' : 'aquamarine'} variant="h5">
-          {ratio}%
-        </Typography>
+          {/* 습관 이름 */}
+          <TypographyByRatio ratio={habitDerivative.ratio}>
+            {props.habit.name}
+          </TypographyByRatio>
+        </ResponsiveStack>
+
+        <ResponsiveStack>
+          {/* 현재 목표 */}
+          <TypographyByRatio
+            ratio={habitDerivative.ratio}
+            ratioThreshold={80}
+            colorBefore="aquamarine"
+          >
+            {habitDerivative.goalWithUnit}
+          </TypographyByRatio>
+          {habitDerivative.goalLeftWithUnitAndMessage && (
+            <TypographyByRatio
+              ratio={habitDerivative.ratio}
+              ratioThreshold={80}
+              colorBefore="aquamarine"
+            >
+              {habitDerivative.goalLeftWithUnitAndMessage}
+            </TypographyByRatio>
+          )}
+        </ResponsiveStack>
       </Button>
-      <HabitItemMenu habitId={props.habit.id} />
+      <HabitItemMenu habit={props.habit} />
     </Box>
   );
 }
 
 interface HabitItemType {
   habit: HabitType;
-  transparent?: boolean;
   disabled?: boolean;
+  opacity?: number;
 }

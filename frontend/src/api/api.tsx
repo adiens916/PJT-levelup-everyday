@@ -12,7 +12,13 @@ import {
   DailyRecordType,
 } from './types';
 
-const host = 'http://127.0.0.1:8000/api';
+// Set host by an environment variable.
+let host = process.env.REACT_APP_BACKEND_HOST;
+if (host) {
+  host += '/api';
+} else {
+  host = 'http://127.0.0.1:8000/api';
+}
 
 export async function signUp(username: string, password: string) {
   return await request<SignUpResponseType>(`${host}/account/signup/`, {
@@ -34,12 +40,14 @@ export async function login(username: string, password: string) {
 }
 
 export async function logout() {
-  const data: LogoutResponseType = await requestPostByAxios(
-    `${host}/account/logout/`,
-    {},
-  );
-  clearUserToken();
-  return data;
+  let data: LogoutResponseType | null = null;
+  try {
+    data = await requestPostByAxios(`${host}/account/logout/`, {});
+  } finally {
+    clearUserToken();
+    location.replace('/');
+    return data;
+  }
 }
 
 export function saveUserToken(token: string) {
@@ -55,15 +63,21 @@ export function getUserToken() {
 }
 
 export async function getHabits() {
-  const data = await requestGetByAxios<HabitResponseType[]>(`${host}/habit/`);
-  return extractFields(data);
+  const response = await requestGetByAxios<HabitResponseType[]>(
+    `${host}/habit/`,
+  );
+  return response;
+  // if (response.status === 200) {
+  //   return extractFields(response.data);
+  // } else {
+  // }
 }
 
 export async function getHabit(habitId: number) {
-  const data = await requestGetByAxios<HabitResponseType[]>(
+  const response = await requestGetByAxios<HabitResponseType[]>(
     `${host}/habit/${habitId}/`,
   );
-  return extractFields(data)[0];
+  return extractFields(response.data)[0];
 }
 
 export async function createHabit(habit: HabitType) {
@@ -97,11 +111,21 @@ export async function createHabit(habit: HabitType) {
   return data;
 }
 
+export async function deleteHabit(habitId: number) {
+  return await requestPostByAxios(`${host}/habit/${habitId}/`);
+}
+
+export async function updateImportance(habitId: number, importance: number) {
+  return await requestPostByAxios(`${host}/habit/${habitId}/importance`, {
+    importance,
+  });
+}
+
 export async function getRecords(habitId: number) {
-  const data = await requestGetByAxios<DailyRecordResponseType[]>(
+  const response = await requestGetByAxios<DailyRecordResponseType[]>(
     `${host}/habit/${habitId}/record/`,
   );
-  const records = extractRecordFields(data);
+  const records = extractRecordFields(response.data);
   return convertRecordsForChart(records);
 }
 
@@ -133,10 +157,10 @@ async function requestGetByAxios<T>(url: string) {
     },
     withCredentials: true,
   });
-  return response.data;
+  return response;
 }
 
-function extractFields(querySet: HabitResponseType[]): HabitType[] {
+export function extractFields(querySet: HabitResponseType[]): HabitType[] {
   return querySet.map((instance) => ({
     id: instance.pk,
     ...instance.fields,

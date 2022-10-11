@@ -12,6 +12,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 import { useParams } from 'react-router-dom';
 import { useDailyRecords } from './useDailyRecords';
+import useDocumentTitle from '../../hook/useDocumentTitle';
 
 ChartJS.register(
   CategoryScale,
@@ -40,7 +41,10 @@ const options: ChartOptions<'bar'> = {
 };
 
 export function DailyGraph() {
+  useDocumentTitle('기록');
+
   const { id: habitId } = useParams();
   const data = useDailyRecords(Number(habitId));
+
   return <Bar options={options} data={data} />;
 }

@@ -10,6 +10,7 @@ export const initialState: HabitType = {
   growth_amount: 0,
   growth_type: 'INCREASE',
   day_cycle: 0,
+  importance: 0,
 
   due_date: null,
   is_today_due_date: false,
@@ -48,6 +49,7 @@ export function reducer(state = initialState, action: ActionType): HabitType {
       return { ...state, is_running: !state.is_running };
 
     case 'PROCEED':
+      return { ...state, temporary_progress: state.temporary_progress + 1 };
       if (state.growth_type === 'INCREASE') {
         return { ...state, temporary_progress: state.temporary_progress + 1 };
       } else {

@@ -16,6 +16,7 @@ services:
       - MYSQL_DATABASE=${DJANGO_DB_NAME}
     ports:
       - ${DJANGO_DB_PORT}:3306
+    restart: always
 
   backend:
     container_name: backend
@@ -56,5 +57,7 @@ services:
     build:
       context: ./frontend/
       dockerfile: Dockerfile
+    environment:
+      - REACT_APP_BACKEND_HOST=${BACKEND_WITH_DOMAIN}
     ports:
       - '3000:3000'

@@ -22,10 +22,13 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { login, signUp } from '../../api/api';
 import { useSetRecoilState } from 'recoil';
 import { userTokenState } from '../../state/state';
+import useDocumentTitle from '../../hook/useDocumentTitle';
 
 const theme = createTheme();
 
 export default function SignUp() {
+  useDocumentTitle('회원가입');
+
   const navigate = useNavigate();
   const setUserToken = useSetRecoilState(userTokenState);
 
