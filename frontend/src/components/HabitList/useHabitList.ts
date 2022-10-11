@@ -4,7 +4,7 @@ import { extractFields, getHabits } from '../../api/api';
 import { HabitType } from '../../api/types';
 
 export default function useHabitList() {
-  const [habits, setHabits] = useState<HabitType[]>([]);
+  const [habits, setHabits] = useState<HabitType[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [errorCode, setErrorCode] = useState(0);

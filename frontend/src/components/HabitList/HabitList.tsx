@@ -2,17 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { CircularProgress, Container, Typography } from '@mui/material';
 
-import HabitItem from './HabitItem/HabitItem';
-import useHabitList from './useHabitList';
 import useDocumentTitle from '../../hook/useDocumentTitle';
-import { HabitDerivative } from '../../utils/habitDerivative';
-import HabitListContainer from './HabitListContainer/HabitListContainer';
+import useHabitList from './useHabitList';
+import HabitListContainerGroup from './HabitListContainerGroup/HabitListContainerGroup';
 
 export default function HabitList() {
   useDocumentTitle('습관 목록');
   const { habits, loading, isError, errorCode } = useHabitList();
-  const { habitsToDo, habitsDone, habitsNotDue } =
-    HabitDerivative.splitHabitsByStatus(habits);
 
   const formatDateMMDD = () => {
     const today = new Date();
@@ -34,7 +30,7 @@ export default function HabitList() {
         {/* 안내 메시지 */}
         {loading ? (
           <CircularProgress sx={{ alignSelf: 'center', marginTop: '1.5rem' }} />
-        ) : errorCode === 403 || (!isError && habits.length === 0) ? (
+        ) : errorCode === 403 || (!isError && habits && habits.length === 0) ? (
           <Typography textAlign="center" marginTop="2rem">
             <Link to="/create">새로운 습관</Link>을 만들어봅시다 ٩(ˊᗜˋ*)و
           </Typography>
@@ -51,49 +47,8 @@ export default function HabitList() {
         )}
 
         {/* 상태별로 정렬 */}
-        {!loading && (
-          <>
-            <HabitListContainer
-              expanded={true}
-              summary={'✨ 오늘의 습관'}
-              details={habitsToDo.map((habit, index) => (
-                <HabitItem
-                  habit={habit}
-                  opacity={1 - 0.7 * (index / habitsToDo.length)}
-                  key={index}
-                />
-              ))}
-              detailsIfEmpty={
-                <Typography textAlign="center" color="GrayText">
-                  전부 끝! 　(๑˃̵ᴗ˂̵)و
-                </Typography>
-              }
-            />
-            <HabitListContainer
-              opacity={0.5}
-              summary="🎉 달성한 습관"
-              details={habitsDone.map((habit, index) => (
-                <HabitItem habit={habit} key={index} />
-              ))}
-              detailsIfEmpty={
-                <Typography textAlign="center" color="GrayText">
-                  없음 　(:3) ×)〆～～～
-                </Typography>
-              }
-            />
-            <HabitListContainer
-              opacity={0.5}
-              summary="🎵 나중에 할 습관"
-              details={habitsNotDue.map((habit, index) => (
-                <HabitItem habit={habit} key={index} />
-              ))}
-              detailsIfEmpty={
-                <Typography textAlign="center" color="GrayText">
-                  없음 　(:3) ×)〆～～～
-                </Typography>
-              }
-            />
-          </>
+        {!loading && habits && habits.length && (
+          <HabitListContainerGroup habits={habits} />
         )}
       </Container>
     </>
