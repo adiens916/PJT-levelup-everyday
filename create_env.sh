@@ -1,7 +1,7 @@
 #!/bin/bash
 
 backend_env="./backend/.env"
-frontend_env="./frontend/.env"
+frontend_env="./frontend/.env.production"
 
 function main {
   if test ! -f $backend_env; then
