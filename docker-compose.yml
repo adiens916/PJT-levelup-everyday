@@ -29,19 +29,6 @@ services:
       - ./backend/:/app/
       - ./backend/.collected_static/:/app/.collected_static/
       - db-socket:/var/run/mysqld/
-    environment:
-      - BACKEND_HOST=${BACKEND_HOST}
-      - BACKEND_WITH_DOMAIN=${BACKEND_WITH_DOMAIN}
-      - FRONTEND_PORT=${FRONTEND_PORT}
-      - FRONTEND_WITH_DOMAIN=${FRONTEND_WITH_DOMAIN}
-      
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      - DJANGO_DB_USER=${DJANGO_DB_USER}
-      - DJANGO_DB_PASSWORD=${DJANGO_DB_PASSWORD}
-      - DJANGO_DB_ENGINE=${DJANGO_DB_ENGINE}
-      - DJANGO_DB_NAME=${DJANGO_DB_NAME}
-      - DJANGO_DB_HOST=${DJANGO_DB_HOST}
-      - DJANGO_DB_PORT=${DJANGO_DB_PORT}
     entrypoint: ["/bin/bash", "-c"]
     command: 
       - |
@@ -56,8 +43,6 @@ services:
     container_name: frontend
     build:
       context: ./frontend/
-      dockerfile: Dockerfile
-    environment:
-      - REACT_APP_BACKEND_HOST=${BACKEND_WITH_DOMAIN}
+      dockerfile: Dockerfile.dev
     ports:
       - '3000:3000'
