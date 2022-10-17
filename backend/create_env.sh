@@ -100,12 +100,12 @@ function add_backend_url {
   echo
   echo "Enter full backend URL (Ex. https://www.example.com/api)"
   echo
-  read -p ": " FULL_URL
+  read -p ": " BACKEND_URL
 
-  WITHOUT_PROTOCOL=$(echo ${FULL_URL#http?://})
+  WITHOUT_PROTOCOL=$(echo ${BACKEND_URL#http?://})
   WITHOUT_PATH=$(echo ${WITHOUT_PROTOCOL} | cut -d "/" -f1)
   BACKEND_HOST=${WITHOUT_PATH}
-  BACKEND_WITH_DOMAIN=${FULL_URL}
+  BACKEND_WITH_DOMAIN=${BACKEND_URL}
 
   env_replace ${env_file} BACKEND_HOST ${BACKEND_HOST}
   env_replace ${env_file} BACKEND_WITH_DOMAIN ${BACKEND_WITH_DOMAIN}
