@@ -1,15 +1,24 @@
 #!/bin/bash
 
-frontend_env="./.env.production"
-BACKEND_URL=$1
+frontend_env=".env.production"
 
 function main {
+  set_absolute_path
   create_frontend_env
+  
+  BACKEND_URL=$1
   if test ! ${BACKEND_URL}; then
     update_frontend_env
   else
     sync_frontend_env
   fi
+}
+
+function set_absolute_path {
+  # https://codechacha.com/ko/how-to-get-path-of-bash-script/#readlink으로-파일-경로-얻기-1
+  RELATIVE_PATH=$(dirname $BASH_SOURCE)
+  ABSOLUTE_PATH=$(readlink -f $RELATIVE_PATH)
+  frontend_env=${ABSOLUTE_PATH}/${frontend_env}
 }
 
 function create_frontend_env {
