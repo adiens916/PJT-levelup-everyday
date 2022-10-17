@@ -2,7 +2,7 @@ version: '3'
 
 volumes:
   db-data:
-  db-socket: 
+  db-socket:
 
 services:
   db:
@@ -23,15 +23,14 @@ services:
       - db
     build:
       context: ./backend/
-      dockerfile: Dockerfile.dev
-    entrypoint: ["/bin/bash", "-c"]
-    command: 
+      dockerfile: Dockerfile
+    entrypoint: ['/bin/bash', '-c']
+    command:
       - |
         python manage.py makemigrations
         python manage.py migrate
         python manage.py runserver 0:8000
     volumes:
-      - ./backend/:/app/
       - ./backend/.collected_static/:/app/.collected_static/
       - db-socket:/var/run/mysqld/
     ports:
@@ -42,6 +41,6 @@ services:
     container_name: frontend
     build:
       context: ./frontend/
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     ports:
       - '3000:3000'
