@@ -7,11 +7,12 @@ function main {
 }
 
 function create_db_env {
-  echo 
+  source create_db.sh
 }
 
 function create_backend_env_from_db {
-  BACKEND_URL='example.com'
+  source .env
+  source backend/create_env.sh ${MYSQL_ROOT_PASSWORD}
 }
 
 function create_frontend_env_from_backend {
