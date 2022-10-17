@@ -1,5 +1,4 @@
 # Custom
-env_vars.py
 migrations/
 .collected_static/
 
