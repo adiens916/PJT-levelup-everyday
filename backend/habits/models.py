@@ -49,14 +49,41 @@ class Habit(models.Model):
         self.growth_type = request.POST.get("growth_type")
         self.day_cycle = int(request.POST.get("day_cycle"))
 
-        # 임시로 초기 목표 & 증감량 설정
         if self.growth_type == "INCREASE":
-            self.today_goal = int(self.final_goal * 0.01)
-            self.growth_amount = int(self.final_goal * 0.01)
+            initial_goal = request.POST.get("initial_goal")
+            if initial_goal:
+                self.today_goal = int(initial_goal)
+            else:
+                self.today_goal = self.get_initial_today_goal(self.final_goal)
+            self.growth_amount = self.get_initial_growth_amount(self.final_goal)
         elif self.growth_type == "DECREASE":
             self.today_goal = int(self.final_goal * 10)
             self.growth_amount = int((self.today_goal - self.final_goal) * 0.01)
         self.save()
+
+    def get_initial_today_goal(self, final_goal: int):
+        thresholds = [0, 10, 15, 20, 60]
+        goals = [0.5, 1, 3, 5, 10]
+
+        final_goal_as_minute = final_goal // 60
+        try:
+            for i in range(len(thresholds)):
+                if thresholds[i] <= final_goal_as_minute < thresholds[i + 1]:
+                    today_goal = goals[i]
+                    break
+        except:
+            today_goal = goals[-1]
+        finally:
+            return int(today_goal * 60)
+
+    def get_initial_growth_amount(self, final_goal: int):
+        initial_growth_amount = int(final_goal * 0.01)
+        if 0 <= initial_growth_amount < 30:
+            return 10
+        elif 30 <= initial_growth_amount < 60:
+            return 30
+        else:
+            return (initial_growth_amount // 60) * 60
 
     def save_start_datetime(self):
         self.start_datetime = timezone.now()
