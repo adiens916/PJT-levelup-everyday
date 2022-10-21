@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator
@@ -27,8 +27,8 @@ class Habit(models.Model):
     today_goal = models.PositiveIntegerField(default=0)
     today_progress = models.PositiveIntegerField(default=0)
     growth_amount = models.IntegerField(default=0)
-    due_date = models.DateField(null=True, blank=True)
-    is_today_due_date = models.BooleanField(default=False)
+    due_date = models.DateField(default=date.today)
+    is_today_due_date = models.BooleanField(default=True)
 
     is_running = models.BooleanField(default=False)
     start_datetime = models.DateTimeField(null=True, blank=True)
