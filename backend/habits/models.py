@@ -106,11 +106,8 @@ class Habit(models.Model):
         self.due_date += timedelta(days=self.day_cycle)
 
     def set_is_today_due_date(self):
-        self.is_today_due_date = self.check_due_date()
-
-    def check_due_date(self):
         if self.due_date == None:
-            return False
+            self.is_today_due_date = False
 
         user: User = self.user
         due_date_start = datetime.combine(self.due_date, user.daily_reset_time)
@@ -118,14 +115,14 @@ class Habit(models.Model):
 
         now = datetime.now()
         if now < due_date_start:
-            return False
+            self.is_today_due_date = False
         elif due_date_start <= now < due_date_end:
-            return True
+            self.is_today_due_date = True
         elif due_date_end <= now:
             # 원래 예정일에 접속했더라면 알아서 다음 날로 갱신이 됨.
             # 이 경우는 예정일에 아예 접속조차 안 해서 갱신이 안 됐던 상황.
             # 밀린 게 쌓였을 수 있으므로, 부담을 줄이기 위해 예정에서 빼놓기
-            return False
+            self.is_today_due_date = False
 
     def is_today_successful(self) -> bool:
         if self.growth_type == "INCREASE":
