@@ -21,6 +21,10 @@ export class HabitDerivative {
   }
 
   static isDone(habit: HabitType) {
+    if (habit.is_running) {
+      return false;
+    }
+
     switch (habit.growth_type) {
       case 'INCREASE':
         return habit.today_progress >= habit.today_goal;
@@ -32,6 +36,10 @@ export class HabitDerivative {
   }
 
   static isToDo(habit: HabitType) {
+    if (habit.is_running) {
+      return true;
+    }
+
     switch (habit.growth_type) {
       case 'INCREASE':
         return (
