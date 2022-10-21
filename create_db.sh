@@ -3,8 +3,9 @@
 env_file=".env"
 
 function main {
+  set_absolute_path
+  
   if test ! -f ${env_file}; then
-    set_absolute_path
     create_db_password
     add_db_name_and_port
   fi
