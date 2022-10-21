@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator
@@ -27,8 +27,8 @@ class Habit(models.Model):
     today_goal = models.PositiveIntegerField(default=0)
     today_progress = models.PositiveIntegerField(default=0)
     growth_amount = models.IntegerField(default=0)
-    due_date = models.DateField(null=True, blank=True)
-    is_today_due_date = models.BooleanField(default=False)
+    due_date = models.DateField(default=date.today)
+    is_today_due_date = models.BooleanField(default=True)
 
     is_running = models.BooleanField(default=False)
     start_datetime = models.DateTimeField(null=True, blank=True)
@@ -49,14 +49,41 @@ class Habit(models.Model):
         self.growth_type = request.POST.get("growth_type")
         self.day_cycle = int(request.POST.get("day_cycle"))
 
-        # 임시로 초기 목표 & 증감량 설정
         if self.growth_type == "INCREASE":
-            self.today_goal = int(self.final_goal * 0.01)
-            self.growth_amount = int(self.final_goal * 0.01)
+            initial_goal = request.POST.get("initial_goal")
+            if initial_goal:
+                self.today_goal = int(initial_goal)
+            else:
+                self.today_goal = self.get_initial_today_goal(self.final_goal)
+            self.growth_amount = self.get_initial_growth_amount(self.final_goal)
         elif self.growth_type == "DECREASE":
             self.today_goal = int(self.final_goal * 10)
             self.growth_amount = int((self.today_goal - self.final_goal) * 0.01)
         self.save()
+
+    def get_initial_today_goal(self, final_goal: int):
+        thresholds = [0, 10, 15, 20, 60]
+        goals = [0.5, 1, 3, 5, 10]
+
+        final_goal_as_minute = final_goal // 60
+        try:
+            for i in range(len(thresholds)):
+                if thresholds[i] <= final_goal_as_minute < thresholds[i + 1]:
+                    today_goal = goals[i]
+                    break
+        except:
+            today_goal = goals[-1]
+        finally:
+            return int(today_goal * 60)
+
+    def get_initial_growth_amount(self, final_goal: int):
+        initial_growth_amount = int(final_goal * 0.01)
+        if 0 <= initial_growth_amount < 30:
+            return 10
+        elif 30 <= initial_growth_amount < 60:
+            return 30
+        else:
+            return (initial_growth_amount // 60) * 60
 
     def save_start_datetime(self):
         self.start_datetime = timezone.now()
@@ -106,11 +133,8 @@ class Habit(models.Model):
         self.due_date += timedelta(days=self.day_cycle)
 
     def set_is_today_due_date(self):
-        self.is_today_due_date = self.check_due_date()
-
-    def check_due_date(self):
         if self.due_date == None:
-            return False
+            self.is_today_due_date = False
 
         user: User = self.user
         due_date_start = datetime.combine(self.due_date, user.daily_reset_time)
@@ -118,14 +142,14 @@ class Habit(models.Model):
 
         now = datetime.now()
         if now < due_date_start:
-            return False
+            self.is_today_due_date = False
         elif due_date_start <= now < due_date_end:
-            return True
+            self.is_today_due_date = True
         elif due_date_end <= now:
             # 원래 예정일에 접속했더라면 알아서 다음 날로 갱신이 됨.
             # 이 경우는 예정일에 아예 접속조차 안 해서 갱신이 안 됐던 상황.
             # 밀린 게 쌓였을 수 있으므로, 부담을 줄이기 위해 예정에서 빼놓기
-            return False
+            self.is_today_due_date = False
 
     def is_today_successful(self) -> bool:
         if self.growth_type == "INCREASE":
