@@ -24,9 +24,13 @@ class Habit(models.Model):
         default=100, validators=[MaxValueValidator(10000)]
     )
 
+    level = models.PositiveIntegerField(default=1)
+    # modifier = models.FloatField(default=1.0)
     goal_xp = models.PositiveIntegerField(default=0)
     current_xp = models.PositiveIntegerField(default=0)
     growth_amount = models.IntegerField(default=0)
+
+    is_done_today = models.BooleanField(default=False)
     due_date = models.DateField(default=date.today)
     is_today_due_date = models.BooleanField(default=True)
 
@@ -152,10 +156,11 @@ class Habit(models.Model):
             self.is_today_due_date = False
 
     def is_today_successful(self) -> bool:
-        if self.growth_type == "INCREASE":
-            return self.goal_xp <= self.current_xp
-        elif self.growth_type == "DECREASE":
-            return self.goal_xp >= self.current_xp
+        return self.is_done_today
+        # if self.growth_type == "INCREASE":
+        #     return self.goal_xp <= self.current_xp
+        # elif self.growth_type == "DECREASE":
+        #     return self.goal_xp >= self.current_xp
 
     def is_owned_by_user(self, given_user: User):
         return self.user.pk == given_user.pk
@@ -222,6 +227,8 @@ class DailyRecord(models.Model):
                 self.set_for_excess(habit)
 
     def set_for_excess(self, habit: Habit):
+        # TODO: Change to use current level & today progress.
+        # To exclude goal & excess
         self.goal = habit.goal_xp
         self.progress = habit.goal_xp
         self.excess = habit.current_xp
