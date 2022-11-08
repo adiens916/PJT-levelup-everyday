@@ -1,4 +1,4 @@
-import datetime
+from datetime import date, timedelta, time
 import json
 
 from django.views.decorators.csrf import csrf_exempt
@@ -28,25 +28,11 @@ from .models import User
 @csrf_exempt
 @permission_classes([AllowAny])
 def signup(request: HttpRequest):
-    def create_user(request: HttpRequest) -> User:
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-        user = User.objects.create_user(username, email, password)
-        return user
-
-    def change_standard_reset_time(request: HttpRequest) -> None:
-        standard_reset_time = request.POST.get("standard_reset_time")
-        # ex) '03:30'
-        # TODO: 정규표현식으로 체크하기
-        if standard_reset_time:
-            hour, minute = standard_reset_time.split(":")
-            user.daily_reset_time = datetime.time(int(hour), int(minute))
-            user.save()
-
     if request.method == "POST":
-        user = create_user(request)
-        change_standard_reset_time(request)
+        user = User.create_from_request(request)
+        user.change_standard_reset_time(request)
+        user.next_reset_date = date.today() + timedelta(days=1)
+        user.save()
         return JsonResponse({"id": user.pk})
     else:
         return HttpResponseBadRequest()
