@@ -9,10 +9,8 @@ from rest_framework import status
 
 from account.models import User
 from .models import DailyRecord, Habit, RoundRecord
-from .views_aux import (
-    json_response_wrapper,
-    update_goals_and_due_dates,
-)
+from .models_aux import RecordSaver, GoalAdjuster, DueAdjuster
+from .views_aux import json_response_wrapper
 
 
 # Create your views here.
@@ -27,12 +25,18 @@ def index(request: HttpRequest):
         user: User = request.user
         habit_list = Habit.objects.filter(user=user.pk).order_by("-importance")
         if user.is_day_changed():
-            print("day changed")
-            if user.next_reset_date:
+            if not user.next_reset_date:
+                user.next_reset_date = date.today() + timedelta(days=1)
+                user.save()
+            else:
                 # TODO: 자정 후에 미리 다음 날로 넘어가는 기능 추가하기
-                update_goals_and_due_dates(habit_list, user)
-            user.next_reset_date = date.today() + timedelta(days=1)
-            user.save()
+                for habit in habit_list:
+                    RecordSaver.save(habit)
+                    GoalAdjuster.adjust_habit_goal(habit)
+                    DueAdjuster.adjust_habit_due(habit)
+                    DueAdjuster.set_is_today_due_date(habit)
+                    habit.save()
+
         return json_response_wrapper(habit_list)
 
     elif request.method == "POST":
