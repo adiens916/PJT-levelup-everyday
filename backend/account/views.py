@@ -1,18 +1,11 @@
-from datetime import date, timedelta, time
+from datetime import date, timedelta
 import json
 
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth import (
-    authenticate,
-    login as user_login,
-    logout as user_logout,
-)
+from django.contrib.auth import authenticate
 from django.http import (
     JsonResponse,
     HttpRequest,
-    HttpResponse,
-    HttpResponseBadRequest,
     HttpResponseNotFound,
 )
 from rest_framework.decorators import api_view, permission_classes
@@ -52,10 +45,6 @@ def login(request: HttpRequest):
                 "user_id": user.pk,
             }
         )
-        user_login(request, user)
-        return JsonResponse(
-            {"id": user.pk, "name": user.get_username(), "last_login": user.last_login}
-        )
     else:
         result = json.dumps({"success": False, "error": "User not found"})
         return HttpResponseNotFound(result, content_type="application/json")
@@ -70,8 +59,6 @@ def logout(request: HttpRequest):
             {"success": True, "detail": "Successfully logged out"},
             status=status.HTTP_200_OK,
         )
-        user_logout(request)
-        return JsonResponse({"success": True, "message": "Successfully logged out"})
     else:
         result = json.dumps({"success": False, "error": "User not logged in"})
         return HttpResponseNotFound(result, content_type="application/json")
