@@ -112,12 +112,6 @@ class Habit(models.Model):
     def is_due_or_done(self):
         return self.is_today_due_date or self.current_xp > 0 or self.is_running
 
-    def save_round_record_if_running(self):
-        if self.is_running:
-            round_record = RoundRecord()
-            round_record.create_from_habit_running(self)
-            self.add_progress_and_init(round_record.progress, save=False)
-
     def adjust_goal_and_due_date_by_success(self, success: bool):
         if self.growth_type == "INCREASE":
             growth_amount = self.growth_amount

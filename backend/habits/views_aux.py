@@ -24,16 +24,17 @@ def update_goals_and_due_dates(habit_list: Iterable[Habit], user: User):
 
     for habit in habit_list:
         if habit.is_due_or_done():
+            # 1. 저장
             habit.save_round_record_if_running()
 
             # 어제 기록 저장
             daily_record = DailyRecord()
             daily_record.create_from_habit(habit)
 
-            # 어제 기록에 따라 목표 조정
+            # 2. 어제 기록에 따라 목표 조정
             habit.adjust_goal_and_due_date_by_success(daily_record.success)
 
-        # 오늘 해야 하는지
+        # 3. 오늘 해야 하는지
         habit.set_is_today_due_date()
         habit.save()
 
