@@ -27,8 +27,6 @@ class Habit(models.Model):
     today_goal = models.PositiveIntegerField(default=0)
     today_progress = models.PositiveIntegerField(default=0)
     growth_amount = models.IntegerField(default=0)
-
-    is_done_today = models.BooleanField(default=False)
     due_date = models.DateField(default=date.today)
     is_today_due_date = models.BooleanField(default=True)
 
@@ -111,11 +109,10 @@ class Habit(models.Model):
         return self.is_today_due_date or self.today_progress > 0 or self.is_running
 
     def is_today_successful(self) -> bool:
-        return self.is_done_today
-        # if self.growth_type == "INCREASE":
-        #     return self.goal_xp <= self.current_xp
-        # elif self.growth_type == "DECREASE":
-        #     return self.goal_xp >= self.current_xp
+        if self.growth_type == "INCREASE":
+            return self.today_goal <= self.today_progress
+        elif self.growth_type == "DECREASE":
+            return self.today_goal >= self.today_progress
 
     def is_owned_by_user(self, given_user: User):
         return self.user.pk == given_user.pk
