@@ -26,16 +26,14 @@ from .models import User
 
 # Create your views here.
 @csrf_exempt
+@api_view(["POST"])
 @permission_classes([AllowAny])
 def signup(request: HttpRequest):
-    if request.method == "POST":
-        user = User.create_from_request(request)
-        user.change_standard_reset_time(request)
-        user.next_reset_date = date.today() + timedelta(days=1)
-        user.save()
-        return JsonResponse({"id": user.pk})
-    else:
-        return HttpResponseBadRequest()
+    user = User.create_from_request(request)
+    user.change_standard_reset_time(request)
+    user.next_reset_date = date.today() + timedelta(days=1)
+    user.save()
+    return JsonResponse({"id": user.pk})
 
 
 @csrf_exempt
