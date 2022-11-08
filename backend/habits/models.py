@@ -108,49 +108,6 @@ class Habit(models.Model):
     def is_due_or_done(self):
         return self.is_today_due_date or self.today_progress > 0 or self.is_running
 
-    def save_round_record_if_running(self):
-        if self.is_running:
-            round_record = RoundRecord()
-            round_record.create_from_habit_running(self)
-            self.add_progress_and_init(round_record.progress, save=False)
-
-    def adjust_goal_and_due_date_by_success(self, success: bool):
-        if self.growth_type == "INCREASE":
-            growth_amount = self.growth_amount
-        elif self.growth_type == "DECREASE":
-            growth_amount = -self.growth_amount
-
-        if success:
-            self.today_goal += growth_amount
-        else:
-            self.today_goal -= growth_amount
-
-        self.today_progress = 0
-
-        # 예정일이 아니었는데 진행한 경우, 원래는 None이라 오류 남
-        # => 어제로 예정일을 바꿈
-        self.due_date = self.user.get_yesterday()
-        self.due_date += timedelta(days=self.day_cycle)
-
-    def set_is_today_due_date(self):
-        if self.due_date == None:
-            self.is_today_due_date = False
-
-        user: User = self.user
-        due_date_start = datetime.combine(self.due_date, user.daily_reset_time)
-        due_date_end = due_date_start + timedelta(days=1)
-
-        now = datetime.now()
-        if now < due_date_start:
-            self.is_today_due_date = False
-        elif due_date_start <= now < due_date_end:
-            self.is_today_due_date = True
-        elif due_date_end <= now:
-            # 원래 예정일에 접속했더라면 알아서 다음 날로 갱신이 됨.
-            # 이 경우는 예정일에 아예 접속조차 안 해서 갱신이 안 됐던 상황.
-            # 밀린 게 쌓였을 수 있으므로, 부담을 줄이기 위해 예정에서 빼놓기
-            self.is_today_due_date = False
-
     def is_today_successful(self) -> bool:
         if self.growth_type == "INCREASE":
             return self.today_goal <= self.today_progress
