@@ -112,24 +112,6 @@ class Habit(models.Model):
     def is_due_or_done(self):
         return self.is_today_due_date or self.current_xp > 0 or self.is_running
 
-    def adjust_goal_and_due_date_by_success(self, success: bool):
-        if self.growth_type == "INCREASE":
-            growth_amount = self.growth_amount
-        elif self.growth_type == "DECREASE":
-            growth_amount = -self.growth_amount
-
-        if success:
-            self.goal_xp += growth_amount
-        else:
-            self.goal_xp -= growth_amount
-
-        self.current_xp = 0
-
-        # 예정일이 아니었는데 진행한 경우, 원래는 None이라 오류 남
-        # => 어제로 예정일을 바꿈
-        self.due_date = self.user.get_yesterday()
-        self.due_date += timedelta(days=self.day_cycle)
-
     def set_is_today_due_date(self):
         if self.due_date == None:
             self.is_today_due_date = False
