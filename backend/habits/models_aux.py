@@ -28,7 +28,7 @@ class RecordSaver:
 
 class GoalAdjuster:
     @staticmethod
-    def adjust_habit_goal_by_success(habit: Habit, success: bool) -> None:
+    def adjust_habit_goal(habit: Habit) -> None:
         if not habit.is_due_or_done():
             return
 
@@ -37,7 +37,7 @@ class GoalAdjuster:
         elif habit.growth_type == "DECREASE":
             growth_amount = -habit.growth_amount
 
-        if success:
+        if habit.is_today_successful():
             habit.goal_xp += growth_amount
         else:
             habit.goal_xp -= growth_amount
