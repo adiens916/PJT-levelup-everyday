@@ -1,4 +1,3 @@
-from datetime import date, timedelta
 from typing import Iterable
 
 from django.http import JsonResponse, HttpRequest
@@ -25,17 +24,13 @@ def index(request: HttpRequest):
         user: User = request.user
         habit_list = Habit.objects.filter(user=user.pk).order_by("-importance")
         if user.is_day_changed():
-            if not user.next_reset_date:
-                user.next_reset_date = date.today() + timedelta(days=1)
-                user.save()
-            else:
-                # TODO: 자정 후에 미리 다음 날로 넘어가는 기능 추가하기
-                for habit in habit_list:
-                    RecordSaver.save(habit)
-                    GoalAdjuster.adjust_habit_goal(habit)
-                    DueAdjuster.adjust_habit_due(habit)
-                    DueAdjuster.set_is_today_due_date(habit)
-                    habit.save()
+            # TODO: 자정 후에 미리 다음 날로 넘어가는 기능 추가하기
+            for habit in habit_list:
+                RecordSaver.save(habit)
+                GoalAdjuster.adjust_habit_goal(habit)
+                DueAdjuster.adjust_habit_due(habit)
+                DueAdjuster.set_is_today_due_date(habit)
+                habit.save()
 
         return json_response_wrapper(habit_list)
 
