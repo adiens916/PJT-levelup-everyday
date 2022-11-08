@@ -38,11 +38,11 @@ class GoalAdjuster:
             growth_amount = -habit.growth_amount
 
         if habit.is_today_successful():
-            habit.goal_xp += growth_amount
+            habit.today_goal += growth_amount
         else:
-            habit.goal_xp -= growth_amount
+            habit.today_goal -= growth_amount
 
-        habit.current_xp = 0
+        habit.today_progress = 0
 
 
 class DueAdjuster:

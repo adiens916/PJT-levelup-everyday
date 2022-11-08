@@ -24,10 +24,8 @@ class Habit(models.Model):
         default=100, validators=[MaxValueValidator(10000)]
     )
 
-    level = models.PositiveIntegerField(default=1)
-    # modifier = models.FloatField(default=1.0)
-    goal_xp = models.PositiveIntegerField(default=0)
-    current_xp = models.PositiveIntegerField(default=0)
+    today_goal = models.PositiveIntegerField(default=0)
+    today_progress = models.PositiveIntegerField(default=0)
     growth_amount = models.IntegerField(default=0)
 
     is_done_today = models.BooleanField(default=False)
@@ -56,13 +54,13 @@ class Habit(models.Model):
         if self.growth_type == "INCREASE":
             initial_goal = request.POST.get("initial_goal")
             if initial_goal:
-                self.goal_xp = int(initial_goal)
+                self.today_goal = int(initial_goal)
             else:
-                self.goal_xp = self.get_initial_today_goal(self.final_goal)
+                self.today_goal = self.get_initial_today_goal(self.final_goal)
             self.growth_amount = self.get_initial_growth_amount(self.final_goal)
         elif self.growth_type == "DECREASE":
-            self.goal_xp = int(self.final_goal * 10)
-            self.growth_amount = int((self.goal_xp - self.final_goal) * 0.01)
+            self.today_goal = int(self.final_goal * 10)
+            self.growth_amount = int((self.today_goal - self.final_goal) * 0.01)
         self.save()
 
     def get_initial_today_goal(self, final_goal: int):
@@ -101,7 +99,7 @@ class Habit(models.Model):
     def add_progress_and_init(self, progress: int, save=True):
         self.start_datetime = None
         self.is_running = False
-        self.current_xp += progress
+        self.today_progress += progress
         if save:
             self.save()
 
@@ -110,7 +108,7 @@ class Habit(models.Model):
         user.save()
 
     def is_due_or_done(self):
-        return self.is_today_due_date or self.current_xp > 0 or self.is_running
+        return self.is_today_due_date or self.today_progress > 0 or self.is_running
 
     def is_today_successful(self) -> bool:
         return self.is_done_today
@@ -184,15 +182,13 @@ class DailyRecord(models.Model):
                 self.set_for_excess(habit)
 
     def set_for_excess(self, habit: Habit):
-        # TODO: Change to use current level & today progress.
-        # To exclude goal & excess
-        self.goal = habit.goal_xp
-        self.progress = habit.goal_xp
-        self.excess = habit.current_xp
+        self.goal = habit.today_goal
+        self.progress = habit.today_goal
+        self.excess = habit.today_progress
 
     def set_for_lack(self, habit: Habit):
-        self.goal = habit.goal_xp
-        self.progress = habit.current_xp
+        self.goal = habit.today_goal
+        self.progress = habit.today_progress
         self.excess = 0
 
     def is_owned_by_user(self, given_user: User):
