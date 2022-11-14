@@ -10,11 +10,11 @@ class UserModelTestCase(TestCase):
     def setUp(self) -> None:
         self.user = User.objects.create()
 
-    @mock.patch("account.models.datetime")
+    @mock.patch("account.models.datetime", wraps=datetime)
     def test_is_day_changed_when_reset_at_night(self, mocked_datetime):
         """
         If a user's reset time is PM 10:15, and now is PM 10:30,
-        then day was changed.
+        then the day has been changed.
         """
 
         self.user.next_reset_date = date(2022, 9, 1)
