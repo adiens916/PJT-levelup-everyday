@@ -4,34 +4,6 @@
 """
 
 from datetime import datetime, time, timedelta, date
-from django.test import TestCase
-
-
-# Create your tests here.
-def is_day_changed(next_reset_date: date, daily_reset_time: time, now: datetime):
-    if next_reset_date == None:
-        return True
-
-    next_reset_datetime = datetime.combine(next_reset_date, daily_reset_time)
-    return next_reset_datetime <= now
-
-
-def test_is_day_changed_when_reset_at_night():
-    reset_date = date(2022, 9, 1)
-    reset_hour = time(22, 15)
-    now = datetime(2022, 9, 1, hour=22, minute=30)
-    assert True == is_day_changed(reset_date, reset_hour, now)
-
-
-def test_is_day_changed_when_reset_at_dawn():
-    reset_date = date(2022, 9, 17)
-    reset_hour = time(6, 0)
-
-    now = datetime(2022, 9, 17, hour=0)
-    assert False == is_day_changed(reset_date, reset_hour, now)
-
-    now = datetime(2022, 9, 17, hour=7)
-    assert True == is_day_changed(reset_date, reset_hour, now)
 
 
 def is_due_today(due_date: date, reset_hour: time, now: datetime):
