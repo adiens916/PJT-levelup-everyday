@@ -32,7 +32,7 @@ class HabitModelTestCase(TestCase):
 
     @mock.patch("habits.models_aux.datetime", wraps=datetime)
     def test_is_today_due_date_when_after_due(self, mocked_datetime):
-        # when: now is after due date by one day
+        # when: now is after due date by 1 day
         now = datetime(2022, 9, 4, hour=7, minute=0)
         mocked_datetime.now.return_value = now
 
@@ -40,15 +40,28 @@ class HabitModelTestCase(TestCase):
         result = DueAdjuster.is_today_due_date(self.habit)
         self.assertFalse(result)
 
-    # def test_is_today_due_date_when_border_values():
-    #     due_date = date(2022, 9, 1)
-    #     reset_hour = time(6, 0)
+    @mock.patch("habits.models_aux.datetime", wraps=datetime)
+    def test_is_today_due_date_when_border_values(self, mocked_datetime):
+        # when: now is before due date by 1 minute
+        now = datetime(2022, 9, 3, hour=5, minute=59)
+        mocked_datetime.now.return_value = now
 
-    #     day_cycle = 2
-    #     next_due_date = due_date + timedelta(days=day_cycle)
+        # then: the habit doesn't have to do yet
+        result = DueAdjuster.is_today_due_date(self.habit)
+        self.assertFalse(result)
 
-    #     now = datetime(2022, 9, 3, hour=5, minute=59)
-    #     assert False == is_due_today(next_due_date, reset_hour, now)
+        # when: now is due
+        now = datetime(2022, 9, 3, hour=6, minute=0)
+        mocked_datetime.now.return_value = now
 
-    #     now = datetime(2022, 9, 4, hour=5, minute=59)
-    #     assert True == is_due_today(next_due_date, reset_hour, now)
+        # then: the habit doesn't have to do yet
+        result = DueAdjuster.is_today_due_date(self.habit)
+        self.assertTrue(result)
+
+        # when: now is before overdue by 1 minute
+        now = datetime(2022, 9, 4, hour=5, minute=59)
+        mocked_datetime.now.return_value = now
+
+        # then: the habit doesn't have to do yet
+        result = DueAdjuster.is_today_due_date(self.habit)
+        self.assertTrue(result)
