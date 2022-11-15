@@ -13,15 +13,16 @@ class HabitModelTestCase(TestCase):
         self.habit = Habit()
         self.habit.user = User()
 
-    @mock.patch("habits.models_aux.datetime", wraps=datetime)
-    def test_is_today_due_date(self, mocked_datetime):
-        # given: 2022-09-03 AM 06:00
+        # given: the habit is to do at 2022-09-03
         self.habit.due_date = date(2022, 9, 3)
         user: User = self.habit.user
+        # given: the owner of the habit starts the day at AM 06:00
         user.daily_reset_time = time(6, 0)
         user.save()
 
-        # when: now is AM 07:00
+    @mock.patch("habits.models_aux.datetime", wraps=datetime)
+    def test_is_today_due_date(self, mocked_datetime):
+        # when: now is 2022-09-03 AM 07:00
         now = datetime(2022, 9, 3, hour=7, minute=0)
         mocked_datetime.now.return_value = now
 
