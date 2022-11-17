@@ -1,5 +1,5 @@
 from datetime import datetime, time, timedelta
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.http import HttpRequest
 
@@ -8,6 +8,8 @@ class User(AbstractUser):
     next_reset_date = models.DateField(blank=True, null=True)
     daily_reset_time = models.TimeField(default=time(hour=0, minute=0))
     is_recording = models.BooleanField(default=False)
+
+    objects = UserManager()
 
     @staticmethod
     def create_from_request(request: HttpRequest):
