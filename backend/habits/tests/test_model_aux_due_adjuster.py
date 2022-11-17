@@ -8,7 +8,7 @@ from habits.models import Habit
 from habits.models_aux import DueAdjuster
 
 
-class HabitModelTestCase(TestCase):
+class DueAdjusterTestCase(TestCase):
     def setUp(self) -> None:
         self.habit = Habit()
         self.habit.user = User()
