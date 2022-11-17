@@ -23,14 +23,19 @@ class GoalAdjusterTestCase(TestCase):
         self.assertNotEqual(id(self.habit), id(habit_copy))
 
     def test_ignore_for_not_due_habit(self):
-        habit_not_due = deepcopy(self.habit)
-        habit_not_due.is_today_due_date = False
-
-        GoalAdjuster.adjust_habit_goal(habit_not_due)
-        self.assertEqual(habit_not_due.today_goal, 60)
+        self.habit.is_today_due_date = False
+        GoalAdjuster.adjust_habit_goal(self.habit)
+        self.assertEqual(self.habit.today_goal, 60)
 
     def test_success_for_increase_type(self):
-        pass
+        self.habit.today_progress = 60
+        GoalAdjuster.adjust_habit_goal(self.habit)
+        self.assertEqual(self.habit.today_goal, 120)
+        self.assertEqual(self.habit.today_progress, 0)
 
     def test_fail_for_increase_type(self):
-        pass
+        self.habit.today_progress = 10
+        GoalAdjuster.adjust_habit_goal(self.habit)
+        # TODO: prevent today_goal from decreasing below 0
+        # self.assertEqual(self.habit.today_goal, 60)
+        self.assertEqual(self.habit.today_progress, 0)
