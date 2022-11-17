@@ -20,10 +20,6 @@ class RecordSaverTestCase(TestCase):
         habit.is_today_due_date = True
         self.habit = habit
 
-    def test_ensure_no_records_before_save(self):
-        self.assertFalse(RoundRecord.objects.exists())
-        self.assertFalse(DailyRecord.objects.exists())
-
     def test_create_round_record(self):
         user = User()
         user.next_reset_date = date(2022, 11, 11)
@@ -37,7 +33,6 @@ class RecordSaverTestCase(TestCase):
 
         RecordSaver.save(self.habit)
         round_record = RoundRecord.objects.get(habit=self.habit)
-        self.assertEqual(round_record.habit.name, "Reading a book")
         self.assertEqual(
             round_record.start_datetime, datetime(2022, 11, 10, hour=23, minute=50)
         )
