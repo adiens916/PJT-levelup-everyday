@@ -20,13 +20,14 @@ class RecordSaverTestCase(TestCase):
         habit.is_today_due_date = True
         self.habit = habit
 
-    def test_create_round_record(self):
         user = User()
         user.next_reset_date = date(2022, 11, 11)
         user.daily_reset_time = time(hour=0, minute=0)
         user.save()
         self.habit.user = user
+        self.habit.save()
 
+    def test_create_round_record(self):
         self.habit.is_running = True
         self.habit.start_datetime = datetime(2022, 11, 10, hour=23, minute=50)
         self.habit.save()
@@ -42,13 +43,6 @@ class RecordSaverTestCase(TestCase):
         self.assertEqual(round_record.progress, 60 * 9)
 
     def test_create_daily_record(self):
-        user = User()
-        user.next_reset_date = date(2022, 11, 11)
-        user.daily_reset_time = time(hour=0, minute=0)
-        user.save()
-        self.habit.user = user
-        self.habit.save()
-
         RecordSaver.save(self.habit)
         daily_record = DailyRecord.objects.get(habit=self.habit)
         self.assertEqual(daily_record.date, date(2022, 11, 10))
