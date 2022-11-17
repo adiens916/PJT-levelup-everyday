@@ -42,7 +42,20 @@ class RecordSaverTestCase(TestCase):
         self.assertEqual(round_record.progress, 60 * 9)
 
     def test_create_daily_record(self):
-        pass
+        user = User()
+        user.next_reset_date = date(2022, 11, 11)
+        user.daily_reset_time = time(hour=0, minute=0)
+        user.save()
+        self.habit.user = user
+        self.habit.save()
+
+        RecordSaver.save(self.habit)
+        daily_record = DailyRecord.objects.get(habit=self.habit)
+        self.assertEqual(daily_record.date, date(2022, 11, 10))
+        self.assertEqual(daily_record.success, True)
+        self.assertEqual(daily_record.goal, 60)
+        self.assertEqual(daily_record.progress, 60)
+        self.assertEqual(daily_record.excess, 70)
 
     def test_create_records_if_habit_is_done_but_not_due(self):
         pass
