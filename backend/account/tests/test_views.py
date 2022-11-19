@@ -5,12 +5,16 @@ from django.test import TestCase
 from account.models import User
 
 
-class HabitViewTestCase(TestCase):
+class AccountViewTestCase(TestCase):
     def setUp(self) -> None:
         self.user = User.objects.create_user(username="john", password="doe")
 
     def test_login(self):
-        response = self.client.post(
-            "/api/account/login/", {"username": "john", "password": "doe"}
-        )
-        print(response.content)
+        credentials = {"username": "john", "password": "doe"}
+        response = self.client.post("/api/account/login/", credentials)
+        # print(response.client)
+
+        items: dict = response.json()
+        self.assertTrue(items.get("token"))
+        self.assertTrue(items.get("user_id"))
+        self.assertIsNone(items.get("success"))
