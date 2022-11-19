@@ -65,6 +65,7 @@ def logout(request: HttpRequest):
 
 
 @csrf_exempt
+@api_view(["POST"])
 def check_authenticated(request: HttpRequest):
     if not request.user:
         result = json.dumps({"success": False, "error": "User not found"})
