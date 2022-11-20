@@ -85,7 +85,7 @@ class Habit(models.Model):
         else:
             return (initial_growth_amount // 60) * 60
 
-    def save_start_datetime(self):
+    def start_recording(self):
         self.start_datetime = timezone.now()
         self.is_running = True
         self.save()
@@ -94,7 +94,7 @@ class Habit(models.Model):
         user.is_recording = True
         user.save()
 
-    def add_progress_and_init(self, progress: int, save=True):
+    def end_recording(self, progress: int, save=True):
         self.start_datetime = None
         self.is_running = False
         self.current_xp += progress
