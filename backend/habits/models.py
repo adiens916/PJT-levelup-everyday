@@ -24,7 +24,7 @@ class Habit(models.Model):
         default=100, validators=[MaxValueValidator(10000)]
     )
 
-    today_goal = models.PositiveIntegerField(default=0)
+    goal_xp = models.PositiveIntegerField(default=0)
     today_progress = models.PositiveIntegerField(default=0)
     growth_amount = models.IntegerField(default=0)
     due_date = models.DateField(default=date.today)
@@ -52,13 +52,13 @@ class Habit(models.Model):
         if self.growth_type == "INCREASE":
             initial_goal = request.POST.get("initial_goal")
             if initial_goal:
-                self.today_goal = int(initial_goal)
+                self.goal_xp = int(initial_goal)
             else:
-                self.today_goal = self.get_initial_today_goal(self.final_goal)
+                self.goal_xp = self.get_initial_today_goal(self.final_goal)
             self.growth_amount = self.get_initial_growth_amount(self.final_goal)
         elif self.growth_type == "DECREASE":
-            self.today_goal = int(self.final_goal * 10)
-            self.growth_amount = int((self.today_goal - self.final_goal) * 0.01)
+            self.goal_xp = int(self.final_goal * 10)
+            self.growth_amount = int((self.goal_xp - self.final_goal) * 0.01)
         self.save()
 
     def get_initial_today_goal(self, final_goal: int):
@@ -110,9 +110,9 @@ class Habit(models.Model):
 
     def is_today_successful(self) -> bool:
         if self.growth_type == "INCREASE":
-            return self.today_goal <= self.today_progress
+            return self.goal_xp <= self.today_progress
         elif self.growth_type == "DECREASE":
-            return self.today_goal >= self.today_progress
+            return self.goal_xp >= self.today_progress
 
     def is_owned_by_user(self, given_user: User):
         return self.user.pk == given_user.pk
@@ -179,12 +179,12 @@ class DailyRecord(models.Model):
                 self.set_for_excess(habit)
 
     def set_for_excess(self, habit: Habit):
-        self.goal = habit.today_goal
-        self.progress = habit.today_goal
+        self.goal = habit.goal_xp
+        self.progress = habit.goal_xp
         self.excess = habit.today_progress
 
     def set_for_lack(self, habit: Habit):
-        self.goal = habit.today_goal
+        self.goal = habit.goal_xp
         self.progress = habit.today_progress
         self.excess = 0
 
