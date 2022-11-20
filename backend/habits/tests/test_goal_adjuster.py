@@ -12,8 +12,8 @@ class GoalAdjusterTestCase(TestCase):
         habit.name = "Reading a book"
         habit.growth_type = "INCREASE"
         habit.final_goal = 3600
-        habit.today_goal = 60
-        habit.today_progress = 0
+        habit.goal_xp = 60
+        habit.current_xp = 0
         habit.growth_amount = 60
         habit.is_today_due_date = True
         self.habit = habit
@@ -25,17 +25,17 @@ class GoalAdjusterTestCase(TestCase):
     def test_ignore_for_not_due_habit(self):
         self.habit.is_today_due_date = False
         GoalAdjuster.adjust_habit_goal(self.habit)
-        self.assertEqual(self.habit.today_goal, 60)
+        self.assertEqual(self.habit.goal_xp, 60)
 
     def test_success_for_increase_type(self):
-        self.habit.today_progress = 60
+        self.habit.current_xp = 60
         GoalAdjuster.adjust_habit_goal(self.habit)
-        self.assertEqual(self.habit.today_goal, 120)
-        self.assertEqual(self.habit.today_progress, 0)
+        self.assertEqual(self.habit.goal_xp, 120)
+        self.assertEqual(self.habit.current_xp, 0)
 
     def test_fail_for_increase_type(self):
-        self.habit.today_progress = 10
+        self.habit.current_xp = 10
         GoalAdjuster.adjust_habit_goal(self.habit)
         # TODO: prevent today_goal from decreasing below 0
         # self.assertEqual(self.habit.today_goal, 60)
-        self.assertEqual(self.habit.today_progress, 0)
+        self.assertEqual(self.habit.current_xp, 0)

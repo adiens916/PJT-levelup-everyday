@@ -14,8 +14,8 @@ class RecordSaverTestCase(TestCase):
         habit.estimate_type = "TIME"
         habit.growth_type = "INCREASE"
         habit.final_goal = 3600
-        habit.today_goal = 60
-        habit.today_progress = 70
+        habit.goal_xp = 60
+        habit.current_xp = 70
         habit.growth_amount = 60
         habit.is_today_due_date = True
         self.habit = habit
@@ -63,7 +63,7 @@ class RecordSaverTestCase(TestCase):
         self.assertEqual(daily_record.excess, 70)
 
     def test_create_records_if_habit_is_not_completed(self):
-        self.habit.today_progress = 10
+        self.habit.current_xp = 10
         self.habit.save()
 
         RecordSaver.save(self.habit)
