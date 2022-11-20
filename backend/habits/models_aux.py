@@ -42,7 +42,7 @@ class GoalAdjuster:
         else:
             habit.goal_xp -= growth_amount
 
-        habit.today_progress = 0
+        habit.current_xp = 0
 
 
 class DueAdjuster:
