@@ -20,6 +20,7 @@ class HabitViewTestCase(TestCase):
             "day_cycle": 2,
             "initial_goal": "",
         }
+        cls.habit_id = cls.create_habit()
 
     @classmethod
     def get_auth_headers(cls, username: str, password: str) -> dict:
@@ -30,14 +31,15 @@ class HabitViewTestCase(TestCase):
         token = items.get("token")
         return {"HTTP_AUTHORIZATION": f"Token {token}"}
 
-    def test_create_habit(self):
-        response = self.client.post(
-            "/api/habit/", data=self.habit_info, **self.auth_headers
-        )
+    @classmethod
+    def create_habit(cls) -> int:
+        response = Client().post("/api/habit/", data=cls.habit_info, **cls.auth_headers)
 
         items: dict = response.json()
         habit_id = items.get("id")
-        habit = Habit.objects.get(pk=habit_id)
+        return habit_id
 
+    def test_create_habit(self):
+        habit = Habit.objects.get(pk=self.habit_id)
         self.assertEqual(habit.name, "Reading a book")
         self.assertEqual(habit.final_goal, 3600)
