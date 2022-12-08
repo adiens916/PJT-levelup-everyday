@@ -59,3 +59,22 @@ class HabitViewTestCase(TestCase):
         self.assertIsInstance(habit.start_datetime, datetime)
         self.assertGreaterEqual(habit.start_datetime, before - timedelta(minutes=1))
         self.assertLessEqual(habit.start_datetime, after + timedelta(minutes=1))
+
+    def test_finish_timer(self):
+        self.test_start_timer()
+
+        habit = Habit.objects.get(pk=self.habit_id)
+        self.assertTrue(habit.is_running)
+
+        self.client.post(
+            "/api/habit/timer/finish/",
+            {"habit_id": self.habit_id, "progress": 45},
+            **self.auth_headers,
+        )
+
+        round_record = RoundRecord.objects.get(habit=habit)
+        self.assertEqual(round_record.progress, 45)
+
+        habit = Habit.objects.get(pk=self.habit_id)
+        self.assertEqual(habit.goal_xp, 300)
+        self.assertEqual(habit.current_xp, 45)
