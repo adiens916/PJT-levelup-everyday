@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from unittest import mock
 
 from django.test import TestCase, Client
@@ -43,3 +44,21 @@ class HabitViewTestCase(TestCase):
         habit = Habit.objects.get(pk=self.habit_id)
         self.assertEqual(habit.name, "Reading a book")
         self.assertEqual(habit.final_goal, 3600)
+
+    def test_start_timer(self):
+        before = datetime.now()
+        response = self.client.post(
+            "/api/habit/timer/start/", {"habit_id": self.habit_id}, **self.auth_headers
+        )
+        after = datetime.now()
+
+        items: dict = response.json()
+        self.assertTrue(items.get("success"))
+        self.assertTrue(items.get("is_running"))
+
+        start_datetime = items.get("start_date")
+        start_datetime = datetime.fromisoformat(start_datetime)
+        self.assertIsInstance(start_datetime, datetime)
+
+        self.assertGreaterEqual(start_datetime, before)
+        self.assertLessEqual(start_datetime, after)
