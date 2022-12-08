@@ -4,7 +4,7 @@ from unittest import mock
 from django.test import TestCase, Client
 
 from account.models import User
-from habits.models import Habit
+from habits.models import Habit, RoundRecord
 
 
 class HabitViewTestCase(TestCase):
@@ -48,18 +48,14 @@ class HabitViewTestCase(TestCase):
 
     def test_start_timer(self):
         before = datetime.now()
-        response = self.client.post(
+        self.client.post(
             "/api/habit/timer/start/", {"habit_id": self.habit_id}, **self.auth_headers
         )
         after = datetime.now()
 
-        items: dict = response.json()
-        self.assertTrue(items.get("success"))
-        self.assertTrue(items.get("is_running"))
+        habit = Habit.objects.get(pk=self.habit_id)
+        self.assertTrue(habit.is_running)
 
-        start_datetime = items.get("start_date")
-        start_datetime = datetime.fromisoformat(start_datetime)
-        self.assertIsInstance(start_datetime, datetime)
-
-        self.assertGreaterEqual(start_datetime, before - timedelta(minutes=1))
-        self.assertLessEqual(start_datetime, after + timedelta(minutes=1))
+        self.assertIsInstance(habit.start_datetime, datetime)
+        self.assertGreaterEqual(habit.start_datetime, before - timedelta(minutes=1))
+        self.assertLessEqual(habit.start_datetime, after + timedelta(minutes=1))
