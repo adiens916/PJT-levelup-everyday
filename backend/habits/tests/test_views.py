@@ -19,7 +19,7 @@ class HabitViewTestCase(TestCase):
             "final_goal": 3600,
             "growth_type": "INCREASE",
             "day_cycle": 2,
-            "initial_goal": "",
+            "initial_goal": 300,
         }
         cls.habit_id = cls.create_habit()
 
@@ -44,6 +44,7 @@ class HabitViewTestCase(TestCase):
         habit = Habit.objects.get(pk=self.habit_id)
         self.assertEqual(habit.name, "Reading a book")
         self.assertEqual(habit.final_goal, 3600)
+        self.assertEqual(habit.goal_xp, 300)
 
     def test_start_timer(self):
         before = datetime.now()
@@ -60,5 +61,5 @@ class HabitViewTestCase(TestCase):
         start_datetime = datetime.fromisoformat(start_datetime)
         self.assertIsInstance(start_datetime, datetime)
 
-        self.assertGreaterEqual(start_datetime, before)
-        self.assertLessEqual(start_datetime, after)
+        self.assertGreaterEqual(start_datetime, before - timedelta(minutes=1))
+        self.assertLessEqual(start_datetime, after + timedelta(minutes=1))
