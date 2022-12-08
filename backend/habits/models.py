@@ -98,6 +98,11 @@ class Habit(models.Model):
         self.start_datetime = None
         self.is_running = False
         self.current_xp += progress
+
+        while self.current_xp >= self.goal_xp:
+            self.current_xp -= self.goal_xp
+            self.goal_xp += self.growth_amount
+
         if save:
             self.save()
 
