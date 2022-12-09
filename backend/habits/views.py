@@ -129,7 +129,7 @@ def get_daily_records(request: HttpRequest, habit_id: int):
 def start_timer(request: HttpRequest):
     habit_id = request.POST.get("habit_id")
     habit = Habit.objects.get(id=habit_id)
-    habit.save_start_datetime()
+    habit.start_recording()
     return JsonResponse(
         {
             "success": True,
@@ -148,6 +148,6 @@ def finish_timer(request: HttpRequest):
 
     record = RoundRecord()
     record.create_from_habit_finished(habit, progress)
-    habit.add_progress_and_init(record.progress)
+    habit.end_recording(record.progress)
 
     return json_response_wrapper([record])

@@ -17,7 +17,7 @@ class RecordSaver:
         if habit.is_running:
             round_record = RoundRecord()
             round_record.create_from_habit_running(habit)
-            habit.add_progress_and_init(round_record.progress, save=False)
+            habit.end_recording(round_record.progress, save=False)
 
     @staticmethod
     def __save_daily_record(habit: Habit):
@@ -38,11 +38,11 @@ class GoalAdjuster:
             growth_amount = -habit.growth_amount
 
         if habit.is_today_successful():
-            habit.today_goal += growth_amount
+            habit.goal_xp += growth_amount
         else:
-            habit.today_goal -= growth_amount
+            habit.goal_xp -= growth_amount
 
-        habit.today_progress = 0
+        habit.current_xp = 0
 
 
 class DueAdjuster:
