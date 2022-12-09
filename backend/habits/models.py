@@ -24,6 +24,7 @@ class Habit(models.Model):
         default=100, validators=[MaxValueValidator(10000)]
     )
 
+    level = models.PositiveIntegerField(default=1)
     goal_xp = models.PositiveIntegerField(default=0)
     current_xp = models.PositiveIntegerField(default=0)
     growth_amount = models.IntegerField(default=0)
@@ -102,6 +103,7 @@ class Habit(models.Model):
         while self.current_xp >= self.goal_xp:
             self.current_xp -= self.goal_xp
             self.goal_xp += self.growth_amount
+            self.level += 1
 
         if save:
             self.save()
