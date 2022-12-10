@@ -18,22 +18,18 @@ class GoalAdjusterTestCase(TestCase):
         habit.is_today_due_date = True
         self.habit = habit
 
-    def test_habit_copy(self):
-        habit_copy = deepcopy(self.habit)
-        self.assertNotEqual(id(self.habit), id(habit_copy))
-
-    def test_ignore_for_not_due_habit(self):
+    def test_adjust_habit_goal_when_not_due(self):
         self.habit.is_today_due_date = False
         GoalAdjuster.adjust_habit_goal(self.habit)
         self.assertEqual(self.habit.goal_xp, 60)
 
-    def test_success_for_increase_type(self):
+    def test_adjust_habit_goal(self):
         self.habit.current_xp = 60
         GoalAdjuster.adjust_habit_goal(self.habit)
         self.assertEqual(self.habit.goal_xp, 120)
         self.assertEqual(self.habit.current_xp, 0)
 
-    def test_fail_for_increase_type(self):
+    def test_adjust_habit_goal_when_not_reaching_goal(self):
         self.habit.current_xp = 10
         GoalAdjuster.adjust_habit_goal(self.habit)
         # TODO: prevent today_goal from decreasing below 0
