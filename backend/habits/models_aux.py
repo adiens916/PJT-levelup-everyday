@@ -32,10 +32,23 @@ class GoalAdjuster:
         if not habit.is_due_or_done():
             return
 
-        if habit.is_today_successful():
+        if __class__.is_habit_ever_done_today(habit):
             habit.use_xp_for_level_up()
         else:
             habit.lose_xp()
+
+    @staticmethod
+    def is_habit_ever_done_today(habit: Habit) -> bool:
+        last_round_record = RoundRecord.objects.filter(habit=habit).last()
+        if last_round_record == None:
+            return False
+
+        record_date = last_round_record.start_datetime.date()
+        print(record_date)
+        if record_date != habit.due_date:
+            return False
+        else:
+            return True
 
 
 class DueAdjuster:
