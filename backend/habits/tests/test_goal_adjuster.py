@@ -30,6 +30,13 @@ class GoalAdjusterTestCase(TestCase):
         self.assertEqual(self.habit.goal_xp, 120)
         self.assertEqual(self.habit.current_xp, 0)
 
+    def test_adjust_habit_goal_done_just_a_little(self):
+        self.habit.current_xp = 5
+
+        GoalAdjuster.adjust_habit_goal(self.habit)
+        self.assertEqual(self.habit.goal_xp, 60)
+        self.assertEqual(self.habit.current_xp, 5)
+
     def test_adjust_habit_goal_neglected(self):
         self.habit.goal_xp = 300
         self.habit.current_xp = 150
