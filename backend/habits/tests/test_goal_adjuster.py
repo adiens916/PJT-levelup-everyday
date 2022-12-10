@@ -30,8 +30,35 @@ class GoalAdjusterTestCase(TestCase):
         self.assertEqual(self.habit.current_xp, 0)
 
     def test_adjust_habit_goal_when_not_reaching_goal(self):
-        self.habit.current_xp = 10
+        self.habit.goal_xp = 300
+        self.habit.current_xp = 150
+
         GoalAdjuster.adjust_habit_goal(self.habit)
-        # TODO: prevent today_goal from decreasing below 0
-        # self.assertEqual(self.habit.today_goal, 60)
+        self.assertEqual(self.habit.goal_xp, 300)
+        # current XP should be decreased by 10% of goal XP
+        self.assertEqual(self.habit.current_xp, 120)
+
+    def test_adjust_habit_goal_when_not_reaching_goal_and_level_down(self):
+        """
+        When the current XP is 0, then it can't be decreased below zero.
+        Therefore, the goal XP will be decreased instead,
+        followed by decrease of current XP.
+
+        The amount of decrease is based on the **new** goal XP.
+        If not so, a current XP could be greater than the goal XP.
+        """
+
+        self.habit.goal_xp = 300
+        self.habit.current_xp = 0
+
+        GoalAdjuster.adjust_habit_goal(self.habit)
+        self.assertEqual(self.habit.goal_xp, 240)
+        self.assertEqual(self.habit.current_xp, 216)
+
+    def test_adjust_habit_goal_when_not_reaching_goal_and_but_no_negative_goal_xp(self):
+        self.habit.goal_xp = 60
+        self.habit.current_xp = 0
+
+        GoalAdjuster.adjust_habit_goal(self.habit)
+        self.assertEqual(self.habit.goal_xp, 60)
         self.assertEqual(self.habit.current_xp, 0)
