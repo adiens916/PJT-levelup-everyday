@@ -99,11 +99,7 @@ class Habit(models.Model):
         self.start_datetime = None
         self.is_running = False
         self.current_xp += progress
-
-        while self.current_xp >= self.goal_xp:
-            self.current_xp -= self.goal_xp
-            self.goal_xp += self.growth_amount
-            self.level += 1
+        self.use_xp_for_level_up()
 
         if save:
             self.save()
@@ -111,6 +107,12 @@ class Habit(models.Model):
         user: User = self.user
         user.is_recording = False
         user.save()
+
+    def use_xp_for_level_up(self):
+        while self.current_xp >= self.goal_xp:
+            self.current_xp -= self.goal_xp
+            self.goal_xp += self.growth_amount
+            self.level += 1
 
     def is_due_or_done(self):
         return self.is_today_due_date or self.current_xp > 0 or self.is_running

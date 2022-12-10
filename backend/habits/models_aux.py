@@ -39,8 +39,7 @@ class GoalAdjuster:
 
         # TODO: 해당 날짜 round record 있으면 됨.
         if habit.is_today_successful():
-            # habit.goal_xp += growth_amount
-            pass
+            habit.use_xp_for_level_up()
         else:
             decrease_amount = int(habit.goal_xp * 0.1)
             habit.current_xp -= decrease_amount
