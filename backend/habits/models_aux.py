@@ -37,12 +37,18 @@ class GoalAdjuster:
         elif habit.growth_type == "DECREASE":
             growth_amount = -habit.growth_amount
 
+        # TODO: 해당 날짜 round record 있으면 됨.
         if habit.is_today_successful():
-            habit.goal_xp += growth_amount
+            # habit.goal_xp += growth_amount
+            pass
         else:
-            habit.goal_xp -= growth_amount
+            decrease_amount = int(habit.goal_xp * 0.1)
+            habit.current_xp -= decrease_amount
 
-        habit.current_xp = 0
+            if habit.current_xp < 0:
+                habit.goal_xp -= growth_amount
+                decrease_amount = int(habit.goal_xp * 0.1)
+                habit.current_xp = habit.goal_xp - decrease_amount
 
 
 class DueAdjuster:
