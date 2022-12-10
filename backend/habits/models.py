@@ -134,12 +134,6 @@ class Habit(models.Model):
     def is_due_or_done(self):
         return self.is_today_due_date or self.is_running or self.is_done
 
-    def is_today_successful(self) -> bool:
-        if self.growth_type == "INCREASE":
-            return self.goal_xp <= self.current_xp
-        elif self.growth_type == "DECREASE":
-            return self.goal_xp >= self.current_xp
-
     def is_owned_by_user(self, given_user: User):
         return self.user.pk == given_user.pk
 
@@ -188,11 +182,12 @@ class DailyRecord(models.Model):
 
         self.habit = habit
         self.date = user.get_yesterday()
-        self.success = habit.is_today_successful()
+        self.success = habit.is_done
         self.set_record_by_success_and_growth_type(habit)
         self.save()
 
     def set_record_by_success_and_growth_type(self, habit: Habit):
+        # TODO: Need to be adjusted
         if self.success:
             if habit.growth_type == "INCREASE":
                 self.set_for_excess(habit)
