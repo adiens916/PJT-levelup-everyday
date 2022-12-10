@@ -30,6 +30,7 @@ class Habit(models.Model):
     growth_amount = models.IntegerField(default=0)
     due_date = models.DateField(default=date.today)
     is_today_due_date = models.BooleanField(default=True)
+    is_done = models.BooleanField(default=False)  # Added for front-end
 
     is_running = models.BooleanField(default=False)
     start_datetime = models.DateTimeField(null=True, blank=True)
@@ -100,6 +101,9 @@ class Habit(models.Model):
         self.is_running = False
         self.current_xp += progress
         self.use_xp_for_level_up()
+        self.is_done = True
+        # TODO: Need to be reset as 'False'
+        # when the day changes, or...
 
         if save:
             self.save()
@@ -128,7 +132,7 @@ class Habit(models.Model):
             self.current_xp = 0
 
     def is_due_or_done(self):
-        return self.is_today_due_date or self.current_xp > 0 or self.is_running
+        return self.is_today_due_date or self.is_running or self.is_done
 
     def is_today_successful(self) -> bool:
         if self.growth_type == "INCREASE":

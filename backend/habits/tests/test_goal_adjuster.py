@@ -26,14 +26,19 @@ class GoalAdjusterTestCase(TestCase):
 
     def test_adjust_habit_goal(self):
         self.habit.current_xp = 60
+        self.habit.is_done = True
+
         GoalAdjuster.adjust_habit_goal(self.habit)
+        self.assertTrue(self.habit.is_done)
         self.assertEqual(self.habit.goal_xp, 120)
         self.assertEqual(self.habit.current_xp, 0)
 
     def test_adjust_habit_goal_done_just_a_little(self):
         self.habit.current_xp = 5
+        self.habit.is_done = True
 
         GoalAdjuster.adjust_habit_goal(self.habit)
+        self.assertTrue(self.habit.is_done)
         self.assertEqual(self.habit.goal_xp, 60)
         self.assertEqual(self.habit.current_xp, 5)
 

@@ -32,7 +32,7 @@ class GoalAdjuster:
         if not habit.is_due_or_done():
             return
 
-        if __class__.is_habit_ever_done_today(habit):
+        if habit.is_done:
             habit.use_xp_for_level_up()
         else:
             habit.lose_xp()
