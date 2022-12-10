@@ -32,22 +32,10 @@ class GoalAdjuster:
         if not habit.is_due_or_done():
             return
 
-        if habit.growth_type == "INCREASE":
-            growth_amount = habit.growth_amount
-        elif habit.growth_type == "DECREASE":
-            growth_amount = -habit.growth_amount
-
-        # TODO: 해당 날짜 round record 있으면 됨.
         if habit.is_today_successful():
             habit.use_xp_for_level_up()
         else:
-            decrease_amount = int(habit.goal_xp * 0.1)
-            habit.current_xp -= decrease_amount
-
-            if habit.current_xp < 0:
-                habit.goal_xp -= growth_amount
-                decrease_amount = int(habit.goal_xp * 0.1)
-                habit.current_xp = habit.goal_xp - decrease_amount
+            habit.lose_xp()
 
 
 class DueAdjuster:

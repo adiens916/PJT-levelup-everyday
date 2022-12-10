@@ -114,6 +114,19 @@ class Habit(models.Model):
             self.goal_xp += self.growth_amount
             self.level += 1
 
+    def lose_xp(self):
+        decrease_amount = int(self.goal_xp * 0.1)
+
+        if self.current_xp >= decrease_amount:
+            self.current_xp -= decrease_amount
+        elif self.goal_xp > self.growth_amount:
+            self.level -= 1
+            self.goal_xp -= self.growth_amount
+            decrease_amount = int(self.goal_xp * 0.1)
+            self.current_xp = self.goal_xp - decrease_amount
+        else:
+            self.current_xp = 0
+
     def is_due_or_done(self):
         return self.is_today_due_date or self.current_xp > 0 or self.is_running
 
