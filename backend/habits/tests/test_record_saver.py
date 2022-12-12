@@ -1,5 +1,5 @@
 from copy import deepcopy
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 
 from django.test import TestCase
 
@@ -30,19 +30,18 @@ class RecordSaverTestCase(TestCase):
         cls.habit.user = user
         cls.habit.save()
 
-    def test_create_round_record(self):
+    def test_create_round_record_if_running(self):
+        CLOSE_TO_RESET = datetime(2022, 11, 10, hour=23, minute=50)
+        SHORTLY_BEFORE_RESET = datetime(2022, 11, 10, hour=23, minute=59)
+
         self.habit.is_running = True
-        self.habit.start_datetime = datetime(2022, 11, 10, hour=23, minute=50)
+        self.habit.start_datetime = CLOSE_TO_RESET
         self.habit.save()
 
         RecordSaver.save(self.habit)
         round_record = RoundRecord.objects.get(habit=self.habit)
-        self.assertEqual(
-            round_record.start_datetime, datetime(2022, 11, 10, hour=23, minute=50)
-        )
-        self.assertEqual(
-            round_record.end_datetime, datetime(2022, 11, 10, hour=23, minute=59)
-        )
+        self.assertEqual(round_record.start_datetime, CLOSE_TO_RESET)
+        self.assertEqual(round_record.end_datetime, SHORTLY_BEFORE_RESET)
         self.assertEqual(round_record.progress, 60 * 9)
 
     def test_create_daily_record(self):
