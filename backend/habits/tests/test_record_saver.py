@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import date, datetime, time
 
 from django.test import TestCase
@@ -8,7 +9,13 @@ from habits.models_aux import RecordSaver
 
 
 class RecordSaverTestCase(TestCase):
-    def setUp(self) -> None:
+    @classmethod
+    def setUpTestData(cls):
+        user = User()
+        user.next_reset_date = date(2022, 11, 11)
+        user.daily_reset_time = time(hour=0, minute=0)
+        user.save()
+
         habit = Habit()
         habit.name = "Reading a book"
         habit.estimate_type = "TIME"
@@ -18,14 +25,10 @@ class RecordSaverTestCase(TestCase):
         habit.current_xp = 70
         habit.growth_amount = 60
         habit.is_today_due_date = True
-        self.habit = habit
 
-        user = User()
-        user.next_reset_date = date(2022, 11, 11)
-        user.daily_reset_time = time(hour=0, minute=0)
-        user.save()
-        self.habit.user = user
-        self.habit.save()
+        cls.habit = habit
+        cls.habit.user = user
+        cls.habit.save()
 
     def test_create_round_record(self):
         self.habit.is_running = True
