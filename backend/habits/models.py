@@ -30,6 +30,7 @@ class Habit(models.Model):
     growth_amount = models.IntegerField(default=0)
     due_date = models.DateField(default=date.today)
     is_today_due_date = models.BooleanField(default=True)
+    is_done = models.BooleanField(default=False)  # Added for front-end
 
     is_running = models.BooleanField(default=False)
     start_datetime = models.DateTimeField(null=True, blank=True)
@@ -99,11 +100,10 @@ class Habit(models.Model):
         self.start_datetime = None
         self.is_running = False
         self.current_xp += progress
-
-        while self.current_xp >= self.goal_xp:
-            self.current_xp -= self.goal_xp
-            self.goal_xp += self.growth_amount
-            self.level += 1
+        self.use_xp_for_level_up()
+        self.is_done = True
+        # TODO: Need to be reset as 'False'
+        # when the day changes, or...
 
         if save:
             self.save()
@@ -112,14 +112,27 @@ class Habit(models.Model):
         user.is_recording = False
         user.save()
 
-    def is_due_or_done(self):
-        return self.is_today_due_date or self.current_xp > 0 or self.is_running
+    def use_xp_for_level_up(self):
+        while self.current_xp >= self.goal_xp:
+            self.current_xp -= self.goal_xp
+            self.goal_xp += self.growth_amount
+            self.level += 1
 
-    def is_today_successful(self) -> bool:
-        if self.growth_type == "INCREASE":
-            return self.goal_xp <= self.current_xp
-        elif self.growth_type == "DECREASE":
-            return self.goal_xp >= self.current_xp
+    def lose_xp(self):
+        decrease_amount = int(self.goal_xp * 0.1)
+
+        if self.current_xp >= decrease_amount:
+            self.current_xp -= decrease_amount
+        elif self.goal_xp > self.growth_amount:
+            self.level -= 1
+            self.goal_xp -= self.growth_amount
+            decrease_amount = int(self.goal_xp * 0.1)
+            self.current_xp = self.goal_xp - decrease_amount
+        else:
+            self.current_xp = 0
+
+    def is_due_or_done(self):
+        return self.is_today_due_date or self.is_running or self.is_done
 
     def is_owned_by_user(self, given_user: User):
         return self.user.pk == given_user.pk
@@ -169,11 +182,12 @@ class DailyRecord(models.Model):
 
         self.habit = habit
         self.date = user.get_yesterday()
-        self.success = habit.is_today_successful()
+        self.success = habit.is_done
         self.set_record_by_success_and_growth_type(habit)
         self.save()
 
     def set_record_by_success_and_growth_type(self, habit: Habit):
+        # TODO: Need to be adjusted
         if self.success:
             if habit.growth_type == "INCREASE":
                 self.set_for_excess(habit)

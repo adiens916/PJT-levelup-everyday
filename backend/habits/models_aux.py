@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import Iterable
 
 from account.models import User
 from .models import Habit, RoundRecord, DailyRecord
@@ -29,20 +28,12 @@ class RecordSaver:
 class GoalAdjuster:
     @staticmethod
     def adjust_habit_goal(habit: Habit) -> None:
-        if not habit.is_due_or_done():
-            return
-
-        if habit.growth_type == "INCREASE":
-            growth_amount = habit.growth_amount
-        elif habit.growth_type == "DECREASE":
-            growth_amount = -habit.growth_amount
-
-        if habit.is_today_successful():
-            habit.goal_xp += growth_amount
+        if habit.is_done:
+            habit.use_xp_for_level_up()
+        elif habit.is_today_due_date:
+            habit.lose_xp()
         else:
-            habit.goal_xp -= growth_amount
-
-        habit.current_xp = 0
+            return
 
 
 class DueAdjuster:
