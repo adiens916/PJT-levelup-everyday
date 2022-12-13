@@ -24,7 +24,6 @@ def index(request: HttpRequest):
         user: User = request.user
         habit_list = Habit.objects.filter(user=user.pk).order_by("-importance")
         if user.is_day_changed():
-            # TODO: 자정 후에 미리 다음 날로 넘어가는 기능 추가하기
             for habit in habit_list:
                 RecordSaver.save(habit)
                 GoalAdjuster.adjust_habit_goal(habit)

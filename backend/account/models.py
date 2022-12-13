@@ -1,4 +1,6 @@
+import re
 from datetime import datetime, time, timedelta
+
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.http import HttpRequest
@@ -21,11 +23,17 @@ class User(AbstractUser):
 
     def change_standard_reset_time(self, request: HttpRequest) -> None:
         standard_reset_time = request.POST.get("standard_reset_time")
-        # ex) '03:30'
-        # TODO: 정규표현식으로 체크하기
-        if standard_reset_time:
-            hour, minute = standard_reset_time.split(":")
-            self.daily_reset_time = time(int(hour), int(minute))
+        if not standard_reset_time:
+            return
+
+        # Ex.) '03:30'
+        time_pattern = "([0-1][0-9]|2[0-3]):([0-5][0-9])"
+        matched = re.match(time_pattern, standard_reset_time)
+        if not matched:
+            return
+
+        hour, minute = standard_reset_time.split(":")
+        self.daily_reset_time = time(int(hour), int(minute))
 
     def is_day_changed(self):
         if self.next_reset_date == None:
