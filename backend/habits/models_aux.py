@@ -40,11 +40,12 @@ class DueAdjuster:
     @staticmethod
     def adjust_habit_due(habit: Habit) -> None:
         if habit.is_due_or_done():
-            # 예정일이 아니었는데 진행한 경우, 원래는 None이라 오류 남
-            # => 어제로 예정일을 바꿈
             user: User = habit.user
+            # due date will be reset as yesterday
+            # on which the user did the habit actually
             habit.due_date = user.get_yesterday()
             habit.due_date += timedelta(days=habit.day_cycle)
+            habit.is_done = False
 
     @staticmethod
     def set_is_today_due_date(habit: Habit):

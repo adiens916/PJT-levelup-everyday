@@ -102,8 +102,8 @@ class Habit(models.Model):
         self.current_xp += progress
         self.use_xp_for_level_up()
         self.is_done = True
-        # TODO: Need to be reset as 'False'
-        # when the day changes, or...
+        # 'is_done' will be reset as False
+        # by DueAdjuster when day changes.
 
         if save:
             self.save()
