@@ -22,7 +22,7 @@ class RecordSaverTestCase(TestCase):
         habit.final_goal = 3600
         habit.level = 1
         habit.goal_xp = 60
-        habit.current_xp = 70
+        habit.current_xp = 50
         habit.growth_amount = 60
         habit.is_today_due_date = True
         habit.is_done = True
@@ -30,6 +30,9 @@ class RecordSaverTestCase(TestCase):
         cls.habit = habit
         cls.habit.user = user
         cls.habit.save()
+
+    def test_if_current_xp_is_less_than_goal_xp(self):
+        self.assertLess(self.habit.current_xp, self.habit.goal_xp)
 
     def test_create_round_record_if_running(self):
         CLOSE_TO_RESET = datetime(2022, 11, 10, hour=23, minute=50)
@@ -50,10 +53,10 @@ class RecordSaverTestCase(TestCase):
         daily_record = DailyRecord.objects.get(habit=self.habit)
         self.assertEqual(daily_record.date, date(2022, 11, 10))
         self.assertEqual(daily_record.success, True)
-        self.assertEqual(daily_record.level_now, 2)
-        self.assertEqual(daily_record.level_change, 1)
-        self.assertEqual(daily_record.xp_now, 10)
-        self.assertEqual(daily_record.xp_change, 70)
+        self.assertEqual(daily_record.level_now, 1)
+        self.assertEqual(daily_record.level_change, 0)
+        self.assertEqual(daily_record.xp_now, 50)
+        self.assertEqual(daily_record.xp_change, 50)
 
     def test_create_records_if_habit_is_done_but_not_due(self):
         self.habit.is_today_due_date = False
@@ -62,20 +65,7 @@ class RecordSaverTestCase(TestCase):
         RecordSaver.save(self.habit)
         daily_record = DailyRecord.objects.get(habit=self.habit)
         self.assertEqual(daily_record.success, True)
-        self.assertEqual(daily_record.level_now, 2)
-        self.assertEqual(daily_record.level_change, 1)
-        self.assertEqual(daily_record.xp_now, 10)
-        self.assertEqual(daily_record.xp_change, 70)
-
-    def test_create_records_if_habit_is_not_completed(self):
-        self.habit.current_xp = 10
-        self.habit.save()
-
-        RecordSaver.save(self.habit)
-        daily_record = DailyRecord.objects.get(habit=self.habit)
-        self.assertEqual(daily_record.date, date(2022, 11, 10))
-        self.assertEqual(daily_record.success, True)
         self.assertEqual(daily_record.level_now, 1)
         self.assertEqual(daily_record.level_change, 0)
-        self.assertEqual(daily_record.xp_now, 10)
-        self.assertEqual(daily_record.xp_change, 10)
+        self.assertEqual(daily_record.xp_now, 50)
+        self.assertEqual(daily_record.xp_change, 50)
