@@ -173,9 +173,10 @@ class DailyRecord(models.Model):
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
     date = models.DateField()
     success = models.BooleanField()
-    goal = models.PositiveIntegerField()
-    progress = models.PositiveIntegerField()
-    excess = models.PositiveIntegerField()
+    level_now = models.PositiveIntegerField()
+    level_change = models.IntegerField()
+    xp_now = models.PositiveIntegerField()
+    xp_change = models.IntegerField()
 
     def create_from_habit(self, habit: Habit):
         user: User = habit.user
@@ -183,31 +184,29 @@ class DailyRecord(models.Model):
         self.habit = habit
         self.date = user.get_yesterday()
         self.success = habit.is_done
-        self.set_record_by_success_and_growth_type(habit)
+
+        self.level_now = habit.level
+        self.level_change = self.calc_level_change()
+        self.xp_now = habit.current_xp
+        self.xp_change = self.calc_xp_change()
+
         self.save()
 
-    def set_record_by_success_and_growth_type(self, habit: Habit):
-        # TODO: Need to be adjusted
-        if self.success:
-            if habit.growth_type == "INCREASE":
-                self.set_for_excess(habit)
-            elif habit.growth_type == "DECREASE":
-                self.set_for_lack(habit)
-        else:
-            if habit.growth_type == "INCREASE":
-                self.set_for_lack(habit)
-            elif habit.growth_type == "DECREASE":
-                self.set_for_excess(habit)
+    def calc_level_change(self):
+        try:
+            latest = DailyRecord.objects.latest("date")
+            return self.level_now - latest.level_now
+        except Exception:
+            # If it's the first record, there is no previous record.
+            # The level starts from not 0 but 1
+            return self.level_now - 1
 
-    def set_for_excess(self, habit: Habit):
-        self.goal = habit.goal_xp
-        self.progress = habit.goal_xp
-        self.excess = habit.current_xp
-
-    def set_for_lack(self, habit: Habit):
-        self.goal = habit.goal_xp
-        self.progress = habit.current_xp
-        self.excess = 0
+    def calc_xp_change(self):
+        try:
+            latest = DailyRecord.objects.latest("date")
+            return self.xp_now - latest.xp_now
+        except Exception:
+            return self.xp_now
 
     def is_owned_by_user(self, given_user: User):
         return self.habit.is_owned_by_user(given_user)
