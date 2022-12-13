@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import Iterable
 
 from account.models import User
 from .models import Habit, RoundRecord, DailyRecord
@@ -17,7 +16,7 @@ class RecordSaver:
         if habit.is_running:
             round_record = RoundRecord()
             round_record.create_from_habit_running(habit)
-            habit.add_progress_and_init(round_record.progress, save=False)
+            habit.end_recording(round_record.progress, save=False)
 
     @staticmethod
     def __save_daily_record(habit: Habit):
@@ -29,31 +28,24 @@ class RecordSaver:
 class GoalAdjuster:
     @staticmethod
     def adjust_habit_goal(habit: Habit) -> None:
-        if not habit.is_due_or_done():
-            return
-
-        if habit.growth_type == "INCREASE":
-            growth_amount = habit.growth_amount
-        elif habit.growth_type == "DECREASE":
-            growth_amount = -habit.growth_amount
-
-        if habit.is_today_successful():
-            habit.today_goal += growth_amount
+        if habit.is_done:
+            habit.use_xp_for_level_up()
+        elif habit.is_today_due_date:
+            habit.lose_xp()
         else:
-            habit.today_goal -= growth_amount
-
-        habit.today_progress = 0
+            return
 
 
 class DueAdjuster:
     @staticmethod
     def adjust_habit_due(habit: Habit) -> None:
         if habit.is_due_or_done():
-            # 예정일이 아니었는데 진행한 경우, 원래는 None이라 오류 남
-            # => 어제로 예정일을 바꿈
             user: User = habit.user
+            # due date will be reset as yesterday
+            # on which the user did the habit actually
             habit.due_date = user.get_yesterday()
             habit.due_date += timedelta(days=habit.day_cycle)
+            habit.is_done = False
 
     @staticmethod
     def set_is_today_due_date(habit: Habit):

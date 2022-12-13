@@ -24,11 +24,13 @@ class Habit(models.Model):
         default=100, validators=[MaxValueValidator(10000)]
     )
 
-    today_goal = models.PositiveIntegerField(default=0)
-    today_progress = models.PositiveIntegerField(default=0)
+    level = models.PositiveIntegerField(default=1)
+    goal_xp = models.PositiveIntegerField(default=0)
+    current_xp = models.PositiveIntegerField(default=0)
     growth_amount = models.IntegerField(default=0)
     due_date = models.DateField(default=date.today)
     is_today_due_date = models.BooleanField(default=True)
+    is_done = models.BooleanField(default=False)  # Added for front-end
 
     is_running = models.BooleanField(default=False)
     start_datetime = models.DateTimeField(null=True, blank=True)
@@ -52,29 +54,14 @@ class Habit(models.Model):
         if self.growth_type == "INCREASE":
             initial_goal = request.POST.get("initial_goal")
             if initial_goal:
-                self.today_goal = int(initial_goal)
+                self.goal_xp = int(initial_goal)
             else:
-                self.today_goal = self.get_initial_today_goal(self.final_goal)
+                self.goal_xp = int(self.final_goal * 0.01)
             self.growth_amount = self.get_initial_growth_amount(self.final_goal)
         elif self.growth_type == "DECREASE":
-            self.today_goal = int(self.final_goal * 10)
-            self.growth_amount = int((self.today_goal - self.final_goal) * 0.01)
+            self.goal_xp = int(self.final_goal * 10)
+            self.growth_amount = int((self.goal_xp - self.final_goal) * 0.01)
         self.save()
-
-    def get_initial_today_goal(self, final_goal: int):
-        thresholds = [0, 10, 15, 20, 60]
-        goals = [0.5, 1, 3, 5, 10]
-
-        final_goal_as_minute = final_goal // 60
-        try:
-            for i in range(len(thresholds)):
-                if thresholds[i] <= final_goal_as_minute < thresholds[i + 1]:
-                    today_goal = goals[i]
-                    break
-        except:
-            today_goal = goals[-1]
-        finally:
-            return int(today_goal * 60)
 
     def get_initial_growth_amount(self, final_goal: int):
         initial_growth_amount = int(final_goal * 0.01)
@@ -85,7 +72,7 @@ class Habit(models.Model):
         else:
             return (initial_growth_amount // 60) * 60
 
-    def save_start_datetime(self):
+    def start_recording(self):
         self.start_datetime = timezone.now()
         self.is_running = True
         self.save()
@@ -94,10 +81,15 @@ class Habit(models.Model):
         user.is_recording = True
         user.save()
 
-    def add_progress_and_init(self, progress: int, save=True):
+    def end_recording(self, progress: int, save=True):
         self.start_datetime = None
         self.is_running = False
-        self.today_progress += progress
+        self.current_xp += progress
+        self.use_xp_for_level_up()
+        self.is_done = True
+        # 'is_done' will be reset as False
+        # by DueAdjuster when day changes.
+
         if save:
             self.save()
 
@@ -105,14 +97,27 @@ class Habit(models.Model):
         user.is_recording = False
         user.save()
 
-    def is_due_or_done(self):
-        return self.is_today_due_date or self.today_progress > 0 or self.is_running
+    def use_xp_for_level_up(self):
+        while self.current_xp >= self.goal_xp:
+            self.current_xp -= self.goal_xp
+            self.goal_xp += self.growth_amount
+            self.level += 1
 
-    def is_today_successful(self) -> bool:
-        if self.growth_type == "INCREASE":
-            return self.today_goal <= self.today_progress
-        elif self.growth_type == "DECREASE":
-            return self.today_goal >= self.today_progress
+    def lose_xp(self):
+        decrease_amount = int(self.goal_xp * 0.1)
+
+        if self.current_xp >= decrease_amount:
+            self.current_xp -= decrease_amount
+        elif self.goal_xp > self.growth_amount:
+            self.level -= 1
+            self.goal_xp -= self.growth_amount
+            decrease_amount = int(self.goal_xp * 0.1)
+            self.current_xp = self.goal_xp - decrease_amount
+        else:
+            self.current_xp = 0
+
+    def is_due_or_done(self):
+        return self.is_today_due_date or self.is_running or self.is_done
 
     def is_owned_by_user(self, given_user: User):
         return self.user.pk == given_user.pk
@@ -153,40 +158,40 @@ class DailyRecord(models.Model):
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
     date = models.DateField()
     success = models.BooleanField()
-    goal = models.PositiveIntegerField()
-    progress = models.PositiveIntegerField()
-    excess = models.PositiveIntegerField()
+    level_now = models.PositiveIntegerField()
+    level_change = models.IntegerField()
+    xp_now = models.PositiveIntegerField()
+    xp_change = models.IntegerField()
 
     def create_from_habit(self, habit: Habit):
         user: User = habit.user
 
         self.habit = habit
         self.date = user.get_yesterday()
-        self.success = habit.is_today_successful()
-        self.set_record_by_success_and_growth_type(habit)
+        self.success = habit.is_done
+
+        self.level_now = habit.level
+        self.level_change = self.calc_level_change()
+        self.xp_now = habit.current_xp
+        self.xp_change = self.calc_xp_change()
+
         self.save()
 
-    def set_record_by_success_and_growth_type(self, habit: Habit):
-        if self.success:
-            if habit.growth_type == "INCREASE":
-                self.set_for_excess(habit)
-            elif habit.growth_type == "DECREASE":
-                self.set_for_lack(habit)
-        else:
-            if habit.growth_type == "INCREASE":
-                self.set_for_lack(habit)
-            elif habit.growth_type == "DECREASE":
-                self.set_for_excess(habit)
+    def calc_level_change(self):
+        try:
+            latest = DailyRecord.objects.latest("date")
+            return self.level_now - latest.level_now
+        except Exception:
+            # If it's the first record, there is no previous record.
+            # The level starts from not 0 but 1
+            return self.level_now - 1
 
-    def set_for_excess(self, habit: Habit):
-        self.goal = habit.today_goal
-        self.progress = habit.today_goal
-        self.excess = habit.today_progress
-
-    def set_for_lack(self, habit: Habit):
-        self.goal = habit.today_goal
-        self.progress = habit.today_progress
-        self.excess = 0
+    def calc_xp_change(self):
+        try:
+            latest = DailyRecord.objects.latest("date")
+            return self.xp_now - latest.xp_now
+        except Exception:
+            return self.xp_now
 
     def is_owned_by_user(self, given_user: User):
         return self.habit.is_owned_by_user(given_user)
