@@ -56,27 +56,12 @@ class Habit(models.Model):
             if initial_goal:
                 self.goal_xp = int(initial_goal)
             else:
-                self.goal_xp = self.get_initial_today_goal(self.final_goal)
+                self.goal_xp = int(self.final_goal * 0.01)
             self.growth_amount = self.get_initial_growth_amount(self.final_goal)
         elif self.growth_type == "DECREASE":
             self.goal_xp = int(self.final_goal * 10)
             self.growth_amount = int((self.goal_xp - self.final_goal) * 0.01)
         self.save()
-
-    def get_initial_today_goal(self, final_goal: int):
-        thresholds = [0, 10, 15, 20, 60]
-        goals = [0.5, 1, 3, 5, 10]
-
-        final_goal_as_minute = final_goal // 60
-        try:
-            for i in range(len(thresholds)):
-                if thresholds[i] <= final_goal_as_minute < thresholds[i + 1]:
-                    today_goal = goals[i]
-                    break
-        except:
-            today_goal = goals[-1]
-        finally:
-            return int(today_goal * 60)
 
     def get_initial_growth_amount(self, final_goal: int):
         initial_growth_amount = int(final_goal * 0.01)
