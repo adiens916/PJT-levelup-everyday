@@ -30,13 +30,19 @@ class DueAdjusterTestCase(TestCase):
 
     @mock.patch("habits.models_aux.datetime", wraps=datetime)
     def test_is_today_due_date(self, mocked_datetime):
-        # when: now is 2022-09-03 AM 07:00
         now = datetime(2022, 9, 3, hour=7, minute=0)
         mocked_datetime.now.return_value = now
 
-        # then: the habit is to do today
-        result = DueAdjuster.is_today_due_date(self.habit)
-        self.assertIs(result, True)
+        is_today_due_date = DueAdjuster.is_today_due_date(self.habit)
+        self.assertTrue(is_today_due_date)
+
+    @mock.patch("habits.models_aux.datetime", wraps=datetime)
+    def test_not_is_today_due_date(self, mocked_datetime):
+        now = datetime(2022, 9, 3, hour=4, minute=0)
+        mocked_datetime.now.return_value = now
+
+        is_today_due_date = DueAdjuster.is_today_due_date(self.habit)
+        self.assertFalse(is_today_due_date)
 
     @mock.patch("habits.models_aux.datetime", wraps=datetime)
     def test_is_today_due_date_when_after_due(self, mocked_datetime):
