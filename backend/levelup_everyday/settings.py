@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "habits",
     # Third-party
     "corsheaders",
+    "drf_yasg",
     "rest_framework",
     "rest_framework.authtoken",
     # Built-in
