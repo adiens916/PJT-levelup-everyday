@@ -1,4 +1,5 @@
 from django.http import JsonResponse, HttpRequest
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -42,7 +43,7 @@ def index(request: HttpRequest):
 
 
 @csrf_exempt
-@api_view(["GET", "POST"])
+@api_view(["GET", "DELETE"])
 def index_each(request: HttpRequest, habit_id: int):
     if not request.user.is_authenticated:
         return Response(
@@ -50,25 +51,20 @@ def index_each(request: HttpRequest, habit_id: int):
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
-    if request.method == "GET":
-        user: User = request.user
-        habit = Habit.objects.get(user=user.pk, pk=habit_id)
+    habit = get_object_or_404(Habit, pk=habit_id)
+    if not habit.is_owned_by_user(request.user):
+        return Response(
+            {"success": False, "detail": "Habit not owned by the user"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
+    if request.method == "GET":
         serializer = HabitSerializer(habit)
         return Response(serializer.data)
-
-    else:  # request.method == 'DELETE
-        habit = Habit.objects.get(pk=habit_id)
-        if not habit.is_owned_by_user(request.user):
-            return Response(
-                {"success": False, "detail": "Habit not owned by the user"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
+    elif request.method == "DELETE":
         habit.delete()
         return Response(
             {"success": True, "detail": "the habit's successfully deleted"},
-            status=status.HTTP_200_OK,
         )
 
 
@@ -81,7 +77,7 @@ def update_importance(request: HttpRequest, habit_id: int):
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
-    habit = Habit.objects.get(pk=habit_id)
+    habit = get_object_or_404(Habit, pk=habit_id)
     if not habit.is_owned_by_user(request.user):
         return Response(
             {"success": False, "detail": "Habit not owned by the user"},
@@ -105,7 +101,7 @@ def get_daily_records(request: HttpRequest, habit_id: int):
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
-    habit = Habit.objects.get(pk=habit_id)
+    habit = get_object_or_404(Habit, pk=habit_id)
     if not habit.is_owned_by_user(request.user):
         return Response(
             {"success": False, "detail": "Not owned by user"},
@@ -120,6 +116,9 @@ def get_daily_records(request: HttpRequest, habit_id: int):
 @csrf_exempt
 @api_view(["POST"])
 def start_timer(request: HttpRequest):
+    # TODO: Authentication & Authorization step needed
+    # Also, these steps are so redundant that
+    # they will be refactored
     habit_id = request.POST.get("habit_id")
     habit = Habit.objects.get(id=habit_id)
     habit.start_recording()
