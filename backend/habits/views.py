@@ -1,5 +1,3 @@
-from typing import Iterable
-
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
@@ -12,7 +10,6 @@ from account.models import User
 from .models import Habit, RoundRecord, DailyRecord
 from .models_aux import RecordSaver, GoalAdjuster, DueAdjuster
 from .serializers import HabitSerializer, RoundRecordSerializer, DailyRecordSerializer
-from .views_aux import json_response_wrapper
 
 
 # Create your views here.
@@ -40,6 +37,7 @@ def index(request: HttpRequest):
     elif request.method == "POST":
         habit = Habit()
         habit.create_from_request(request)
+        # Instead of DRF Response, you can use Django's built-in JsonResponse
         return JsonResponse({"id": habit.pk})
 
 
@@ -54,15 +52,10 @@ def index_each(request: HttpRequest, habit_id: int):
 
     if request.method == "GET":
         user: User = request.user
-        habit = Habit.objects.filter(user=user.pk, pk=habit_id)
+        habit = Habit.objects.get(user=user.pk, pk=habit_id)
 
-        if len(habit) and user.pk == habit[0].user.pk:
-            return json_response_wrapper(habit)
-        else:
-            return Response(
-                {"success": False, "detail": "Habit not owned by the user"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        serializer = HabitSerializer(habit)
+        return Response(serializer.data)
 
     else:  # request.method == 'DELETE
         habit = Habit.objects.get(pk=habit_id)
@@ -112,19 +105,16 @@ def get_daily_records(request: HttpRequest, habit_id: int):
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
-    records: Iterable[DailyRecord] = DailyRecord.objects.filter(habit=habit_id)
-
-    user: User = request.user
-    if len(records) and records[0].is_owned_by_user(user):
-        return json_response_wrapper(records)
-    # 아직 기록이 없을 때
-    elif len(records) == 0:
-        return json_response_wrapper([])
-    else:
+    habit = Habit.objects.get(pk=habit_id)
+    if not habit.is_owned_by_user(request.user):
         return Response(
             {"success": False, "detail": "Not owned by user"},
             status=status.HTTP_404_NOT_FOUND,
         )
+
+    records = DailyRecord.objects.filter(habit=habit_id)
+    serializer = DailyRecordSerializer(records, many=True)
+    return Response(serializer.data)
 
 
 @csrf_exempt
@@ -133,7 +123,7 @@ def start_timer(request: HttpRequest):
     habit_id = request.POST.get("habit_id")
     habit = Habit.objects.get(id=habit_id)
     habit.start_recording()
-    return JsonResponse(
+    return Response(
         {
             "success": True,
             "start_date": habit.start_datetime,
@@ -153,4 +143,5 @@ def finish_timer(request: HttpRequest):
     record.create_from_habit_finished(habit, progress)
     habit.end_recording(record.progress)
 
-    return json_response_wrapper([record])
+    serializer = RoundRecordSerializer(record)
+    return Response(serializer.data)
