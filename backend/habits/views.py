@@ -6,9 +6,12 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
+# from drf_yasg.utils import swagger_auto_schema
+
 from account.models import User
-from .models import DailyRecord, Habit, RoundRecord
+from .models import Habit, RoundRecord, DailyRecord
 from .models_aux import RecordSaver, GoalAdjuster, DueAdjuster
+from .serializers import HabitSerializer, RoundRecordSerializer, DailyRecordSerializer
 from .views_aux import json_response_wrapper
 
 
@@ -31,7 +34,8 @@ def index(request: HttpRequest):
                 DueAdjuster.set_is_today_due_date(habit)
                 habit.save()
 
-        return json_response_wrapper(habit_list)
+        serializer = HabitSerializer(habit_list, many=True)
+        return Response(serializer.data)
 
     elif request.method == "POST":
         habit = Habit()
