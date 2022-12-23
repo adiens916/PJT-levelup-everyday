@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -8,8 +9,9 @@ import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LowPriorityIcon from '@mui/icons-material/LowPriority';
 import { ListItemIcon, ListItemText } from '@mui/material';
-import { deleteHabit, updateImportance } from '../../../api/api';
-import { HabitType } from '../../../api/types';
+
+import { deleteHabit, updateImportance } from 'api/api';
+import { HabitType } from 'api/types';
 
 const ITEM_HEIGHT = 48;
 

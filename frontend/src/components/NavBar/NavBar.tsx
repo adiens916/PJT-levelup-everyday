@@ -3,10 +3,10 @@ import { Outlet } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import CustomAppBar from './CustomAppBar/CustomAppBar';
 import CustomDrawer from './CustomDrawer/CustomDrawer';
-import { logout } from '../../api/api';
+import { logout } from 'api/api';
 
 import { useRecoilValue } from 'recoil';
-import { userTokenState } from '../../state/state';
+import { userTokenState } from 'state/state';
 
 export default function NavBar() {
   const userToken = useRecoilValue(userTokenState);

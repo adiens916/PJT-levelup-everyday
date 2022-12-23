@@ -3,9 +3,9 @@ import { useParams } from 'react-router-dom';
 import { Box, CircularProgress, Typography } from '@mui/material';
 
 import CircularProgressWithLabel from './CircularProgress/CircularProgress';
-import useDocumentTitle from '../../hook/useDocumentTitle';
+import useDocumentTitle from 'hook/useDocumentTitle';
 import useTimer from './useTimer';
-import { HabitDerivative } from '../../utils/habitDerivative';
+import { HabitDerivative } from 'utils/habitDerivative';
 
 export default function HabitTimer() {
   useDocumentTitle('습관 측정');

@@ -1,6 +1,6 @@
 import { ChartData, ChartDataset } from 'chart.js';
 import { useEffect, useState } from 'react';
-import { getRecords } from '../../api/api';
+import { getRecords } from 'api/api';
 
 const initialState: DailyRecordsForChartType = {
   labels: [],

@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import isPropValid from '@emotion/is-prop-valid';
 import { Typography, Stack } from '@mui/material';
-import { customMediaQuery, get, mediaQueryMin } from '../../../utils/utils';
+import { customMediaQuery, get, mediaQueryMin } from 'utils/utils';
 import type * as CSS from 'csstype';
 
 export const TypographyByRatio = styled(Typography, {

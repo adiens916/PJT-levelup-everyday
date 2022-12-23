@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography } from '@mui/material';
 
 import HabitItem from '../HabitItem/HabitItem';
-import { HabitType } from '../../../api/types';
+import { HabitType } from 'api/types';
 
 export default function HabitListDueFirst({ habits }: { habits: HabitType[] }) {
   const is_exist_habit_due_date = () =>

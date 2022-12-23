@@ -1,11 +1,11 @@
 import React from 'react';
 import { Container, Typography } from '@mui/material';
 
-import useDocumentTitle from '../../hook/useDocumentTitle';
+import useDocumentTitle from 'hook/useDocumentTitle';
 import useHabitList from './useHabitList';
 import ErrorGuide from './ErrorGuide/ErrorGuide';
 import HabitListContainerGroup from './HabitListContainerGroup/HabitListContainerGroup';
-import { formatDateMmDd } from '../../utils/utils';
+import { formatDateMmDd } from 'utils/utils';
 
 export default function HabitList() {
   useDocumentTitle('습관 목록');

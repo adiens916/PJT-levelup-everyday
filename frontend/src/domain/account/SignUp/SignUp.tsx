@@ -19,10 +19,10 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import { login, signUp } from '../../../api/api';
+import { login, signUp } from 'api/api';
 import { useSetRecoilState } from 'recoil';
-import { userTokenState } from '../../../state/state';
-import useDocumentTitle from '../../../hook/useDocumentTitle';
+import { userTokenState } from 'state/state';
+import useDocumentTitle from 'hook/useDocumentTitle';
 
 const theme = createTheme();
 
