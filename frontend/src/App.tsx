@@ -7,7 +7,7 @@ import HabitCreate from './domain/habit/HabitCreate/HabitCreate';
 import HabitTimer from './domain/habit/HabitTimer/HabitTimer';
 import SignUp from './domain/account/SignUp/SignUp';
 import Login from './domain/account/Login/Login';
-import NavBar from './components/NavBar/NavBar';
+import NavBar from './domain/layout/NavBar/NavBar';
 import { DailyGraph } from './domain/habit/Graph/Graph';
 
 function App() {
