@@ -5,7 +5,7 @@ import useDocumentTitle from 'common/hook';
 import useHabitList from './useHabitList';
 import ErrorGuide from './ErrorGuide/ErrorGuide';
 import HabitListContainerGroup from './HabitListContainerGroup/HabitListContainerGroup';
-import { formatDateMmDd } from 'utils/utils';
+import { formatDateMmDd } from 'common/utils';
 
 export default function HabitList() {
   useDocumentTitle('습관 목록');
