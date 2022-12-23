@@ -3,6 +3,8 @@ import {
   SignUpResponseType,
   LoginResponseType,
   LogoutResponseType,
+} from 'domain/account/types';
+import {
   HabitResponseType,
   HabitType,
   StartTimerType,
@@ -10,7 +12,7 @@ import {
   HabitCreateType,
   DailyRecordResponseType,
   DailyRecordType,
-} from '../domain/habit/types';
+} from 'domain/habit/types';
 
 // Set host by an environment variable.
 let host = process.env.REACT_APP_BACKEND_HOST;
