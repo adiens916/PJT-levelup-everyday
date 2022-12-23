@@ -5,8 +5,8 @@ import { RecoilRoot } from 'recoil';
 import HabitList from './components/HabitList/HabitList';
 import HabitCreate from './components/HabitCreate/HabitCreate';
 import HabitTimer from './components/HabitTimer/HabitTimer';
-import SignUp from './components/SignUp/SignUp';
-import Login from './components/Login/Login';
+import SignUp from './domain/account/SignUp/SignUp';
+import Login from './domain/account/Login/Login';
 import NavBar from './components/NavBar/NavBar';
 import { DailyGraph } from './components/Graph/Graph';
 
