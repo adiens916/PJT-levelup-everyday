@@ -1,4 +1,4 @@
-import { HabitType } from 'api/types';
+import { HabitType } from '../types';
 
 export const initialState: HabitType = {
   id: 0,

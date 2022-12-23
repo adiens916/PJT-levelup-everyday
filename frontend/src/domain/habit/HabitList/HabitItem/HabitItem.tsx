@@ -4,7 +4,7 @@ import { Box, Button } from '@mui/material';
 
 import HabitItemMenu from '../HabitItemMenu/HabitItemMenu';
 import { HabitDerivative } from '../../habitDerivative';
-import { HabitType } from 'api/types';
+import { HabitType } from '../../types';
 import { ResponsiveStack, TypographyByRatio } from './style';
 
 export default function HabitItem(props: HabitItemType) {

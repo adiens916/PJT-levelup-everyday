@@ -4,7 +4,7 @@ import { Typography } from '@mui/material';
 import HabitListContainer from '../HabitListContainer/HabitListContainer';
 import HabitItem from '../HabitItem/HabitItem';
 import { HabitDerivative } from '../../habitDerivative';
-import { HabitType } from 'api/types';
+import { HabitType } from '../../types';
 
 export default function HabitListContainerGroup(
   props: HabitListContainerGroupType,

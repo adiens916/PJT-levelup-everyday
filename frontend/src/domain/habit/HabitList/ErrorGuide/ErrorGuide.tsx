@@ -1,6 +1,6 @@
 import React from 'react';
 import { CircularProgress, Typography } from '@mui/material';
-import { HabitType } from 'api/types';
+import { HabitType } from '../../types';
 import { Link } from 'react-router-dom';
 
 export default function ErrorGuide({

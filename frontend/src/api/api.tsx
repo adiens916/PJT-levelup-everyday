@@ -10,7 +10,7 @@ import {
   HabitCreateType,
   DailyRecordResponseType,
   DailyRecordType,
-} from './types';
+} from '../domain/habit/types';
 
 // Set host by an environment variable.
 let host = process.env.REACT_APP_BACKEND_HOST;

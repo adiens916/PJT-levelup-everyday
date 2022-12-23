@@ -3,7 +3,7 @@ import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 
 import { initialState } from '../HabitTimer/reducer';
-import { HabitType } from 'api/types';
+import { HabitType } from '../types';
 import { createHabit } from 'api/api';
 import { useNavigate } from 'react-router-dom';
 import useDocumentTitle from 'common/hook';
