@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 
 import HabitListContainer from '../HabitListContainer/HabitListContainer';
 import HabitItem from '../HabitItem/HabitItem';
-import { HabitDerivative } from 'utils/habitDerivative';
+import { HabitDerivative } from '../../habitDerivative';
 import { HabitType } from 'api/types';
 
 export default function HabitListContainerGroup(

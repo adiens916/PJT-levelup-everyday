@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button } from '@mui/material';
 
 import HabitItemMenu from '../HabitItemMenu/HabitItemMenu';
-import { HabitDerivative } from 'utils/habitDerivative';
+import { HabitDerivative } from '../../habitDerivative';
 import { HabitType } from 'api/types';
 import { ResponsiveStack, TypographyByRatio } from './style';
 
