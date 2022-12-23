@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Typography } from '@mui/material';
 
-import useDocumentTitle from 'hook/useDocumentTitle';
+import useDocumentTitle from 'common/hook';
 import useHabitList from './useHabitList';
 import ErrorGuide from './ErrorGuide/ErrorGuide';
 import HabitListContainerGroup from './HabitListContainerGroup/HabitListContainerGroup';

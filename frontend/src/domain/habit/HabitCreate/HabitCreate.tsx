@@ -6,7 +6,7 @@ import { initialState } from '../HabitTimer/reducer';
 import { HabitType } from 'api/types';
 import { createHabit } from 'api/api';
 import { useNavigate } from 'react-router-dom';
-import useDocumentTitle from 'hook/useDocumentTitle';
+import useDocumentTitle from 'common/hook';
 type HabitKeyType = keyof HabitType;
 // interface HabitCreateType extends HabitType {
 //   final_goal: number | null;

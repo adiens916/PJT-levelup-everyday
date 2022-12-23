@@ -12,7 +12,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 import { useParams } from 'react-router-dom';
 import { useDailyRecords } from './useDailyRecords';
-import useDocumentTitle from 'hook/useDocumentTitle';
+import useDocumentTitle from 'common/hook';
 
 ChartJS.register(
   CategoryScale,

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Box, CircularProgress, Typography } from '@mui/material';
 
 import CircularProgressWithLabel from './CircularProgress/CircularProgress';
-import useDocumentTitle from 'hook/useDocumentTitle';
+import useDocumentTitle from 'common/hook';
 import useTimer from './useTimer';
 import { HabitDerivative } from '../habitDerivative';
 

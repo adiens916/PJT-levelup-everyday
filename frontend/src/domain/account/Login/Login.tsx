@@ -22,7 +22,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { login } from 'api/api';
 import { useSetRecoilState } from 'recoil';
 import { userTokenState } from '../state';
-import useDocumentTitle from 'hook/useDocumentTitle';
+import useDocumentTitle from 'common/hook';
 
 const theme = createTheme();
 
