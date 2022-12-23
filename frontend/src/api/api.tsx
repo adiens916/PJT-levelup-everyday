@@ -1,9 +1,4 @@
-import { requestGetByAxios, requestPostByAxios, request } from 'common/api';
-import {
-  SignUpResponseType,
-  LoginResponseType,
-  LogoutResponseType,
-} from 'domain/account/types';
+import { requestGetByAxios, requestPostByAxios } from 'common/api';
 import {
   HabitResponseType,
   HabitType,
@@ -20,48 +15,6 @@ if (host) {
   host += '/api';
 } else {
   host = 'http://127.0.0.1:8000/api';
-}
-
-export async function signUp(username: string, password: string) {
-  return await request<SignUpResponseType>(`${host}/account/signup/`, {
-    username,
-    password,
-  });
-}
-
-export async function login(username: string, password: string) {
-  const data: LoginResponseType = await requestPostByAxios(
-    `${host}/account/login/`,
-    {
-      username,
-      password,
-    },
-  );
-  saveUserToken(data.token);
-  return data;
-}
-
-export async function logout() {
-  let data: LogoutResponseType | null = null;
-  try {
-    data = await requestPostByAxios(`${host}/account/logout/`, {});
-  } finally {
-    clearUserToken();
-    location.replace('/');
-    return data;
-  }
-}
-
-export function saveUserToken(token: string) {
-  localStorage.setItem('token', token);
-}
-
-export function clearUserToken() {
-  localStorage.removeItem('token');
-}
-
-export function getUserToken() {
-  return localStorage.getItem('token');
 }
 
 export async function getHabits() {

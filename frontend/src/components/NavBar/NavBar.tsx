@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import CustomAppBar from './CustomAppBar/CustomAppBar';
 import CustomDrawer from './CustomDrawer/CustomDrawer';
-import { logout } from 'api/api';
+import { logout } from 'domain/account/api';
 
 import { useRecoilValue } from 'recoil';
 import { userTokenState } from 'domain/account/state';
