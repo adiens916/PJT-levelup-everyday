@@ -6,7 +6,7 @@ import CustomDrawer from './CustomDrawer/CustomDrawer';
 import { logout } from 'api/api';
 
 import { useRecoilValue } from 'recoil';
-import { userTokenState } from 'state/state';
+import { userTokenState } from 'domain/account/state';
 
 export default function NavBar() {
   const userToken = useRecoilValue(userTokenState);
