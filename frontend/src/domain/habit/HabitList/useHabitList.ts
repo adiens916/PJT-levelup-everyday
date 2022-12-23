@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { extractFields, getHabits } from 'api/api';
+import { extractFields, getHabits } from '../api';
 import { HabitType } from '../types';
 
 export default function useHabitList() {

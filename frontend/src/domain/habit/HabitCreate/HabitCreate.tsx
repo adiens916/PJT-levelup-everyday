@@ -4,7 +4,7 @@ import { Container } from '@mui/system';
 
 import { initialState } from '../HabitTimer/reducer';
 import { HabitType } from '../types';
-import { createHabit } from 'api/api';
+import { createHabit } from '../api';
 import { useNavigate } from 'react-router-dom';
 import useDocumentTitle from 'common/hook';
 type HabitKeyType = keyof HabitType;

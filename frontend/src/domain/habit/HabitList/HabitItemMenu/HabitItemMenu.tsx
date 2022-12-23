@@ -10,7 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import LowPriorityIcon from '@mui/icons-material/LowPriority';
 import { ListItemIcon, ListItemText } from '@mui/material';
 
-import { deleteHabit, updateImportance } from 'api/api';
+import { deleteHabit, updateImportance } from '../../api';
 import { HabitType } from '../../types';
 
 const ITEM_HEIGHT = 48;
