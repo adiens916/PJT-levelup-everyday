@@ -2,13 +2,13 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { RecoilRoot } from 'recoil';
 
-import HabitList from './components/HabitList/HabitList';
-import HabitCreate from './components/HabitCreate/HabitCreate';
-import HabitTimer from './components/HabitTimer/HabitTimer';
+import HabitList from './domain/habit/HabitList/HabitList';
+import HabitCreate from './domain/habit/HabitCreate/HabitCreate';
+import HabitTimer from './domain/habit/HabitTimer/HabitTimer';
 import SignUp from './domain/account/SignUp/SignUp';
 import Login from './domain/account/Login/Login';
 import NavBar from './components/NavBar/NavBar';
-import { DailyGraph } from './components/Graph/Graph';
+import { DailyGraph } from './domain/habit/Graph/Graph';
 
 function App() {
   return (
