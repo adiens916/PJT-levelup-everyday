@@ -1,20 +1,10 @@
-import json
-from typing import Iterable
-
-from django.core import serializers
-from django.db.models import Model
-from django.http import JsonResponse, HttpRequest
+from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
+
 from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Habit
-
-
-def json_response_wrapper(queryset: Iterable[Model]):
-    queryset_json = serializers.serialize("json", queryset, ensure_ascii=False)
-    queryset_dict = json.loads(queryset_json)
-    return JsonResponse(queryset_dict, safe=False)
 
 
 def authenticate_and_authorize(view):
