@@ -8,10 +8,8 @@ from .models import Habit
 
 
 def authenticate_and_authorize(view):
-    def wrapper(request: HttpRequest, *args):
-        if any(args):
-            habit_id = args[0]
-        else:
+    def wrapper(request: HttpRequest, habit_id=None):
+        if request.method == "POST":
             habit_id = request.POST.get("habit_id")
 
         if not request.user.is_authenticated:
@@ -27,7 +25,7 @@ def authenticate_and_authorize(view):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        if any(args):
+        if request.method == "GET":
             return view(request, habit_id)
         else:
             return view(request)

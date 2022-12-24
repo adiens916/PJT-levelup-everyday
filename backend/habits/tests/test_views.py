@@ -1,3 +1,5 @@
+from datetime import date, time
+from pprint import pprint
 from django.test import TestCase
 
 from habits.models import Habit
@@ -8,7 +10,12 @@ class HabitViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         provider = TestDataProvider()
+
         cls.auth_headers = provider.get_auth_headers()
+        provider.user.next_reset_date = date(2022, 12, 25)
+        provider.user.daily_reset_time = time(0, 0)
+        provider.user.save()
+
         cls.habit_id = provider.create_habit()
         provider.create_habits()
 
@@ -19,10 +26,20 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(habit.goal_xp, 300)
 
     def test_get_habits(self):
-        pass
+        response = self.client.get("/api/habit/", **self.auth_headers)
+        data: list[dict] = response.json()
+
+        self.assertIsInstance(data, list)
+        self.assertIsInstance(data[0], dict)
+        self.assertEqual(len(data), 3)
+
+        self.assertContains(response, "current_xp")
 
     def test_get_a_habit(self):
-        pass
+        response = self.client.get(f"/api/habit/{self.habit_id}/", **self.auth_headers)
+        data: dict = response.json()
+
+        self.assertIsInstance(data, dict)
 
     def test_delete_habit(self):
         pass

@@ -35,7 +35,7 @@ HABIT_INFO_3 = {
 
 class TestDataProvider:
     def __init__(self) -> None:
-        self.user = User.objects.create_user(username=USERNAME, password=PASSWORD)
+        self.user: User = User.objects.create_user(username=USERNAME, password=PASSWORD)
         self.__auth_headers = None
 
     def get_auth_headers(self) -> dict:
