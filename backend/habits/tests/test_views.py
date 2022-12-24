@@ -1,44 +1,23 @@
-from datetime import datetime, timedelta
-from unittest import mock
+from datetime import date, time
+from unittest import expectedFailure
+from django.test import TestCase
 
-from django.test import TestCase, Client
-
-from account.models import User
-from habits.models import Habit, RoundRecord
+from habits.models import Habit
+from .provider import TestDataProvider
 
 
 class HabitViewTestCase(TestCase):
     @classmethod
-    def setUp(cls) -> None:
-        cls.user = User.objects.create_user(username="john", password="doe")
-        cls.auth_headers = cls.get_auth_headers("john", "doe")
-        cls.habit_info = {
-            "name": "Reading a book",
-            "estimate_type": "TIME",
-            "estimate_unit": "",
-            "final_goal": 3600,
-            "growth_type": "INCREASE",
-            "day_cycle": 2,
-            "initial_goal": 300,
-        }
-        cls.habit_id = cls.create_habit()
+    def setUpTestData(cls):
+        provider = TestDataProvider()
 
-    @classmethod
-    def get_auth_headers(cls, username: str, password: str) -> dict:
-        credentials = {"username": username, "password": password}
-        response = Client().post("/api/account/login/", credentials)
+        cls.auth_headers = provider.get_auth_headers()
+        provider.user.next_reset_date = date(2022, 12, 25)
+        provider.user.daily_reset_time = time(0, 0)
+        provider.user.save()
 
-        items: dict = response.json()
-        token = items.get("token")
-        return {"HTTP_AUTHORIZATION": f"Token {token}"}
-
-    @classmethod
-    def create_habit(cls) -> int:
-        response = Client().post("/api/habit/", data=cls.habit_info, **cls.auth_headers)
-
-        items: dict = response.json()
-        habit_id = items.get("id")
-        return habit_id
+        cls.habit_id = provider.create_habit()
+        provider.create_habits()
 
     def test_create_habit(self):
         habit = Habit.objects.get(pk=self.habit_id)
@@ -46,85 +25,46 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(habit.final_goal, 3600)
         self.assertEqual(habit.goal_xp, 300)
 
-    def test_start_timer(self):
-        before = datetime.now()
-        self.client.post(
-            "/api/habit/timer/start/", {"habit_id": self.habit_id}, **self.auth_headers
+    def test_get_habits(self):
+        response = self.client.get("/api/habit/", **self.auth_headers)
+        data: list[dict] = response.json()
+
+        self.assertIsInstance(data, list)
+        self.assertIsInstance(data[0], dict)
+        self.assertEqual(len(data), 3)
+
+        self.assertContains(response, "current_xp")
+
+    def test_get_a_habit(self):
+        response = self.client.get(f"/api/habit/{self.habit_id}/", **self.auth_headers)
+        data: dict = response.json()
+
+        self.assertIsInstance(data, dict)
+
+    def test_delete_habit(self):
+        pass
+
+    def test_update_importance(self):
+        pass
+
+    @expectedFailure
+    def test_get_daily_records(self):
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
         )
-        after = datetime.now()
+        data: dict = response.json()
 
-        habit = Habit.objects.get(pk=self.habit_id)
-        self.assertTrue(habit.is_running)
+        self.assertContains(response, "date")
+        self.assertContains(response, "success")
+        self.assertContains(response, "level_now")
+        self.assertContains(response, "level_change")
+        self.assertContains(response, "xp_now")
+        self.assertContains(response, "xp_change")
 
-        self.assertIsInstance(habit.start_datetime, datetime)
-        self.assertGreaterEqual(habit.start_datetime, before - timedelta(minutes=1))
-        self.assertLessEqual(habit.start_datetime, after + timedelta(minutes=1))
-
-    def test_finish_timer(self):
-        self.test_start_timer()
-
-        habit = Habit.objects.get(pk=self.habit_id)
-        self.assertTrue(habit.is_running)
-
-        self.client.post(
-            "/api/habit/timer/finish/",
-            {"habit_id": self.habit_id, "progress": 45},
-            **self.auth_headers,
+    def test_failed_get_daily_records_when_init(self):
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
         )
+        data: list = response.json()
 
-        round_record = RoundRecord.objects.get(habit=habit)
-        self.assertEqual(round_record.progress, 45)
-
-        habit = Habit.objects.get(pk=self.habit_id)
-        self.assertEqual(habit.goal_xp, 300)
-        self.assertEqual(habit.current_xp, 45)
-
-    def test_finish_timer_when_level_up(self):
-        self.test_start_timer()
-
-        habit = Habit.objects.get(pk=self.habit_id)
-        self.assertTrue(habit.is_running)
-
-        habit.growth_amount = 60
-        habit.save()
-
-        self.client.post(
-            "/api/habit/timer/finish/",
-            {"habit_id": self.habit_id, "progress": 450},
-            **self.auth_headers,
-        )
-
-        round_record = RoundRecord.objects.get(habit=habit)
-        self.assertEqual(round_record.progress, 450)
-
-        habit = Habit.objects.get(pk=self.habit_id)
-        self.assertEqual(habit.goal_xp, 360)
-        self.assertEqual(habit.current_xp, 150)
-
-    def test_finish_timer_when_level_up_a_lot(self):
-        """
-        lv.1: 0 / 300
-        lv.2: 0 / 360
-        lv.3: 0 / 420
-        lv.4: 0 / 480
-
-        when given 900 XP, then:
-        lv.1: 900 / 300 => lv.2
-        lv.2: 600 / 360 => lv.3
-        lv.3: 240 / 420
-        """
-
-        habit = Habit.objects.get(pk=self.habit_id)
-        habit.growth_amount = 60
-        habit.save()
-
-        self.test_start_timer()
-        self.client.post(
-            "/api/habit/timer/finish/",
-            {"habit_id": self.habit_id, "progress": 900},
-            **self.auth_headers,
-        )
-
-        habit = Habit.objects.get(pk=self.habit_id)
-        self.assertEqual(habit.goal_xp, 420)
-        self.assertEqual(habit.current_xp, 240)
+        self.assertEqual(len(data), 0)

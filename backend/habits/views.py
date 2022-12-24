@@ -11,7 +11,7 @@ from account.models import User
 from .models import Habit, RoundRecord, DailyRecord
 from .models_aux import RecordSaver, GoalAdjuster, DueAdjuster
 from .serializers import HabitSerializer, RoundRecordSerializer, DailyRecordSerializer
-
+from .views_aux import authenticate_and_authorize
 
 # Create your views here.
 @csrf_exempt
@@ -44,23 +44,14 @@ def index(request: HttpRequest):
 
 @csrf_exempt
 @api_view(["GET", "DELETE"])
+@authenticate_and_authorize
 def index_each(request: HttpRequest, habit_id: int):
-    if not request.user.is_authenticated:
-        return Response(
-            {"success": False, "error": "User not authenticated"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
     habit = get_object_or_404(Habit, pk=habit_id)
-    if not habit.is_owned_by_user(request.user):
-        return Response(
-            {"success": False, "detail": "Habit not owned by the user"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
 
     if request.method == "GET":
         serializer = HabitSerializer(habit)
         return Response(serializer.data)
+
     elif request.method == "DELETE":
         habit.delete()
         return Response(
@@ -70,19 +61,9 @@ def index_each(request: HttpRequest, habit_id: int):
 
 @csrf_exempt
 @api_view(["POST"])
+@authenticate_and_authorize
 def update_importance(request: HttpRequest, habit_id: int):
-    if not request.user.is_authenticated:
-        return Response(
-            {"success": False, "detail": "User not authenticated"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
     habit = get_object_or_404(Habit, pk=habit_id)
-    if not habit.is_owned_by_user(request.user):
-        return Response(
-            {"success": False, "detail": "Habit not owned by the user"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
 
     habit.importance = request.POST.get("importance")
     habit.save()
@@ -94,20 +75,8 @@ def update_importance(request: HttpRequest, habit_id: int):
 
 @csrf_exempt
 @api_view(["GET"])
+@authenticate_and_authorize
 def get_daily_records(request: HttpRequest, habit_id: int):
-    if not request.user.is_authenticated:
-        return Response(
-            {"success": False, "detail": "User not authenticated"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
-    habit = get_object_or_404(Habit, pk=habit_id)
-    if not habit.is_owned_by_user(request.user):
-        return Response(
-            {"success": False, "detail": "Not owned by user"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
-
     records = DailyRecord.objects.filter(habit=habit_id)
     serializer = DailyRecordSerializer(records, many=True)
     return Response(serializer.data)
@@ -115,12 +84,11 @@ def get_daily_records(request: HttpRequest, habit_id: int):
 
 @csrf_exempt
 @api_view(["POST"])
+@authenticate_and_authorize
 def start_timer(request: HttpRequest):
-    # TODO: Authentication & Authorization step needed
-    # Also, these steps are so redundant that
-    # they will be refactored
     habit_id = request.POST.get("habit_id")
     habit = Habit.objects.get(id=habit_id)
+
     habit.start_recording()
     return Response(
         {
@@ -133,6 +101,7 @@ def start_timer(request: HttpRequest):
 
 @csrf_exempt
 @api_view(["POST"])
+@authenticate_and_authorize
 def finish_timer(request: HttpRequest):
     habit_id = request.POST.get("habit_id")
     habit: Habit = Habit.objects.get(id=habit_id)
