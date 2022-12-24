@@ -1,5 +1,5 @@
 from datetime import date, time
-from pprint import pprint
+from unittest import expectedFailure
 from django.test import TestCase
 
 from habits.models import Habit
@@ -47,5 +47,24 @@ class HabitViewTestCase(TestCase):
     def test_update_importance(self):
         pass
 
+    @expectedFailure
     def test_get_daily_records(self):
-        pass
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
+        )
+        data: dict = response.json()
+
+        self.assertContains(response, "date")
+        self.assertContains(response, "success")
+        self.assertContains(response, "level_now")
+        self.assertContains(response, "level_change")
+        self.assertContains(response, "xp_now")
+        self.assertContains(response, "xp_change")
+
+    def test_failed_get_daily_records_when_init(self):
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
+        )
+        data: list = response.json()
+
+        self.assertEqual(len(data), 0)
