@@ -33,8 +33,14 @@ def signup(request: HttpRequest):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def login(request: HttpRequest):
-    username = request.POST["username"]
-    password = request.POST["password"]
+    if len(request.POST) == 0:
+        return Response(
+            {"success": False, "error": "No data in request"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    username = request.POST.get("username")
+    password = request.POST.get("password")
     user = authenticate(request, username=username, password=password)
 
     if user:
@@ -65,6 +71,20 @@ def logout(request: HttpRequest):
 
 
 @csrf_exempt
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def check_connection(request: HttpRequest):
+    return Response("connected")
+
+
+@csrf_exempt
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def check_post_availability(request: HttpRequest):
+    return Response("post available")
+
+
+@csrf_exempt
 @api_view(["POST"])
 def check_authenticated(request: HttpRequest):
     if not request.user:
@@ -76,10 +96,6 @@ def check_authenticated(request: HttpRequest):
             "id": request.user.pk,
             "name": request.user.get_username(),
             "post": request.POST,
-            # 'meta': request.META,
-            # 'headers': request.headers,
-            # 'body': request.body,
-            # 'session': list(request.session.values()),
         }
         return JsonResponse(result)
 
