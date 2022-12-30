@@ -22,15 +22,11 @@ export async function signUp(username: string, password: string) {
 }
 
 export async function login(username: string, password: string) {
-  const data: LoginResponseType = await requestPostByAxios(
-    `${host}/account/login/`,
-    {
-      username,
-      password,
-    },
-  );
-  saveUserToken(data.token);
-  return data;
+  const response = await axios.post(`${host}/account/login/`, {
+    username,
+    password,
+  });
+  return response.data;
 }
 
 export async function logout() {
