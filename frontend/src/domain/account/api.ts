@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { requestPostByAxios, request } from 'common/api';
 import {
   SignUpResponseType,
@@ -21,15 +22,11 @@ export async function signUp(username: string, password: string) {
 }
 
 export async function login(username: string, password: string) {
-  const data: LoginResponseType = await requestPostByAxios(
-    `${host}/account/login/`,
-    {
-      username,
-      password,
-    },
-  );
-  saveUserToken(data.token);
-  return data;
+  const response = await axios.post(`${host}/account/login/`, {
+    username,
+    password,
+  });
+  return response.data;
 }
 
 export async function logout() {
@@ -41,6 +38,18 @@ export async function logout() {
     location.replace('/');
     return data;
   }
+}
+
+export async function checkConnection() {
+  const response = await axios.get(`${host}/account/check-conn/`);
+  // 'connected'
+  return response.data;
+}
+
+export async function checkPostAvailability() {
+  const response = await axios.post(`${host}/account/check-post/`);
+  // 'post available'
+  return response.data;
 }
 
 export function saveUserToken(token: string) {
