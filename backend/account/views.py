@@ -11,6 +11,7 @@ from django.http import (
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -32,15 +33,18 @@ def signup(request: HttpRequest):
 @csrf_exempt
 @api_view(["POST"])
 @permission_classes([AllowAny])
-def login(request: HttpRequest):
-    if len(request.POST) == 0:
+def login(request: Request):
+    # print("data", request.data)
+    # print("POST", request.POST)
+
+    if len(request.data) == 0:
         return Response(
             {"success": False, "error": "No data in request"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    username = request.POST.get("username")
-    password = request.POST.get("password")
+    username = request.data.get("username")
+    password = request.data.get("password")
     user = authenticate(request, username=username, password=password)
 
     if user:
