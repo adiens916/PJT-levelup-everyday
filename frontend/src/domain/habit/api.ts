@@ -1,4 +1,5 @@
-import { requestGetByAxios, requestPostByAxios } from 'common/api';
+import { axiosInstance } from 'common/api';
+import { setAxiosInterceptorForHeader } from 'domain/account/api';
 import {
   HabitResponseType,
   HabitType,
@@ -9,23 +10,11 @@ import {
   DailyRecordType,
 } from 'domain/habit/types';
 
-// Set host by an environment variable.
-let host = process.env.REACT_APP_BACKEND_HOST;
-if (host) {
-  host += '/api';
-} else {
-  host = 'http://127.0.0.1:8000/api';
-}
+setAxiosInterceptorForHeader();
 
 export async function getHabits() {
-  const response = await requestGetByAxios<HabitResponseType[]>(
-    `${host}/habit/`,
-  );
-  return response;
-  // if (response.status === 200) {
-  //   return extractFields(response.data);
-  // } else {
-  // }
+  const response = await axiosInstance.get<HabitResponseType[]>('/habit/');
+  return response.data;
 }
 
 export async function getHabit(habitId: number) {

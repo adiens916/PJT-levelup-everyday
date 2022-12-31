@@ -5,13 +5,16 @@ import {
   LogoutResponseType,
 } from './types';
 
-axiosInstance.interceptors.request.use((config) => {
-  if (getUserToken()) {
-    config.headers = { Authorization: `Token ${getUserToken()}` };
-    config.withCredentials = true;
-  }
-  return config;
-});
+export function setAxiosInterceptorForHeader() {
+  axiosInstance.interceptors.request.use((config) => {
+    if (getUserToken()) {
+      config.headers = { Authorization: `Token ${getUserToken()}` };
+      config.withCredentials = true;
+    }
+    return config;
+  });
+}
+setAxiosInterceptorForHeader();
 
 export async function signUp(username: string, password: string) {
   const response = await axiosInstance.post<SignUpResponseType>(
