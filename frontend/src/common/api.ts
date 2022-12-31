@@ -1,22 +1,16 @@
 import axios from 'axios';
 
 // Set host by an environment variable.
-let host = process.env.REACT_APP_BACKEND_HOST;
+export let host = process.env.REACT_APP_BACKEND_HOST;
 if (host) {
   host += '/api';
 } else {
   host = 'http://127.0.0.1:8000/api';
 }
 
-export async function requestGetByAxios<T>(url: string) {
-  const response = await axios.get<T>(url, {
-    headers: {
-      Authorization: `Token ${getUserToken()}`,
-    },
-    withCredentials: true,
-  });
-  return response;
-}
+export const axiosInstance = axios.create({
+  baseURL: host,
+});
 
 export async function requestPostByAxios(url: string, data?: object) {
   const response = await axios({

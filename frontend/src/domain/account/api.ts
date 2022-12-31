@@ -1,18 +1,10 @@
 import axios from 'axios';
-import { requestPostByAxios, request } from 'common/api';
+import { host, axiosInstance, request, requestPostByAxios } from 'common/api';
 import {
   SignUpResponseType,
   LoginResponseType,
   LogoutResponseType,
 } from './types';
-
-// Set host by an environment variable.
-let host = process.env.REACT_APP_BACKEND_HOST;
-if (host) {
-  host += '/api';
-} else {
-  host = 'http://127.0.0.1:8000/api';
-}
 
 export async function signUp(username: string, password: string) {
   return await request<SignUpResponseType>(`${host}/account/signup/`, {
@@ -22,8 +14,8 @@ export async function signUp(username: string, password: string) {
 }
 
 export async function login(username: string, password: string) {
-  const response = await axios.post<LoginResponseType>(
-    `${host}/account/login/`,
+  const response = await axiosInstance.post<LoginResponseType>(
+    '/account/login/',
     {
       username,
       password,
