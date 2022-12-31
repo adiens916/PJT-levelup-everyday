@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { host, axiosInstance, request, requestPostByAxios } from 'common/api';
+import { axiosInstance } from 'common/api';
 import {
   SignUpResponseType,
   LoginResponseType,
@@ -15,19 +14,17 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 export async function signUp(username: string, password: string) {
-  return await request<SignUpResponseType>(`${host}/account/signup/`, {
-    username,
-    password,
-  });
+  const response = await axiosInstance.post<SignUpResponseType>(
+    '/account/signup/',
+    { username, password },
+  );
+  return response.data;
 }
 
 export async function login(username: string, password: string) {
   const response = await axiosInstance.post<LoginResponseType>(
     '/account/login/',
-    {
-      username,
-      password,
-    },
+    { username, password },
   );
   saveUserToken(response.data.token);
   return response.data;
@@ -48,13 +45,13 @@ export async function logout() {
 }
 
 export async function checkConnection() {
-  const response = await axios.get(`${host}/account/check-conn/`);
+  const response = await axiosInstance.get('/account/check-conn/');
   // 'connected'
   return response.data;
 }
 
 export async function checkPostAvailability() {
-  const response = await axios.post(`${host}/account/check-post/`);
+  const response = await axiosInstance.post('/account/check-post/');
   // 'post available'
   return response.data;
 }
