@@ -13,15 +13,13 @@ import {
 setAxiosInterceptorForHeader();
 
 export async function getHabits() {
-  const response = await axiosInstance.get<HabitResponseType[]>('/habit/');
+  const response = await axiosInstance.get<HabitType[]>('/habit/');
   return response.data;
 }
 
 export async function getHabit(habitId: number) {
-  const response = await requestGetByAxios<HabitResponseType[]>(
-    `${host}/habit/${habitId}/`,
-  );
-  return extractFields(response.data)[0];
+  const response = await axiosInstance.get<HabitType>(`/habit/${habitId}/`);
+  return response.data;
 }
 
 export async function createHabit(habit: HabitType) {
