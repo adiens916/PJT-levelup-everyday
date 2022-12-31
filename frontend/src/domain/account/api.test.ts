@@ -1,7 +1,12 @@
-import { checkConnection, checkPostAvailability, login } from './api';
+import {
+  login,
+  getUserToken,
+  checkConnection,
+  checkPostAvailability,
+} from './api';
 
 describe('login tests', () => {
-  test('login', async () => {
+  test.skip('login', async () => {
     try {
       const result = await login('john', 'johnjohn');
       expect(result.token).toMatch(/[0-9a-z]{40}/);
@@ -9,6 +14,12 @@ describe('login tests', () => {
     } catch (error) {
       console.log(error);
     }
+  });
+
+  test('user token should be saved after login', async () => {
+    await login('john', 'johnjohn');
+    expect(getUserToken()).toMatch(/[0-9a-z]{40}/);
+    // result.token == c59705415cde035735c37c4711d97f56c49648b6
   });
 });
 

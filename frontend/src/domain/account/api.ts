@@ -22,10 +22,14 @@ export async function signUp(username: string, password: string) {
 }
 
 export async function login(username: string, password: string) {
-  const response = await axios.post(`${host}/account/login/`, {
-    username,
-    password,
-  });
+  const response = await axios.post<LoginResponseType>(
+    `${host}/account/login/`,
+    {
+      username,
+      password,
+    },
+  );
+  saveUserToken(response.data.token);
   return response.data;
 }
 
@@ -56,10 +60,10 @@ export function saveUserToken(token: string) {
   localStorage.setItem('token', token);
 }
 
-export function clearUserToken() {
-  localStorage.removeItem('token');
-}
-
 export function getUserToken() {
   return localStorage.getItem('token');
+}
+
+export function clearUserToken() {
+  localStorage.removeItem('token');
 }
