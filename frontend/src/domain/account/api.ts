@@ -6,6 +6,14 @@ import {
   LogoutResponseType,
 } from './types';
 
+axiosInstance.interceptors.request.use((config) => {
+  if (getUserToken()) {
+    config.headers = { Authorization: `Token ${getUserToken()}` };
+    config.withCredentials = true;
+  }
+  return config;
+});
+
 export async function signUp(username: string, password: string) {
   return await request<SignUpResponseType>(`${host}/account/signup/`, {
     username,
@@ -26,13 +34,16 @@ export async function login(username: string, password: string) {
 }
 
 export async function logout() {
-  let data: LogoutResponseType | null = null;
   try {
-    data = await requestPostByAxios(`${host}/account/logout/`, {});
+    const response = await axiosInstance.post<LogoutResponseType>(
+      `/account/logout/`,
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
   } finally {
     clearUserToken();
     location.replace('/');
-    return data;
   }
 }
 
