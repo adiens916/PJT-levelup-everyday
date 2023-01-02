@@ -33,6 +33,16 @@ export interface HabitType {
   temporary_progress: number;
 }
 
+export type HabitCreateRequestType = Pick<
+  HabitType,
+  | 'name'
+  | 'estimate_type'
+  | 'estimate_unit'
+  | 'final_goal'
+  | 'growth_type'
+  | 'day_cycle'
+>;
+
 export interface DailyRecordResponseType {
   model: string;
   pk: number;
