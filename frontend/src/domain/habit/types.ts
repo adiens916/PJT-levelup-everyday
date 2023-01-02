@@ -4,10 +4,6 @@ export interface HabitResponseType {
   fields: HabitType;
 }
 
-export interface HabitCreateType {
-  id: number;
-}
-
 export interface HabitType {
   id?: number;
   user: number;
@@ -42,6 +38,10 @@ export type HabitCreateRequestType = Pick<
   | 'growth_type'
   | 'day_cycle'
 >;
+
+export interface HabitCreateResponseType {
+  id: number;
+}
 
 export interface DailyRecordResponseType {
   model: string;

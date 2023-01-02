@@ -5,7 +5,8 @@ import {
   HabitType,
   StartTimerType,
   FinishTimerType,
-  HabitCreateType,
+  HabitCreateRequestType,
+  HabitCreateResponseType,
   DailyRecordResponseType,
   DailyRecordType,
 } from 'domain/habit/types';
@@ -22,35 +23,12 @@ export async function getHabit(habitId: number) {
   return response.data;
 }
 
-export async function createHabit(habit: HabitType) {
-  const body = {
-    name: habit.name,
-    estimate_type: habit.estimate_type,
-    estimate_unit: habit.estimate_unit,
-    final_goal: habit.final_goal,
-    growth_type: habit.growth_type,
-    day_cycle: habit.day_cycle,
-  };
-
-  if (body.estimate_type === 'TIME') {
-    switch (body.estimate_unit) {
-      case 'HOUR':
-        body.final_goal *= 3600;
-        break;
-      case 'MINUTE':
-        body.final_goal *= 60;
-        break;
-      default:
-        break;
-    }
-    body.estimate_unit = '';
-  }
-
-  const data: HabitCreateType = await requestPostByAxios(
-    `${host}/habit/`,
-    body,
+export async function createHabit(habit: HabitCreateRequestType) {
+  const response = await axiosInstance.post<HabitCreateResponseType>(
+    '/habit/',
+    habit,
   );
-  return data;
+  return response.data;
 }
 
 export async function deleteHabit(habitId: number) {
