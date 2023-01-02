@@ -51,9 +51,17 @@ class Habit(models.Model):
         self.growth_type = request.data.get("growth_type")
         self.day_cycle = int(request.data.get("day_cycle"))
 
+        self.__modify_final_goal_by_unit()
         self.goal_xp = self.__set_initial_goal_xp(request)
         self.growth_amount = self.__set_initial_growth_amount(self.final_goal)
         self.save()
+
+    def __modify_final_goal_by_unit(self):
+        if self.estimate_type == "TIME":
+            if self.estimate_unit == "HOUR":
+                self.final_goal *= 3600
+            elif self.estimate_unit == "MINUTE":
+                self.final_goal *= 60
 
     def __set_initial_goal_xp(self, request: Request):
         initial_goal = request.data.get("initial_goal")
