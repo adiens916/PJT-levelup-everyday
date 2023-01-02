@@ -52,7 +52,7 @@ class Habit(models.Model):
         self.day_cycle = int(request.data.get("day_cycle"))
 
         self.__modify_final_goal_by_unit()
-        self.goal_xp = self.__set_initial_goal_xp(request)
+        self.__set_initial_goal_xp(request)
         self.growth_amount = self.__set_initial_growth_amount(self.final_goal)
         self.save()
 
