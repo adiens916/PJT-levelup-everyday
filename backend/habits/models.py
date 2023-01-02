@@ -51,19 +51,18 @@ class Habit(models.Model):
         self.growth_type = request.POST.get("growth_type")
         self.day_cycle = int(request.POST.get("day_cycle"))
 
-        if self.growth_type == "INCREASE":
-            initial_goal = request.POST.get("initial_goal")
-            if initial_goal:
-                self.goal_xp = int(initial_goal)
-            else:
-                self.goal_xp = int(self.final_goal * 0.01)
-            self.growth_amount = self.get_initial_growth_amount(self.final_goal)
-        elif self.growth_type == "DECREASE":
-            self.goal_xp = int(self.final_goal * 10)
-            self.growth_amount = int((self.goal_xp - self.final_goal) * 0.01)
+        self.goal_xp = self.__set_initial_goal_xp(request)
+        self.growth_amount = self.__set_initial_growth_amount(self.final_goal)
         self.save()
 
-    def get_initial_growth_amount(self, final_goal: int):
+    def __set_initial_goal_xp(self, request: HttpRequest):
+        initial_goal = request.POST.get("initial_goal")
+        if initial_goal:
+            self.goal_xp = int(initial_goal)
+        else:
+            self.goal_xp = int(self.final_goal * 0.01)
+
+    def __set_initial_growth_amount(self, final_goal: int):
         initial_growth_amount = int(final_goal * 0.01)
         if 0 <= initial_growth_amount < 30:
             return 10
