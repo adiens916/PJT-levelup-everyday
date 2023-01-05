@@ -2,8 +2,8 @@ from datetime import date, datetime, timedelta
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator
-from django.http import HttpRequest
 from django.utils import timezone
+from rest_framework.request import Request
 from account.models import User
 
 ESTIMATE_TYPE_CHOICES = [("TIME", "TIME"), ("COUNT", "COUNT")]
@@ -41,29 +41,36 @@ class Habit(models.Model):
     def __str__(self) -> str:
         return self.name
 
-    def create_from_request(self, request: HttpRequest):
+    def create_from_request(self, request: Request):
         self.user = request.user
-        self.name = request.POST.get("name")
+        self.name = request.data.get("name")
 
-        self.estimate_type = request.POST.get("estimate_type")
-        self.estimate_unit = request.POST.get("estimate_unit")
-        self.final_goal = int(request.POST.get("final_goal"))
-        self.growth_type = request.POST.get("growth_type")
-        self.day_cycle = int(request.POST.get("day_cycle"))
+        self.estimate_type = request.data.get("estimate_type")
+        self.estimate_unit = request.data.get("estimate_unit")
+        self.final_goal = int(request.data.get("final_goal"))
+        self.growth_type = request.data.get("growth_type")
+        self.day_cycle = int(request.data.get("day_cycle"))
 
-        if self.growth_type == "INCREASE":
-            initial_goal = request.POST.get("initial_goal")
-            if initial_goal:
-                self.goal_xp = int(initial_goal)
-            else:
-                self.goal_xp = int(self.final_goal * 0.01)
-            self.growth_amount = self.get_initial_growth_amount(self.final_goal)
-        elif self.growth_type == "DECREASE":
-            self.goal_xp = int(self.final_goal * 10)
-            self.growth_amount = int((self.goal_xp - self.final_goal) * 0.01)
+        self.__modify_final_goal_by_unit()
+        self.__set_initial_goal_xp(request)
+        self.growth_amount = self.__set_initial_growth_amount(self.final_goal)
         self.save()
 
-    def get_initial_growth_amount(self, final_goal: int):
+    def __modify_final_goal_by_unit(self):
+        if self.estimate_type == "TIME":
+            if self.estimate_unit == "HOUR":
+                self.final_goal *= 3600
+            elif self.estimate_unit == "MINUTE":
+                self.final_goal *= 60
+
+    def __set_initial_goal_xp(self, request: Request):
+        initial_goal = request.data.get("initial_goal")
+        if initial_goal:
+            self.goal_xp = int(initial_goal)
+        else:
+            self.goal_xp = int(self.final_goal * 0.01)
+
+    def __set_initial_growth_amount(self, final_goal: int):
         initial_growth_amount = int(final_goal * 0.01)
         if 0 <= initial_growth_amount < 30:
             return 10

@@ -4,10 +4,6 @@ export interface HabitResponseType {
   fields: HabitType;
 }
 
-export interface HabitCreateType {
-  id: number;
-}
-
 export interface HabitType {
   id?: number;
   user: number;
@@ -31,6 +27,20 @@ export interface HabitType {
   is_paused: boolean;
   paused_datetime: string | null;
   temporary_progress: number;
+}
+
+export type HabitCreateRequestType = Pick<
+  HabitType,
+  | 'name'
+  | 'estimate_type'
+  | 'estimate_unit'
+  | 'final_goal'
+  | 'growth_type'
+  | 'day_cycle'
+>;
+
+export interface HabitCreateResponseType {
+  id: number;
 }
 
 export interface DailyRecordResponseType {

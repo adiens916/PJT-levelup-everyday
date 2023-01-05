@@ -1,73 +1,39 @@
-import { requestGetByAxios, requestPostByAxios } from 'common/api';
+import { axiosInstance } from 'common/api';
+import { setAxiosInterceptorForHeader } from 'domain/account/api';
 import {
   HabitResponseType,
   HabitType,
   StartTimerType,
   FinishTimerType,
-  HabitCreateType,
+  HabitCreateRequestType,
+  HabitCreateResponseType,
   DailyRecordResponseType,
   DailyRecordType,
 } from 'domain/habit/types';
 
-// Set host by an environment variable.
-let host = process.env.REACT_APP_BACKEND_HOST;
-if (host) {
-  host += '/api';
-} else {
-  host = 'http://127.0.0.1:8000/api';
-}
+setAxiosInterceptorForHeader();
 
 export async function getHabits() {
-  const response = await requestGetByAxios<HabitResponseType[]>(
-    `${host}/habit/`,
-  );
-  return response;
-  // if (response.status === 200) {
-  //   return extractFields(response.data);
-  // } else {
-  // }
+  const response = await axiosInstance.get<HabitType[]>('/habit/');
+  return response.data;
 }
 
 export async function getHabit(habitId: number) {
-  const response = await requestGetByAxios<HabitResponseType[]>(
-    `${host}/habit/${habitId}/`,
-  );
-  return extractFields(response.data)[0];
+  const response = await axiosInstance.get<HabitType>(`/habit/${habitId}/`);
+  return response.data;
 }
 
-export async function createHabit(habit: HabitType) {
-  const body = {
-    name: habit.name,
-    estimate_type: habit.estimate_type,
-    estimate_unit: habit.estimate_unit,
-    final_goal: habit.final_goal,
-    growth_type: habit.growth_type,
-    day_cycle: habit.day_cycle,
-  };
-
-  if (body.estimate_type === 'TIME') {
-    switch (body.estimate_unit) {
-      case 'HOUR':
-        body.final_goal *= 3600;
-        break;
-      case 'MINUTE':
-        body.final_goal *= 60;
-        break;
-      default:
-        break;
-    }
-    body.estimate_unit = '';
-  }
-
-  const data: HabitCreateType = await requestPostByAxios(
-    `${host}/habit/`,
-    body,
+export async function createHabit(habit: HabitCreateRequestType) {
+  const response = await axiosInstance.post<HabitCreateResponseType>(
+    '/habit/',
+    habit,
   );
-  return data;
+  return response.data;
 }
 
 export async function deleteHabit(habitId: number) {
-  return await requestPostByAxios(`${host}/habit/${habitId}/`);
+  const response = await axiosInstance.delete(`/habit/${habitId}/`);
+  return response.data;
 }
 
 export async function updateImportance(habitId: number, importance: number) {

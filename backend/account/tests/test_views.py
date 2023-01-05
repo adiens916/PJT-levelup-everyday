@@ -40,7 +40,7 @@ class AccountViewTestCase(TestCase):
 
         # NOTE: Headers should be in upper case (capital letters).
         headers = {"HTTP_AUTHORIZATION": f"Token {token}"}
-        response = self.client.post("/api/account/check/", **headers)
+        response = self.client.post("/api/account/check-auth/", **headers)
         # print(response.content)
         # print("< response >")
         # print(*response.items(), sep="\n")
