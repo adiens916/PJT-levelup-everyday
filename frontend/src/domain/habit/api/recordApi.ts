@@ -1,11 +1,6 @@
 import { axiosInstance } from 'common/api';
 import { setAxiosInterceptorForHeader } from 'domain/account/api';
-import {
-  HabitResponseType,
-  HabitType,
-  DailyRecordResponseType,
-  DailyRecordType,
-} from 'domain/habit/types';
+import { DailyRecordResponseType, DailyRecordType } from 'domain/habit/types';
 
 setAxiosInterceptorForHeader();
 
@@ -15,13 +10,6 @@ export async function getRecords(habitId: number) {
   );
   const records = extractRecordFields(response.data);
   return convertRecordsForChart(records);
-}
-
-export function extractFields(querySet: HabitResponseType[]): HabitType[] {
-  return querySet.map((instance) => ({
-    id: instance.pk,
-    ...instance.fields,
-  }));
 }
 
 function extractRecordFields(
