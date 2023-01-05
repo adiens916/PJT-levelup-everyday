@@ -32,7 +32,8 @@ export async function deleteHabit(habitId: number) {
 }
 
 export async function updateImportance(habitId: number, importance: number) {
-  return await requestPostByAxios(`${host}/habit/${habitId}/importance`, {
+  const response = await axiosInstance.patch(`/habit/${habitId}/importance/`, {
     importance,
   });
+  return response.data;
 }
