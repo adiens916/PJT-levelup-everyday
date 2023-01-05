@@ -1,6 +1,6 @@
 import { createHabit, deleteHabit, getHabit, getHabits } from './api';
 import { login } from 'domain/account/api';
-import { HabitCreateRequestType } from './types';
+import { HabitCreateRequestType } from '../types';
 
 const USERNAME = 'john';
 const PASSWORD = 'johnjohn';
