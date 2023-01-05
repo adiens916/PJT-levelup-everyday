@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework import status
 
 # from drf_yasg.utils import swagger_auto_schema
@@ -62,10 +63,10 @@ def index_each(request: HttpRequest, habit_id: int):
 @csrf_exempt
 @api_view(["POST"])
 @authenticate_and_authorize
-def update_importance(request: HttpRequest, habit_id: int):
+def update_importance(request: Request, habit_id: int):
     habit = get_object_or_404(Habit, pk=habit_id)
 
-    habit.importance = request.POST.get("importance")
+    habit.importance = request.data.get("importance")
     habit.save()
     return Response(
         {"success": True, "detail": "Updated successfully"},
@@ -85,8 +86,8 @@ def get_daily_records(request: HttpRequest, habit_id: int):
 @csrf_exempt
 @api_view(["POST"])
 @authenticate_and_authorize
-def start_timer(request: HttpRequest):
-    habit_id = request.POST.get("habit_id")
+def start_timer(request: Request):
+    habit_id = request.data.get("habit_id")
     habit = Habit.objects.get(id=habit_id)
 
     habit.start_recording()
@@ -102,10 +103,10 @@ def start_timer(request: HttpRequest):
 @csrf_exempt
 @api_view(["POST"])
 @authenticate_and_authorize
-def finish_timer(request: HttpRequest):
-    habit_id = request.POST.get("habit_id")
+def finish_timer(request: Request):
+    habit_id = request.data.get("habit_id")
     habit: Habit = Habit.objects.get(id=habit_id)
-    progress = int(request.POST.get("progress"))
+    progress = int(request.data.get("progress"))
 
     record = RoundRecord()
     record.create_from_habit_finished(habit, progress)
