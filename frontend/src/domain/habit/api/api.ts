@@ -3,8 +3,6 @@ import { setAxiosInterceptorForHeader } from 'domain/account/api';
 import {
   HabitResponseType,
   HabitType,
-  StartTimerType,
-  FinishTimerType,
   DailyRecordResponseType,
   DailyRecordType,
 } from 'domain/habit/types';
@@ -17,27 +15,6 @@ export async function getRecords(habitId: number) {
   );
   const records = extractRecordFields(response.data);
   return convertRecordsForChart(records);
-}
-
-export async function startTimer(habitId: number) {
-  const data: StartTimerType = await requestPostByAxios(
-    `${host}/habit/timer/start/`,
-    {
-      habit_id: habitId,
-    },
-  );
-  return data;
-}
-
-export async function finishTimer(habitId: number, progress: number) {
-  const data: FinishTimerType = await requestPostByAxios(
-    `${host}/habit/timer/finish/`,
-    {
-      habit_id: habitId,
-      progress: progress,
-    },
-  );
-  return data;
 }
 
 export function extractFields(querySet: HabitResponseType[]): HabitType[] {
