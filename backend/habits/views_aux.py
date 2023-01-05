@@ -25,7 +25,9 @@ def authenticate_and_authorize(view):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        if request.method == "GET":
+        if request.method != "POST":
+            # Fixed from == 'GET' to != 'POST'
+            # for including 'DELETE' method.
             return view(request, habit_id)
         else:
             return view(request)
