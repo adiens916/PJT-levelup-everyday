@@ -1,4 +1,4 @@
-import { createHabit, deleteHabit, getHabit, getHabits } from './api';
+import { createHabit, deleteHabit, getHabit, getHabits } from './crudApi';
 import { login } from 'domain/account/api';
 import { HabitCreateRequestType } from '../types';
 
