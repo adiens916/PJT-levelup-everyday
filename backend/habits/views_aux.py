@@ -1,16 +1,16 @@
-from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework import status
 
 from .models import Habit
 
 
 def authenticate_and_authorize(view):
-    def wrapper(request: HttpRequest, habit_id=None):
-        if request.method == "POST":
-            habit_id = request.POST.get("habit_id")
+    def wrapper(request: Request, habit_id=None):
+        if habit_id == None:
+            habit_id = request.data.get("habit_id")
 
         if not request.user.is_authenticated:
             return Response(

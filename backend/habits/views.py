@@ -61,7 +61,7 @@ def index_each(request: HttpRequest, habit_id: int):
 
 
 @csrf_exempt
-@api_view(["POST"])
+@api_view(["PATCH"])
 @authenticate_and_authorize
 def update_importance(request: Request, habit_id: int):
     habit = get_object_or_404(Habit, pk=habit_id)
