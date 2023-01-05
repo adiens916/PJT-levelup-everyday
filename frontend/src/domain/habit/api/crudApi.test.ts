@@ -1,4 +1,10 @@
-import { createHabit, deleteHabit, getHabit, getHabits } from './crudApi';
+import {
+  createHabit,
+  deleteHabit,
+  getHabit,
+  getHabits,
+  updateImportance,
+} from './crudApi';
 import { login } from 'domain/account/api';
 import { HabitCreateRequestType } from '../types';
 
@@ -45,4 +51,14 @@ test('delete habit', async () => {
     const habits = await getHabits();
     expect(habits.length).toBe(HABIT_LENGTH);
   }
+});
+
+test('update habit importance', async () => {
+  const result = await updateImportance(HABIT_ID, 300);
+  expect(result.success).toBe(true);
+
+  const habit = await getHabit(HABIT_ID);
+  expect(habit.importance).toBe(300);
+
+  await updateImportance(HABIT_ID, 100);
 });
