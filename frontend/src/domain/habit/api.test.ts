@@ -1,4 +1,4 @@
-import { createHabit, getHabit, getHabits } from './api';
+import { createHabit, deleteHabit, getHabit, getHabits } from './api';
 import { login } from 'domain/account/api';
 import { HabitCreateRequestType } from './types';
 
@@ -6,6 +6,7 @@ const USERNAME = 'john';
 const PASSWORD = 'johnjohn';
 const HABIT_LENGTH = 3;
 const HABIT_ID = 16;
+let newHabitId = 0;
 
 beforeAll(async () => {
   await login(USERNAME, PASSWORD);
@@ -13,7 +14,7 @@ beforeAll(async () => {
 
 test('get habits', async () => {
   const data = await getHabits();
-  expect(data).toHaveLength(HABIT_LENGTH);
+  expect(data.length).toBe(HABIT_LENGTH);
 });
 
 test('get habit', async () => {
@@ -33,4 +34,15 @@ test('create habit', async () => {
 
   const data = await createHabit(HABIT_INFO);
   expect(data.id).toBeTruthy();
+  newHabitId = data.id;
+});
+
+test('delete habit', async () => {
+  if (newHabitId) {
+    const result = await deleteHabit(newHabitId);
+    expect(result.success).toBe(true);
+
+    const habits = await getHabits();
+    expect(habits.length).toBe(HABIT_LENGTH);
+  }
 });

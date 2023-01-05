@@ -32,7 +32,8 @@ export async function createHabit(habit: HabitCreateRequestType) {
 }
 
 export async function deleteHabit(habitId: number) {
-  return await requestPostByAxios(`${host}/habit/${habitId}/`);
+  const response = await axiosInstance.delete(`/habit/${habitId}/`);
+  return response.data;
 }
 
 export async function updateImportance(habitId: number, importance: number) {
