@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import date, time, timedelta
 from unittest import expectedFailure
 from django.test import TestCase
 
@@ -12,7 +12,7 @@ class HabitViewTestCase(TestCase):
         provider = TestDataProvider()
 
         cls.auth_headers = provider.get_auth_headers()
-        provider.user.next_reset_date = date(2022, 12, 25)
+        provider.user.next_reset_date = date.today() + timedelta(days=1)
         provider.user.daily_reset_time = time(0, 0)
         provider.user.save()
 
@@ -51,17 +51,17 @@ class HabitViewTestCase(TestCase):
         response = self.client.get(
             f"/api/habit/{self.habit_id}/record/", **self.auth_headers
         )
-        data: list[DailyRecord] = response.json()
+        data: list[dict] = response.json()
 
         self.assertEqual(len(data), 1)
 
         first_record = data[0]
-        self.assertEqual(first_record.habit, self.habit_id)
-        self.assertEqual(first_record.date, date.today())
-        self.assertEqual(first_record.level_now, 1)
-        self.assertEqual(first_record.level_change, 0)
-        self.assertEqual(first_record.xp_now, 0)
-        self.assertEqual(first_record.xp_change, 0)
+        self.assertEqual(first_record.get("habit"), self.habit_id)
+        self.assertEqual(first_record.get("date"), date.today().isoformat())
+        self.assertEqual(first_record.get("level_now"), 1)
+        self.assertEqual(first_record.get("level_change"), 0)
+        self.assertEqual(first_record.get("xp_now"), 0)
+        self.assertEqual(first_record.get("xp_change"), 0)
 
     @expectedFailure
     def test_get_daily_records(self):

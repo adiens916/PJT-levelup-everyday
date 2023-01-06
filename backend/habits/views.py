@@ -39,6 +39,8 @@ def index(request: HttpRequest):
     elif request.method == "POST":
         habit = Habit()
         habit.create_from_request(request)
+        DailyRecord().create_from_habit(habit)
+
         # Instead of DRF Response, you can use Django's built-in JsonResponse
         return JsonResponse({"id": habit.pk})
 
