@@ -1,6 +1,6 @@
 import { login } from 'domain/account/api';
 import { getHabit } from './crudApi';
-import { startTimer } from './timerApi';
+import { finishTimer, startTimer } from './timerApi';
 
 const HABIT_ID = 16;
 
@@ -22,4 +22,16 @@ test('start timer', async () => {
     const now_datetime = new Date();
     expect(start_datetime < now_datetime).toBe(true);
   }
+});
+
+test('finish timer', async () => {
+  const habit = await getHabit(HABIT_ID);
+  expect(habit.is_running).toBe(true);
+
+  // when 60 seconds passed
+  const CURRENT_PROGRESS = 60;
+
+  const result = await finishTimer(HABIT_ID, CURRENT_PROGRESS);
+  expect(result.id).toBeTruthy();
+  expect(result.progress).toBe(60);
 });

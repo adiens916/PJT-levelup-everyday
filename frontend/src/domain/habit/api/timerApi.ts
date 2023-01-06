@@ -15,12 +15,12 @@ export async function startTimer(habitId: number) {
 }
 
 export async function finishTimer(habitId: number, progress: number) {
-  const data: FinishTimerType = await requestPostByAxios(
-    `${host}/habit/timer/finish/`,
+  const response = await axiosInstance.post<FinishTimerType>(
+    '/habit/timer/finish/',
     {
       habit_id: habitId,
-      progress: progress,
+      progress,
     },
   );
-  return data;
+  return response.data;
 }
