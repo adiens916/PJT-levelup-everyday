@@ -1,3 +1,4 @@
+from datetime import date
 from django.http import JsonResponse, HttpRequest
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -112,7 +113,10 @@ def finish_timer(request: Request):
 
     record = RoundRecord()
     record.create_from_habit_finished(habit, progress)
-    habit.end_recording(record.progress)
+    habit.end_recording(progress)
+
+    daily_record = get_object_or_404(DailyRecord, habit=habit_id, date=date.today())
+    daily_record.create_from_habit(habit)
 
     serializer = RoundRecordSerializer(record)
     return Response(serializer.data)

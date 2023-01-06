@@ -75,12 +75,17 @@ class HabitViewTestCase(TestCase):
             **self.auth_headers,
         )
 
+        response = self.client.get(f"/api/habit/{self.habit_id}/", **self.auth_headers)
+        data = response.json()
+        self.assertEqual(data.get("current_xp"), 60)
+
         response = self.client.get(
             f"/api/habit/{self.habit_id}/record/", **self.auth_headers
         )
         data: list[DailyRecordType] = response.json()
-        record = data[0]
+        self.assertEqual(len(data), 1)
 
+        record = data[0]
         self.assertEqual(record.get("xp_now"), 60)
 
     @expectedFailure
