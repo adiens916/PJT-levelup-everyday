@@ -5,13 +5,13 @@ import { StartTimerType, FinishTimerType } from '../types';
 setAxiosInterceptorForHeader();
 
 export async function startTimer(habitId: number) {
-  const data: StartTimerType = await requestPostByAxios(
-    `${host}/habit/timer/start/`,
+  const response = await axiosInstance.post<StartTimerType>(
+    '/habit/timer/start/',
     {
       habit_id: habitId,
     },
   );
-  return data;
+  return response.data;
 }
 
 export async function finishTimer(habitId: number, progress: number) {
