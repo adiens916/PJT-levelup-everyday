@@ -70,6 +70,39 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(record.get("xp_now"), 60)
         self.assertEqual(record.get("xp_change"), 60)
 
+    def test_daily_record_updated_when_round_finished_continuously(self):
+        # [given]
+        # habit's initial goal == 300
+        # habit's growth amount == 30
+        response = self.client.get(f"/api/habit/{self.habit_id}/", **self.auth_headers)
+        data: dict = response.json()
+        self.assertEqual(data.get("goal_xp"), 300)
+        self.assertEqual(data.get("growth_amount"), 30)
+
+        # [given] it has record for 60 seconds
+        try:
+            record = self.__get_record_by_request()
+            self.assertEqual(record.get("xp_now"), 60)
+            self.assertEqual(record.get("xp_change"), 60)
+        except:
+            self.__record_habit_progress(60)
+
+        # [when] adding 200 seconds
+        self.__record_habit_progress(200)
+        record = self.__get_record_by_request()
+        # [then] total 260 seconds
+        self.assertEqual(record.get("xp_now"), 260)
+        self.assertEqual(record.get("xp_change"), 260)
+
+        # [when] adding 150 seconds
+        self.__record_habit_progress(300)
+        record = self.__get_record_by_request()
+        # [then] level up & xp initialized
+        self.assertEqual(record.get("level_now"), 2)
+        self.assertEqual(record.get("level_change"), 1)
+        self.assertEqual(record.get("xp_now"), 110)
+        self.assertEqual(record.get("xp_change"), 410)
+
     def __record_habit_progress(self, progress: int) -> None:
         self.client.post(
             f"/api/habit/timer/start/", {"habit_id": self.habit_id}, **self.auth_headers
