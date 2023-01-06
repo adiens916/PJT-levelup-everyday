@@ -3,6 +3,7 @@ from unittest import expectedFailure
 from django.test import TestCase
 
 from habits.models import Habit, DailyRecord
+from habits.models_type import DailyRecordType
 from .provider import TestDataProvider
 
 
@@ -51,7 +52,7 @@ class HabitViewTestCase(TestCase):
         response = self.client.get(
             f"/api/habit/{self.habit_id}/record/", **self.auth_headers
         )
-        data: list[dict] = response.json()
+        data: list[DailyRecordType] = response.json()
 
         self.assertEqual(len(data), 1)
 
@@ -62,6 +63,25 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(first_record.get("level_change"), 0)
         self.assertEqual(first_record.get("xp_now"), 0)
         self.assertEqual(first_record.get("xp_change"), 0)
+
+    def test_daily_record_updated_whenever_round_finished(self):
+        # recording started and finished after 1 minute
+        self.client.post(
+            f"/api/habit/timer/start/", {"habit_id": self.habit_id}, **self.auth_headers
+        )
+        self.client.post(
+            f"/api/habit/timer/finish/",
+            {"habit_id": self.habit_id, "progress": 60},
+            **self.auth_headers,
+        )
+
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
+        )
+        data: list[DailyRecordType] = response.json()
+        record = data[0]
+
+        self.assertEqual(record.get("xp_now"), 60)
 
     @expectedFailure
     def test_get_daily_records(self):
