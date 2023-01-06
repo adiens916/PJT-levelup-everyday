@@ -2,7 +2,7 @@ from datetime import date, time
 from unittest import expectedFailure
 from django.test import TestCase
 
-from habits.models import Habit
+from habits.models import Habit, DailyRecord
 from .provider import TestDataProvider
 
 
@@ -47,6 +47,22 @@ class HabitViewTestCase(TestCase):
     def test_update_importance(self):
         pass
 
+    def test_daily_record_created_at_first(self):
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
+        )
+        data: list[DailyRecord] = response.json()
+
+        self.assertEqual(len(data), 1)
+
+        first_record = data[0]
+        self.assertEqual(first_record.habit, self.habit_id)
+        self.assertEqual(first_record.date, date.today())
+        self.assertEqual(first_record.level_now, 1)
+        self.assertEqual(first_record.level_change, 0)
+        self.assertEqual(first_record.xp_now, 0)
+        self.assertEqual(first_record.xp_change, 0)
+
     @expectedFailure
     def test_get_daily_records(self):
         response = self.client.get(
@@ -60,11 +76,3 @@ class HabitViewTestCase(TestCase):
         self.assertContains(response, "level_change")
         self.assertContains(response, "xp_now")
         self.assertContains(response, "xp_change")
-
-    def test_failed_get_daily_records_when_init(self):
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: list = response.json()
-
-        self.assertEqual(len(data), 0)
