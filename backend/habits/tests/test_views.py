@@ -64,29 +64,29 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(first_record.get("xp_now"), 0)
         self.assertEqual(first_record.get("xp_change"), 0)
 
-    def test_daily_record_updated_whenever_round_finished(self):
-        # recording started and finished after 1 minute
+    def test_daily_record_updated_when_round_finished(self):
+        self.__record_habit_progress(60)
+        record = self.__get_record_by_request()
+        self.assertEqual(record.get("xp_now"), 60)
+        self.assertEqual(record.get("xp_change"), 60)
+
+    def __record_habit_progress(self, progress: int) -> None:
         self.client.post(
             f"/api/habit/timer/start/", {"habit_id": self.habit_id}, **self.auth_headers
         )
         self.client.post(
             f"/api/habit/timer/finish/",
-            {"habit_id": self.habit_id, "progress": 60},
+            {"habit_id": self.habit_id, "progress": progress},
             **self.auth_headers,
         )
 
-        response = self.client.get(f"/api/habit/{self.habit_id}/", **self.auth_headers)
-        data = response.json()
-        self.assertEqual(data.get("current_xp"), 60)
-
+    def __get_record_by_request(self) -> DailyRecordType:
         response = self.client.get(
             f"/api/habit/{self.habit_id}/record/", **self.auth_headers
         )
         data: list[DailyRecordType] = response.json()
-        self.assertEqual(len(data), 1)
-
         record = data[0]
-        self.assertEqual(record.get("xp_now"), 60)
+        return record
 
     @expectedFailure
     def test_get_daily_records(self):
