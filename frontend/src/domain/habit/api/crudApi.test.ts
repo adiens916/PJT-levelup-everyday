@@ -8,23 +8,23 @@ import {
 import { login } from 'domain/account/api';
 import { HabitCreateRequestType } from '../types';
 
-const USERNAME = 'john';
-const PASSWORD = 'johnjohn';
-const HABIT_LENGTH = 3;
-const HABIT_ID = 16;
+const SAMPLE_HABIT_COUNT = 3;
+const SAMPLE_HABIT_ID = 16;
 let newHabitId = 0;
 
 beforeAll(async () => {
+  const USERNAME = 'john';
+  const PASSWORD = 'johnjohn';
   await login(USERNAME, PASSWORD);
 });
 
 test('get habits', async () => {
   const data = await getHabits();
-  expect(data.length).toBe(HABIT_LENGTH);
+  expect(data.length).toBe(SAMPLE_HABIT_COUNT);
 });
 
 test('get habit', async () => {
-  const data = await getHabit(HABIT_ID);
+  const data = await getHabit(SAMPLE_HABIT_ID);
   expect(data.name).toBe('new');
 });
 
@@ -49,16 +49,16 @@ test('delete habit', async () => {
     expect(result.success).toBe(true);
 
     const habits = await getHabits();
-    expect(habits.length).toBe(HABIT_LENGTH);
+    expect(habits.length).toBe(SAMPLE_HABIT_COUNT);
   }
 });
 
 test('update habit importance', async () => {
-  const result = await updateImportance(HABIT_ID, 300);
+  const result = await updateImportance(SAMPLE_HABIT_ID, 300);
   expect(result.success).toBe(true);
 
-  const habit = await getHabit(HABIT_ID);
+  const habit = await getHabit(SAMPLE_HABIT_ID);
   expect(habit.importance).toBe(300);
 
-  await updateImportance(HABIT_ID, 100);
+  await updateImportance(SAMPLE_HABIT_ID, 100);
 });
