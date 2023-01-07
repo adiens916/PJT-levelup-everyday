@@ -95,9 +95,9 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(record.get("xp_change"), 260)
 
         # [when] adding 150 seconds
-        self.__record_habit_progress(300)
+        self.__record_habit_progress(150)
         record = self.__get_record_by_request()
-        # [then] level up & xp initialized
+        # [then] level increased & xp subtracted
         self.assertEqual(record.get("level_now"), 2)
         self.assertEqual(record.get("level_change"), 1)
         self.assertEqual(record.get("xp_now"), 110)
