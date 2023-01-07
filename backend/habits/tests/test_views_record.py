@@ -1,5 +1,5 @@
-from datetime import date, time, timedelta
-from unittest import expectedFailure
+from datetime import date, datetime, time, timedelta
+from unittest import expectedFailure, mock
 from django.test import TestCase
 
 from habits.models_type import DailyRecordType
@@ -34,6 +34,26 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(first_record.get("level_change"), 0)
         self.assertEqual(first_record.get("xp_now"), 0)
         self.assertEqual(first_record.get("xp_change"), 0)
+
+    @mock.patch("account.models.datetime", wraps=datetime)
+    def test_daily_record_created_after_days_passed(self, mocked_datetime):
+        # [given] 3 days has passed after a user visited
+        now = datetime.today() + timedelta(days=3)
+        mocked_datetime.now.return_value = now
+
+        # [when] the user logs in and get habit list
+        self.client.get("/api/habit/", **self.auth_headers)
+
+        # [then] daily record for today should exist
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
+        )
+        data: list[DailyRecordType] = response.json()
+        self.assertEqual(len(data), 2)
+
+        latest_record = data[-1]
+        self.assertEqual(latest_record.get("date"), now.date().isoformat())
+        self.assertEqual(latest_record.get("xp_change"), 0)
 
     def test_daily_record_updated_when_round_finished(self):
         self.__record_habit_progress(60)
@@ -84,12 +104,12 @@ class HabitViewTestCase(TestCase):
             **self.auth_headers,
         )
 
-    def __get_record_by_request(self) -> DailyRecordType:
+    def __get_record_by_request(self, index=0) -> DailyRecordType:
         response = self.client.get(
             f"/api/habit/{self.habit_id}/record/", **self.auth_headers
         )
         data: list[DailyRecordType] = response.json()
-        record = data[0]
+        record = data[index]
         return record
 
     @expectedFailure
