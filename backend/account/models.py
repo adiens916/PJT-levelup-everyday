@@ -1,10 +1,10 @@
-import re
 from datetime import datetime, time, timedelta
 
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
-
 from rest_framework.request import Request
+
+from .models_aux import DateTimeCalculator
 
 
 class User(AbstractUser):
@@ -27,13 +27,11 @@ class User(AbstractUser):
         if not standard_reset_time:
             raise ValueError("No data in request")
 
-        # Ex.) '03:30'
-        time_pattern = "([0-1][0-9]|2[0-3]):([0-5][0-9])"
-        matched = re.match(time_pattern, standard_reset_time)
+        matched = DateTimeCalculator.is_iso_format(standard_reset_time)
         if not matched:
             raise ValueError(
                 f"Time format must be ISO format (HH:MM), \
-                    but given time is {standard_reset_time}"
+                    but given time format is ({time})"
             )
 
         hour, minute = standard_reset_time.split(":")
