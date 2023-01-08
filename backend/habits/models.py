@@ -1,8 +1,12 @@
 from datetime import date, datetime, timedelta
+
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.db.models import Sum
+
 from rest_framework.request import Request
 from account.models import User
 
@@ -132,12 +136,16 @@ class Habit(models.Model):
 
 class RoundRecord(models.Model):
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
+    date = models.DateField()
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
     progress = models.PositiveIntegerField()
 
     def create_from_habit_finished(self, habit: Habit, progress: int | float):
+        user: User = habit.user
+
         self.habit = habit
+        self.date = user.get_yesterday()
         self.start_datetime = habit.start_datetime
 
         self.end_datetime = timezone.now()
@@ -145,7 +153,10 @@ class RoundRecord(models.Model):
         self.save()
 
     def create_from_habit_running(self, habit: Habit):
+        user: User = habit.user
+
         self.habit = habit
+        self.date = user.get_yesterday()
         self.start_datetime = habit.start_datetime
 
         user: User = self.habit.user
@@ -174,7 +185,7 @@ class DailyRecord(models.Model):
         user: User = habit.user
 
         self.habit = habit
-        self.date = user.get_yesterday()
+        self.date = user.get_today()
         self.success = habit.is_done
 
         self.level_now = habit.level
@@ -184,21 +195,23 @@ class DailyRecord(models.Model):
 
         self.save()
 
-    def calc_level_change(self):
+    def calc_level_change(self) -> int:
         try:
-            latest = DailyRecord.objects.latest("date")
-            return self.level_now - latest.level_now
-        except Exception:
-            # If it's the first record, there is no previous record.
-            # The level starts from not 0 but 1
+            yesterday_record = DailyRecord.objects.filter(habit=self.habit).order_by(
+                "-date"
+            )[1]
+            return self.level_now - yesterday_record.level_now
+        except IndexError:
+            # at the first day
             return self.level_now - 1
 
-    def calc_xp_change(self):
-        try:
-            latest = DailyRecord.objects.latest("date")
-            return self.xp_now - latest.xp_now
-        except Exception:
-            return self.xp_now
+    def calc_xp_change(self) -> int:
+        queryset_result = RoundRecord.objects.filter(
+            habit=self.habit, date=self.date
+        ).aggregate(Sum("progress"))
+
+        today_progress_sum = queryset_result.get("progress__sum")
+        return today_progress_sum if today_progress_sum else 0
 
     def is_owned_by_user(self, given_user: User):
         return self.habit.is_owned_by_user(given_user)

@@ -1,3 +1,4 @@
+from datetime import date
 from django.http import JsonResponse, HttpRequest
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -31,6 +32,9 @@ def index(request: HttpRequest):
                 GoalAdjuster.adjust_habit_goal(habit)
                 DueAdjuster.adjust_habit_due(habit)
                 DueAdjuster.set_is_today_due_date(habit)
+                # TODO: daily record must be created for due habits only
+                DailyRecord().create_from_habit(habit)
+                # TODO: user's next reset date must be set
                 habit.save()
 
         serializer = HabitSerializer(habit_list, many=True)
@@ -39,6 +43,8 @@ def index(request: HttpRequest):
     elif request.method == "POST":
         habit = Habit()
         habit.create_from_request(request)
+        DailyRecord().create_from_habit(habit)
+
         # Instead of DRF Response, you can use Django's built-in JsonResponse
         return JsonResponse({"id": habit.pk})
 
@@ -110,7 +116,10 @@ def finish_timer(request: Request):
 
     record = RoundRecord()
     record.create_from_habit_finished(habit, progress)
-    habit.end_recording(record.progress)
+    habit.end_recording(progress)
+
+    daily_record = get_object_or_404(DailyRecord, habit=habit_id, date=date.today())
+    daily_record.create_from_habit(habit)
 
     serializer = RoundRecordSerializer(record)
     return Response(serializer.data)

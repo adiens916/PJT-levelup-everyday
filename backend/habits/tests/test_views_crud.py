@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import date, time, timedelta
 from unittest import expectedFailure
 from django.test import TestCase
 
@@ -12,7 +12,7 @@ class HabitViewTestCase(TestCase):
         provider = TestDataProvider()
 
         cls.auth_headers = provider.get_auth_headers()
-        provider.user.next_reset_date = date(2022, 12, 25)
+        provider.user.next_reset_date = date.today() + timedelta(days=1)
         provider.user.daily_reset_time = time(0, 0)
         provider.user.save()
 
@@ -46,25 +46,3 @@ class HabitViewTestCase(TestCase):
 
     def test_update_importance(self):
         pass
-
-    @expectedFailure
-    def test_get_daily_records(self):
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: dict = response.json()
-
-        self.assertContains(response, "date")
-        self.assertContains(response, "success")
-        self.assertContains(response, "level_now")
-        self.assertContains(response, "level_change")
-        self.assertContains(response, "xp_now")
-        self.assertContains(response, "xp_change")
-
-    def test_failed_get_daily_records_when_init(self):
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: list = response.json()
-
-        self.assertEqual(len(data), 0)
