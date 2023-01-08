@@ -185,7 +185,7 @@ class DailyRecord(models.Model):
         user: User = habit.user
 
         self.habit = habit
-        self.date = user.get_yesterday()
+        self.date = user.get_today()
         self.success = habit.is_done
 
         self.level_now = habit.level

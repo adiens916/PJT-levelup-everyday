@@ -44,6 +44,9 @@ class User(AbstractUser):
     def get_yesterday(self):
         return self.get_reset_datetime().date() - timedelta(days=1)
 
+    def get_today(self):
+        return datetime.now().date()
+
     def get_reset_datetime(self):
         reset_datetime = datetime.combine(self.next_reset_date, self.daily_reset_time)
         return reset_datetime

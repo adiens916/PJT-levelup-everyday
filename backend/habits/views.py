@@ -32,6 +32,9 @@ def index(request: HttpRequest):
                 GoalAdjuster.adjust_habit_goal(habit)
                 DueAdjuster.adjust_habit_due(habit)
                 DueAdjuster.set_is_today_due_date(habit)
+                # TODO: daily record must be created for due habits only
+                DailyRecord().create_from_habit(habit)
+                # TODO: user's next reset date must be set
                 habit.save()
 
         serializer = HabitSerializer(habit_list, many=True)
