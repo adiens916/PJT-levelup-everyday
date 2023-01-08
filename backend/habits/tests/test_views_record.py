@@ -37,6 +37,13 @@ class HabitViewTestCase(TestCase):
 
     @mock.patch("account.models.datetime", wraps=datetime)
     def test_daily_record_created_after_days_passed(self, mocked_datetime):
+        # [given] assuming a daily record has existed already
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
+        )
+        data: list[DailyRecordType] = response.json()
+        self.assertEqual(len(data), 1)
+
         # [given] 3 days has passed after a user visited
         now = datetime.today() + timedelta(days=3)
         mocked_datetime.now.return_value = now
@@ -44,14 +51,14 @@ class HabitViewTestCase(TestCase):
         # [when] the user logs in and get habit list
         self.client.get("/api/habit/", **self.auth_headers)
 
-        # [then] daily record for today should exist
+        # [then] the new daily record for today should exist
         response = self.client.get(
             f"/api/habit/{self.habit_id}/record/", **self.auth_headers
         )
         data: list[DailyRecordType] = response.json()
         self.assertEqual(len(data), 2)
 
-        latest_record = data[-1]
+        latest_record = data[1]
         self.assertEqual(latest_record.get("date"), now.date().isoformat())
         self.assertEqual(latest_record.get("xp_change"), 0)
 
