@@ -8,8 +8,8 @@ from .models_aux import RelativeDateTime, is_iso_format_time
 
 
 class User(AbstractUser):
-    next_reset_date = models.DateField(blank=True, null=True)
-    daily_reset_time = models.TimeField(default=time(hour=0, minute=0))
+    last_reset_date = models.DateField(blank=True, null=True)
+    reset_time = models.TimeField(default=time(hour=0, minute=0))
     is_recording = models.BooleanField(default=False)
 
     objects = UserManager()
@@ -22,9 +22,9 @@ class User(AbstractUser):
         user: User = __class__.objects.create_user(username, email, password)
 
         user.change_standard_reset_time(request)
-        user.next_reset_date = RelativeDateTime.get_relative_date(
-            datetime.now(), user.daily_reset_time
-        ) + timedelta(days=1)
+        user.last_reset_date = RelativeDateTime.get_relative_date(
+            datetime.now(), user.reset_time
+        )
 
         user.save()
         return user
@@ -42,20 +42,25 @@ class User(AbstractUser):
             )
 
         hour, minute = standard_reset_time.split(":")
-        self.daily_reset_time = time(int(hour), int(minute))
+        self.reset_time = time(int(hour), int(minute))
 
     def is_day_changed(self):
-        if self.next_reset_date == None:
+        if self.last_reset_date == None:
             return True
 
         return self.get_reset_datetime() <= datetime.now()
+        # return RelativeDateTime(
+        #     self.get_yesterday(), self.daily_reset_time
+        # ).is_day_changed_relatively()
 
     def get_yesterday(self):
         return self.get_reset_datetime().date() - timedelta(days=1)
+        # return self.next_reset_date - timedelta(days=1)
 
     def get_today(self):
         return datetime.now().date()
+        # return self.next_reset_date
 
     def get_reset_datetime(self):
-        reset_datetime = datetime.combine(self.next_reset_date, self.daily_reset_time)
+        reset_datetime = datetime.combine(self.last_reset_date, self.reset_time)
         return reset_datetime

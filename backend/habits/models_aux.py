@@ -18,6 +18,10 @@ class RecordSaver:
             )
             daily_record.create_from_habit(habit)
 
+    @staticmethod
+    def create_daily_record_for_habit_due_but_not_done(habit: Habit):
+        pass
+
 
 class GoalAdjuster:
     @staticmethod
@@ -51,7 +55,7 @@ class DueAdjuster:
             return False
 
         user: User = habit.user
-        due_date_start = datetime.combine(habit.due_date, user.daily_reset_time)
+        due_date_start = datetime.combine(habit.due_date, user.reset_time)
         due_date_end = due_date_start + timedelta(days=1)
 
         now = datetime.now()

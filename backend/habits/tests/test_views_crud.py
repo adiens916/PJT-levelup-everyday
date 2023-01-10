@@ -12,8 +12,8 @@ class HabitViewTestCase(TestCase):
         provider = TestDataProvider()
 
         cls.auth_headers = provider.get_auth_headers()
-        provider.user.next_reset_date = date.today() + timedelta(days=1)
-        provider.user.daily_reset_time = time(0, 0)
+        provider.user.last_reset_date = date.today() + timedelta(days=1)
+        provider.user.reset_time = time(0, 0)
         provider.user.save()
 
         cls.habit_id = provider.create_habit()

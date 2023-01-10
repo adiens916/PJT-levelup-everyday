@@ -17,8 +17,8 @@ class DueAdjusterTestCase(TestCase):
         """
 
         user = User()
-        user.daily_reset_time = time(6, 0)
-        user.next_reset_date = date(2022, 9, 4)
+        user.reset_time = time(6, 0)
+        user.last_reset_date = date(2022, 9, 4)
         user.save()
 
         habit = Habit()

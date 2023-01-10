@@ -11,8 +11,8 @@ class RecordSaverTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         user = User()
-        user.next_reset_date = date(2022, 11, 11)
-        user.daily_reset_time = time(hour=0, minute=0)
+        user.last_reset_date = date(2022, 11, 11)
+        user.reset_time = time(hour=0, minute=0)
         user.save()
 
         habit = Habit()
