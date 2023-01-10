@@ -11,29 +11,38 @@ class UserModelTestCase(TestCase):
         self.user = User()
 
     @mock.patch("account.models.datetime", wraps=datetime)
-    def test_is_day_changed_when_reset_at_night(self, mocked_datetime):
-        """
-        If a user's reset time is PM 10:15, and now is PM 10:30,
-        then the day has been changed.
-        """
-
+    def test_is_day_changed_when_reset_before_midnight(self, mocked_datetime):
+        # [given]
         self.user.last_reset_date = date(2022, 9, 1)
         self.user.reset_time = time(22, 15)
-        mocked_datetime.now.return_value = datetime(2022, 9, 1, hour=22, minute=30)
-        self.assertIs(self.user.is_day_changed(), True)
+
+        # [when]
+        now = datetime(2022, 9, 1, hour=22, minute=30)
+        mocked_datetime.now.return_value = now
+
+        # [then]
+        self.assertTrue(self.user.is_day_changed())
 
     @mock.patch("account.models.datetime", wraps=datetime)
-    def test_is_day_changed_when_reset_at_dawn(self, mocked_datetime):
-        # given: a user's reset time is AM 06:00
+    def test_is_day_changed_when_reset_after_midnight(self, mocked_datetime):
+        # [given]
         self.user.last_reset_date = date(2022, 9, 17)
-        self.user.reset_time = time(6, 0)
+        self.user.reset_time = time(2, 0)
 
-        # when: now is AM 00:00
-        mocked_datetime.now.return_value = datetime(2022, 9, 17, hour=0)
-        # then: not changed yet
-        self.assertIs(self.user.is_day_changed(), False)
+        # [when]
+        now = datetime(2022, 9, 17, hour=3)
+        mocked_datetime.now.return_value = now
+        # [then]
+        self.assertFalse(self.user.is_day_changed())
 
-        # when: now is AM 07:00
-        mocked_datetime.now.return_value = datetime(2022, 9, 17, hour=7)
-        # then: changed
-        self.assertIs(self.user.is_day_changed(), True)
+        # [when]
+        now = datetime(2022, 9, 17, hour=23)
+        mocked_datetime.now.return_value = now
+        # [then]
+        self.assertFalse(self.user.is_day_changed())
+
+        # [when]
+        now = datetime(2022, 9, 18, hour=3)
+        mocked_datetime.now.return_value = now
+        # [then]
+        self.assertTrue(self.user.is_day_changed())
