@@ -90,7 +90,7 @@ class DateTimeCalculatorTestCase(TestCase):
         )
         self.assertTrue(result)
 
-    @mock.patch("habits.models_aux.datetime", wraps=datetime)
+    @mock.patch("account.models_aux.datetime", wraps=datetime)
     def test_is_day_on_due_relatively(self, mocked_datetime):
         last_done_date = date(2023, 1, 10)
         reset_time = time(2, 0)

@@ -17,8 +17,11 @@ class DateTimeCalculator:
         return reference_date != relative_date
 
     @staticmethod
-    def is_day_on_due_relatively(reference_date: date, interval=1):
-        pass
+    def is_day_on_due_relatively(
+        reference_date: date, reference_time: time, interval=1
+    ):
+        relative_date = __class__.get_relative_date(datetime.now(), reference_time)
+        return reference_date + timedelta(days=interval) == relative_date
 
     @staticmethod
     def get_relative_date(absolute_datetime: datetime, reference_time: time) -> date:
