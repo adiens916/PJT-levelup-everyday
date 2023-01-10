@@ -92,4 +92,24 @@ class DateTimeCalculatorTestCase(TestCase):
 
     @mock.patch("habits.models_aux.datetime", wraps=datetime)
     def test_is_day_on_due_relatively(self, mocked_datetime):
-        pass
+        last_done_date = date(2023, 1, 10)
+        reset_time = time(2, 0)
+        day_cycle = 2
+
+        mocked_datetime.now.return_value = datetime(2023, 1, 11, 2, 0)
+        result = DateTimeCalculator.is_day_on_due_relatively(
+            last_done_date, reset_time, day_cycle
+        )
+        self.assertFalse(result)
+
+        mocked_datetime.now.return_value = datetime(2023, 1, 12, 0, 0)
+        result = DateTimeCalculator.is_day_on_due_relatively(
+            last_done_date, reset_time, day_cycle
+        )
+        self.assertFalse(result)
+
+        mocked_datetime.now.return_value = datetime(2023, 1, 12, 2, 0)
+        result = DateTimeCalculator.is_day_on_due_relatively(
+            last_done_date, reset_time, day_cycle
+        )
+        self.assertTrue(result)
