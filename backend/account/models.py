@@ -20,12 +20,19 @@ class User(AbstractUser):
         email = request.data.get("email")
         password = request.data.get("password")
         user: User = __class__.objects.create_user(username, email, password)
+
+        user.change_standard_reset_time(request)
+        user.next_reset_date = RelativeDateTime.get_relative_date(
+            datetime.now(), user.daily_reset_time
+        ) + timedelta(days=1)
+
+        user.save()
         return user
 
     def change_standard_reset_time(self, request: Request) -> None:
         standard_reset_time = request.data.get("standard_reset_time")
         if not standard_reset_time:
-            raise ValueError("No data in request")
+            return
 
         matched = is_iso_format_time(standard_reset_time)
         if not matched:
