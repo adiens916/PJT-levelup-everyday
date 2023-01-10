@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from rest_framework.request import Request
 
-from .models_aux import DateTimeCalculator
+from .models_aux import DateTimeCalculator, is_iso_format_time
 
 
 class User(AbstractUser):
@@ -27,7 +27,7 @@ class User(AbstractUser):
         if not standard_reset_time:
             raise ValueError("No data in request")
 
-        matched = DateTimeCalculator.is_iso_format(standard_reset_time)
+        matched = is_iso_format_time(standard_reset_time)
         if not matched:
             raise ValueError(
                 f"Time format must be ISO format (HH:MM), \

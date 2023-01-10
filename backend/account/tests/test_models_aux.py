@@ -1,17 +1,17 @@
 from unittest import TestCase, mock
 from datetime import date, datetime, time
 
-from account.models_aux import DateTimeCalculator
+from account.models_aux import DateTimeCalculator, is_iso_format_time
 
 
 class DateTimeCalculatorTestCase(TestCase):
     def test_is_iso_format(self):
         given_time = "03:30"
-        matched = DateTimeCalculator.is_iso_format(given_time)
+        matched = is_iso_format_time(given_time)
         self.assertTrue(matched)
 
         wrong_time = "3:30"
-        matched = DateTimeCalculator.is_iso_format(wrong_time)
+        matched = is_iso_format_time(wrong_time)
         self.assertFalse(matched)
 
     def test_get_relative_date_when_reset_after_midnight(self):

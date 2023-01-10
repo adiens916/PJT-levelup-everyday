@@ -35,10 +35,10 @@ class DateTimeCalculator:
         else:
             return relative_datetime.date() + timedelta(days=1)
 
-    @staticmethod
-    def is_iso_format(time: str) -> bool:
-        iso_format = "([0-1][0-9]|2[0-3]):([0-5][0-9])"
-        # Ex.) '03:30'
 
-        matched = re.match(iso_format, time)
-        return matched != None
+def is_iso_format_time(time: str) -> bool:
+    iso_format = "([0-1][0-9]|2[0-3]):([0-5][0-9])"
+    # Ex.) '03:30'
+
+    matched = re.match(iso_format, time)
+    return matched != None
