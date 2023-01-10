@@ -12,6 +12,15 @@ class DateTimeCalculator:
         return self.datetime <= datetime.now()
 
     @staticmethod
+    def is_day_changed_relatively(reference_date: date, reference_time: time) -> bool:
+        relative_date = __class__.get_relative_date(datetime.now(), reference_time)
+        return reference_date != relative_date
+
+    @staticmethod
+    def is_day_on_due_relatively(reference_date: date, interval=1):
+        pass
+
+    @staticmethod
     def get_relative_date(absolute_datetime: datetime, reference_time: time) -> date:
         hours = reference_time.hour
         minutes = reference_time.minute
