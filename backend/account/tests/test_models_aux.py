@@ -63,3 +63,28 @@ class DateTimeCalculatorTestCase(TestCase):
         now = datetime(2023, 1, 9, 13, 0)
         relative_date = DateTimeCalculator.get_relative_date(now, reset_time)
         self.assertEqual(relative_date, date(2023, 1, 9), "2023-01-09 13:00")
+
+    @mock.patch("habits.models_aux.datetime", wraps=datetime)
+    def test_is_day_changed_relatively_when_reset_after_midnight(self, mocked_datetime):
+        reset_time = time(2, 0)
+        last_reset_date = date(2023, 1, 10)
+
+        now = datetime(2023, 1, 11, 0, 0)
+        mocked_datetime.now.return_value = now
+
+        result = DateTimeCalculator.is_day_changed_relatively(
+            last_reset_date, reset_time
+        )
+        self.assertFalse(result)
+
+        now = datetime(2023, 1, 11, 2, 0)
+        mocked_datetime.now.return_value = now
+
+        result = DateTimeCalculator.is_day_changed_relatively(
+            last_reset_date, reset_time
+        )
+        self.assertTrue(result)
+
+    @mock.patch("habits.models_aux.datetime", wraps=datetime)
+    def test_is_day_on_due_relatively(self, mocked_datetime):
+        pass
