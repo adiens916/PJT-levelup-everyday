@@ -1,11 +1,12 @@
-import re
 from datetime import datetime, time, timedelta
 
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
-from django.http import HttpRequest
+from rest_framework.request import Request
 
-# Create your models here.
+from .models_aux import RelativeDateTime, is_iso_format_time
+
+
 class User(AbstractUser):
     next_reset_date = models.DateField(blank=True, null=True)
     daily_reset_time = models.TimeField(default=time(hour=0, minute=0))
@@ -14,23 +15,24 @@ class User(AbstractUser):
     objects = UserManager()
 
     @staticmethod
-    def create_from_request(request: HttpRequest):
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
+    def create_from_request(request: Request):
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
         user: User = __class__.objects.create_user(username, email, password)
         return user
 
-    def change_standard_reset_time(self, request: HttpRequest) -> None:
-        standard_reset_time = request.POST.get("standard_reset_time")
+    def change_standard_reset_time(self, request: Request) -> None:
+        standard_reset_time = request.data.get("standard_reset_time")
         if not standard_reset_time:
-            return
+            raise ValueError("No data in request")
 
-        # Ex.) '03:30'
-        time_pattern = "([0-1][0-9]|2[0-3]):([0-5][0-9])"
-        matched = re.match(time_pattern, standard_reset_time)
+        matched = is_iso_format_time(standard_reset_time)
         if not matched:
-            return
+            raise ValueError(
+                f"Time format must be ISO format (HH:MM), \
+                    but given time format is ({time})"
+            )
 
         hour, minute = standard_reset_time.split(":")
         self.daily_reset_time = time(int(hour), int(minute))
