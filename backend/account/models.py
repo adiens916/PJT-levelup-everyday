@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from rest_framework.request import Request
 
-from .models_aux import DateTimeCalculator, is_iso_format_time
+from .models_aux import RelativeDateTime, is_iso_format_time
 
 
 class User(AbstractUser):

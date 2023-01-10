@@ -2,26 +2,18 @@ import re
 from datetime import date, datetime, time, timedelta
 
 
-class DateTimeCalculator:
-    def __init__(self, date: date, time=time(0, 0)) -> None:
-        self.__date = date
-        self.__time = time
-        self.datetime = datetime.combine(self.__date, self.__time)
+class RelativeDateTime:
+    def __init__(self, reference_date: date, reference_time=time(0, 0)) -> None:
+        self.__reference_date = reference_date
+        self.__reference_time = reference_time
 
-    def is_day_passed(self) -> bool:
-        return self.datetime <= datetime.now()
+    def is_day_changed_relatively(self) -> bool:
+        relative_date = self.get_relative_date(datetime.now(), self.__reference_time)
+        return self.__reference_date != relative_date
 
-    @staticmethod
-    def is_day_changed_relatively(reference_date: date, reference_time: time) -> bool:
-        relative_date = __class__.get_relative_date(datetime.now(), reference_time)
-        return reference_date != relative_date
-
-    @staticmethod
-    def is_day_on_due_relatively(
-        reference_date: date, reference_time: time, interval=1
-    ):
-        relative_date = __class__.get_relative_date(datetime.now(), reference_time)
-        return reference_date + timedelta(days=interval) == relative_date
+    def is_day_on_due_relatively(self, interval=1) -> bool:
+        relative_date = self.get_relative_date(datetime.now(), self.__reference_time)
+        return self.__reference_date + timedelta(days=interval) == relative_date
 
     @staticmethod
     def get_relative_date(absolute_datetime: datetime, reference_time: time) -> date:
