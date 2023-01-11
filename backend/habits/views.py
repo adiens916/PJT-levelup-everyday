@@ -113,12 +113,15 @@ def finish_timer(request: Request):
     habit_id = request.data.get("habit_id")
     habit: Habit = Habit.objects.get(id=habit_id)
     progress = int(request.data.get("progress"))
+    user: User = habit.user
 
     record = RoundRecord()
     record.create_from_habit_finished(habit, progress)
     habit.end_recording(progress)
 
-    daily_record = get_object_or_404(DailyRecord, habit=habit_id, date=date.today())
+    daily_record = get_object_or_404(
+        DailyRecord, habit=habit_id, date=user.last_reset_date
+    )
     daily_record.create_from_habit(habit)
 
     serializer = RoundRecordSerializer(record)

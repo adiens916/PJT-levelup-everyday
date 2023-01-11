@@ -53,4 +53,4 @@ class User(AbstractUser):
         return self.last_reset_date
 
     def get_today(self):
-        return self.last_reset_date + timedelta(days=1)
+        return self.last_reset_date
