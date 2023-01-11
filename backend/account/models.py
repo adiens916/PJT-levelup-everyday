@@ -45,22 +45,12 @@ class User(AbstractUser):
         self.reset_time = time(int(hour), int(minute))
 
     def is_day_changed(self):
-        if self.last_reset_date == None:
-            return True
-
-        return self.get_reset_datetime() <= datetime.now()
-        # return RelativeDateTime(
-        #     self.get_yesterday(), self.daily_reset_time
-        # ).is_day_changed_relatively()
+        return RelativeDateTime(
+            self.last_reset_date, self.reset_time
+        ).is_day_changed_relatively()
 
     def get_yesterday(self):
-        return self.get_reset_datetime().date() - timedelta(days=1)
-        # return self.next_reset_date - timedelta(days=1)
+        return self.last_reset_date
 
     def get_today(self):
-        return datetime.now().date()
-        # return self.next_reset_date
-
-    def get_reset_datetime(self):
-        reset_datetime = datetime.combine(self.last_reset_date, self.reset_time)
-        return reset_datetime
+        return self.last_reset_date + timedelta(days=1)
