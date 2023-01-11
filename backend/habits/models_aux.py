@@ -41,7 +41,7 @@ class DueAdjuster:
             user: User = habit.user
             # due date will be reset as yesterday
             # on which the user did the habit actually
-            habit.due_date = user.get_yesterday()
+            habit.due_date = user.get_day_on_progress()
             habit.due_date += timedelta(days=habit.day_cycle)
             habit.is_done = False
 

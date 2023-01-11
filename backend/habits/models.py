@@ -145,7 +145,7 @@ class RoundRecord(models.Model):
         user: User = habit.user
 
         self.habit = habit
-        self.date = user.get_yesterday()
+        self.date = user.get_day_on_progress()
         self.start_datetime = habit.start_datetime
 
         self.end_datetime = timezone.now()
@@ -156,7 +156,7 @@ class RoundRecord(models.Model):
         user: User = habit.user
 
         self.habit = habit
-        self.date = user.get_yesterday()
+        self.date = user.get_day_on_progress()
         self.start_datetime = habit.start_datetime
 
         user: User = self.habit.user
@@ -185,7 +185,7 @@ class DailyRecord(models.Model):
         user: User = habit.user
 
         self.habit = habit
-        self.date = user.get_today()
+        self.date = user.get_day_on_progess()
         self.success = habit.is_done
 
         self.level_now = habit.level

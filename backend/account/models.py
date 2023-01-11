@@ -49,8 +49,12 @@ class User(AbstractUser):
             self.last_reset_date, self.reset_time
         ).is_day_changed_relatively()
 
-    def get_yesterday(self):
+    def get_day_on_progress(self):
         return self.last_reset_date
 
-    def get_today(self):
-        return self.last_reset_date
+    def get_day_to_proceed(self):
+        return RelativeDateTime.get_relative_date_for_now(self.reset_time)
+
+    def update_reset_date(self) -> None:
+        self.last_reset_date = self.get_day_to_proceed()
+        self.save()
