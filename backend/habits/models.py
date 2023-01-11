@@ -185,7 +185,11 @@ class DailyRecord(models.Model):
         user: User = habit.user
 
         self.habit = habit
-        self.date = user.get_day_on_progess()
+        self.date = user.get_day_to_proceed()
+
+        self.update_from_habit(habit)
+
+    def update_from_habit(self, habit: Habit):
         self.success = habit.is_done
 
         self.level_now = habit.level
@@ -194,6 +198,18 @@ class DailyRecord(models.Model):
         self.xp_change = self.calc_xp_change()
 
         self.save()
+
+    @staticmethod
+    def find_record_and_update_from_habit(habit: Habit) -> None:
+        user: User = habit.user
+        try:
+            daily_record = get_object_or_404(
+                DailyRecord, habit=habit.pk, date=user.get_day_on_progress()
+            )
+        except Exception:
+            daily_record = DailyRecord().create_from_habit(habit)
+        else:
+            daily_record.update_from_habit(habit)
 
     def calc_level_change(self) -> int:
         try:

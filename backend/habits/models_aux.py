@@ -12,11 +12,7 @@ class RecordSaver:
             round_record = RoundRecord()
             round_record.create_from_habit_running(habit)
             habit.end_recording(round_record.progress, save=False)
-
-            daily_record = get_object_or_404(
-                DailyRecord, habit=habit.pk, date=date.today()
-            )
-            daily_record.create_from_habit(habit)
+            DailyRecord.find_record_and_update_from_habit(habit)
 
     @staticmethod
     def create_daily_record_for_habit_due_but_not_done(habit: Habit):
