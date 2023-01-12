@@ -1,4 +1,4 @@
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
@@ -8,7 +8,7 @@ from .models_aux import RelativeDateTime, is_iso_format_time
 
 
 class User(AbstractUser):
-    last_reset_date = models.DateField(blank=True, null=True)
+    last_reset_date = models.DateField(default=date.today)
     reset_time = models.TimeField(default=time(hour=0, minute=0))
     is_recording = models.BooleanField(default=False)
 

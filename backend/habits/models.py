@@ -9,6 +9,7 @@ from django.db.models import Sum
 
 from rest_framework.request import Request
 from account.models import User
+from account.models_aux import RelativeDateTime
 
 ESTIMATE_TYPE_CHOICES = [("TIME", "TIME"), ("COUNT", "COUNT")]
 GROWTH_TYPE_CHOICES = [("INCREASE", "INCREASE"), ("DECREASE", "DECREASE")]
@@ -97,9 +98,8 @@ class Habit(models.Model):
         self.is_running = False
         self.current_xp += progress
         self.use_xp_for_level_up()
+        # 'is_done' will be reset when updating due date.
         self.is_done = True
-        # 'is_done' will be reset as False
-        # by DueAdjuster when day changes.
 
         if save:
             self.save()
@@ -126,6 +126,19 @@ class Habit(models.Model):
             self.current_xp = self.goal_xp - decrease_amount
         else:
             self.current_xp = 0
+
+    def update_due(self):
+        if self.is_due_or_done():
+            user: User = self.user
+            # due date should be reset as today for habit done but not due
+            self.due_date = user.get_day_on_progress()
+            self.due_date += timedelta(days=self.day_cycle)
+            self.is_done = False
+
+        if self.due_date <= user.get_day_to_proceed():
+            self.is_today_due_date = True
+        else:
+            self.is_today_due_date = False
 
     def is_due_or_done(self):
         return self.is_today_due_date or self.is_running or self.is_done
@@ -228,6 +241,3 @@ class DailyRecord(models.Model):
 
         today_progress_sum = queryset_result.get("progress__sum")
         return today_progress_sum if today_progress_sum else 0
-
-    def is_owned_by_user(self, given_user: User):
-        return self.habit.is_owned_by_user(given_user)

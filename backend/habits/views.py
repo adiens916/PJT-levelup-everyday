@@ -1,7 +1,7 @@
-from datetime import date
 from django.http import JsonResponse, HttpRequest
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -13,30 +13,17 @@ from account.models import User
 from .models import Habit, RoundRecord, DailyRecord
 from .models_aux import RecordSaver, GoalAdjuster, DueAdjuster
 from .serializers import HabitSerializer, RoundRecordSerializer, DailyRecordSerializer
-from .views_aux import authenticate_and_authorize
+from .views_aux import authenticate, authenticate_and_authorize
 
 # Create your views here.
 @csrf_exempt
 @api_view(["GET", "POST"])
+@authenticate
 def index(request: HttpRequest):
-    if not request.user.is_authenticated:
-        result = {"success": False, "error": "User not authenticated"}
-        return Response(result, status=status.HTTP_401_UNAUTHORIZED)
-
     if request.method == "GET":
         user: User = request.user
         habit_list = Habit.objects.filter(user=user.pk).order_by("-importance")
-        if user.is_day_changed():
-            for habit in habit_list:
-                RecordSaver.save(habit)
-                GoalAdjuster.adjust_habit_goal(habit)
-                DueAdjuster.adjust_habit_due(habit)
-                DueAdjuster.set_is_today_due_date(habit)
-                # TODO: daily record must be created for due habits only
-                DailyRecord().create_from_habit(habit)
-                habit.save()
-            # user's next reset date must be updated
-            user.update_reset_date()
+        __check_day_changes_and_update_habits(user, habit_list)
 
         serializer = HabitSerializer(habit_list, many=True)
         return Response(serializer.data)
@@ -48,6 +35,23 @@ def index(request: HttpRequest):
 
         # Instead of DRF Response, you can use Django's built-in JsonResponse
         return JsonResponse({"id": habit.pk})
+
+
+def __check_day_changes_and_update_habits(user: User, habits: list[Habit]):
+    if user.is_day_changed():
+        for habit in habits:
+            if habit.is_today_due_date and not habit.is_done:
+                habit.lose_xp()
+                DailyRecord.find_record_and_update_from_habit(habit)
+
+            habit.update_due()
+
+            # TODO: daily record must be created for due habits only
+            # just use **create_or_update**
+            DailyRecord().create_from_habit(habit)
+            habit.save()
+        # user's next reset date must be updated
+        user.update_reset_date()
 
 
 @csrf_exempt
