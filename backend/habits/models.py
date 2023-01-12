@@ -9,6 +9,7 @@ from django.db.models import Sum
 
 from rest_framework.request import Request
 from account.models import User
+from account.models_aux import RelativeDateTime
 
 ESTIMATE_TYPE_CHOICES = [("TIME", "TIME"), ("COUNT", "COUNT")]
 GROWTH_TYPE_CHOICES = [("INCREASE", "INCREASE"), ("DECREASE", "DECREASE")]
@@ -97,9 +98,8 @@ class Habit(models.Model):
         self.is_running = False
         self.current_xp += progress
         self.use_xp_for_level_up()
+        # 'is_done' will be reset when updating due date.
         self.is_done = True
-        # 'is_done' will be reset as False
-        # by DueAdjuster when day changes.
 
         if save:
             self.save()
@@ -130,34 +130,18 @@ class Habit(models.Model):
     def update_due(self):
         if self.is_due_or_done():
             user: User = self.user
-            # due date will be reset as yesterday
-            # on which the user did the habit actually
+            # due date should be reset as today for habit done but not due
             self.due_date = user.get_day_on_progress()
             self.due_date += timedelta(days=self.day_cycle)
             self.is_done = False
-        self.is_today_due_date = self.check_is_today_due_date()
+
+        if self.due_date <= user.get_day_to_proceed():
+            self.is_today_due_date = True
+        else:
+            self.is_today_due_date = False
 
     def is_due_or_done(self):
         return self.is_today_due_date or self.is_running or self.is_done
-
-    def check_is_today_due_date(self):
-        if self.due_date == None:
-            return False
-
-        user: User = self.user
-        due_date_start = datetime.combine(self.due_date, user.reset_time)
-        due_date_end = due_date_start + timedelta(days=1)
-
-        now = datetime.now()
-        if now < due_date_start:
-            return False
-        elif due_date_start <= now < due_date_end:
-            return True
-        elif due_date_end <= now:
-            # 원래 예정일에 접속했더라면 알아서 다음 날로 갱신이 됨.
-            # 이 경우는 예정일에 아예 접속조차 안 해서 갱신이 안 됐던 상황.
-            # 밀린 게 쌓였을 수 있으므로, 부담을 줄이기 위해 예정에서 빼놓기
-            return False
 
     def is_owned_by_user(self, given_user: User):
         return self.user.pk == given_user.pk
