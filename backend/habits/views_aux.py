@@ -1,3 +1,6 @@
+from typing import Callable
+
+from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
@@ -7,7 +10,17 @@ from rest_framework import status
 from .models import Habit
 
 
-def authenticate_and_authorize(view):
+def authenticate(view: Callable[[HttpRequest], Response]):
+    def wrapper(request: HttpRequest):
+        if not request.user.is_authenticated:
+            result = {"success": False, "error": "User not authenticated"}
+            return Response(result, status=status.HTTP_401_UNAUTHORIZED)
+        return view(request)
+
+    return wrapper
+
+
+def authenticate_and_authorize(view: Callable[[HttpRequest], Response]):
     def wrapper(request: Request, habit_id=None):
         if habit_id == None:
             habit_id = request.data.get("habit_id")
