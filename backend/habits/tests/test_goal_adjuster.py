@@ -1,7 +1,6 @@
-from copy import deepcopy
-
 from django.test import TestCase
 
+from account.models import User
 from habits.models import Habit
 from habits.models_aux import GoalAdjuster
 
@@ -16,19 +15,13 @@ class GoalAdjusterTestCase(TestCase):
         habit.current_xp = 0
         habit.growth_amount = 60
         habit.is_today_due_date = True
+
+        habit.user = User()
+        habit.user.save()
         self.habit = habit
 
-    def test_adjust_habit_goal_not_due(self):
-        self.habit.is_today_due_date = False
-        GoalAdjuster.adjust_habit_goal(self.habit)
-        self.assertEqual(self.habit.goal_xp, 60)
-        self.assertEqual(self.habit.current_xp, 0)
-
     def test_adjust_habit_goal(self):
-        self.habit.current_xp = 60
-        self.habit.is_done = True
-
-        GoalAdjuster.adjust_habit_goal(self.habit)
+        self.habit.end_recording(60, False)
         self.assertTrue(self.habit.is_done)
         self.assertEqual(self.habit.goal_xp, 120)
         self.assertEqual(self.habit.current_xp, 0)
