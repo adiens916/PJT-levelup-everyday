@@ -16,6 +16,10 @@ class RelativeDateTime:
         return self.__reference_date + timedelta(days=interval) == relative_date
 
     @staticmethod
+    def get_relative_date_for_now(reference_time: time) -> date:
+        return __class__.get_relative_date(datetime.now(), reference_time)
+
+    @staticmethod
     def get_relative_date(absolute_datetime: datetime, reference_time: time) -> date:
         hours = reference_time.hour
         minutes = reference_time.minute

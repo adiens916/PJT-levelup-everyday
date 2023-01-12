@@ -1,4 +1,3 @@
-from datetime import date, timedelta
 import json
 
 from django.views.decorators.csrf import csrf_exempt
@@ -24,9 +23,6 @@ from .models import User
 @permission_classes([AllowAny])
 def signup(request: HttpRequest):
     user = User.create_from_request(request)
-    user.change_standard_reset_time(request)
-    user.next_reset_date = date.today() + timedelta(days=1)
-    user.save()
     return JsonResponse({"id": user.pk})
 
 

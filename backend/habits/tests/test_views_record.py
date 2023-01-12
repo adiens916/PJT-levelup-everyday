@@ -12,8 +12,8 @@ class HabitViewTestCase(TestCase):
         provider = TestDataProvider()
 
         cls.auth_headers = provider.get_auth_headers()
-        provider.user.next_reset_date = date.today() + timedelta(days=1)
-        provider.user.daily_reset_time = time(0, 0)
+        provider.user.last_reset_date = date.today()
+        provider.user.reset_time = time(0, 0)
         provider.user.save()
 
         cls.habit_id = provider.create_habit()
@@ -35,7 +35,7 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(first_record.get("xp_now"), 0)
         self.assertEqual(first_record.get("xp_change"), 0)
 
-    @mock.patch("account.models.datetime", wraps=datetime)
+    @mock.patch("account.models_aux.datetime", wraps=datetime)
     def test_daily_record_created_after_days_passed(self, mocked_datetime):
         # [given] assuming a daily record has existed already
         response = self.client.get(

@@ -34,8 +34,9 @@ def index(request: HttpRequest):
                 DueAdjuster.set_is_today_due_date(habit)
                 # TODO: daily record must be created for due habits only
                 DailyRecord().create_from_habit(habit)
-                # TODO: user's next reset date must be set
                 habit.save()
+            # user's next reset date must be updated
+            user.update_reset_date()
 
         serializer = HabitSerializer(habit_list, many=True)
         return Response(serializer.data)
@@ -113,13 +114,13 @@ def finish_timer(request: Request):
     habit_id = request.data.get("habit_id")
     habit: Habit = Habit.objects.get(id=habit_id)
     progress = int(request.data.get("progress"))
+    user: User = habit.user
 
     record = RoundRecord()
     record.create_from_habit_finished(habit, progress)
     habit.end_recording(progress)
 
-    daily_record = get_object_or_404(DailyRecord, habit=habit_id, date=date.today())
-    daily_record.create_from_habit(habit)
+    DailyRecord.find_record_and_update_from_habit(habit)
 
     serializer = RoundRecordSerializer(record)
     return Response(serializer.data)
