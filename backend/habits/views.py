@@ -40,11 +40,16 @@ def index(request: HttpRequest):
 def __check_day_changes_and_update_habits(user: User, habits: list[Habit]):
     if user.is_day_changed():
         for habit in habits:
-            RecordSaver.save(habit)
-            GoalAdjuster.adjust_habit_goal(habit)
+            if habit.is_today_due_date and not habit.is_done:
+                habit.lose_xp()
+                DailyRecord.find_record_and_update_from_habit(habit)
+
+            # TODO: habit.update_due()
             DueAdjuster.adjust_habit_due(habit)
             DueAdjuster.set_is_today_due_date(habit)
+
             # TODO: daily record must be created for due habits only
+            # just use **create_or_update**
             DailyRecord().create_from_habit(habit)
             habit.save()
         # user's next reset date must be updated
