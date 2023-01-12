@@ -12,7 +12,7 @@ class HabitViewTestCase(TestCase):
         provider = TestDataProvider()
         cls.auth_headers = provider.get_auth_headers()
 
-        provider.user.last_reset_date = date.today() + timedelta(days=1)
+        provider.user.last_reset_date = date.today()
         provider.user.reset_time = time(0, 0)
         provider.user.save()
 
@@ -20,9 +20,7 @@ class HabitViewTestCase(TestCase):
 
     def test_start_timer(self):
         before = datetime.now()
-        self.client.post(
-            "/api/habit/timer/start/", {"habit_id": self.habit_id}, **self.auth_headers
-        )
+        self.__start_timer()
         after = datetime.now()
 
         habit = Habit.objects.get(pk=self.habit_id)
@@ -33,16 +31,12 @@ class HabitViewTestCase(TestCase):
         self.assertLessEqual(habit.start_datetime, after + timedelta(minutes=1))
 
     def test_finish_timer(self):
-        self.test_start_timer()
+        self.__start_timer()
 
         habit = Habit.objects.get(pk=self.habit_id)
         self.assertTrue(habit.is_running)
 
-        self.client.post(
-            "/api/habit/timer/finish/",
-            {"habit_id": self.habit_id, "progress": 45},
-            **self.auth_headers,
-        )
+        self.__finish_timer(45)
 
         round_record = RoundRecord.objects.get(habit=habit)
         self.assertEqual(round_record.progress, 45)
@@ -52,7 +46,7 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(habit.current_xp, 45)
 
     def test_finish_timer_when_level_up(self):
-        self.test_start_timer()
+        self.__start_timer()
 
         habit = Habit.objects.get(pk=self.habit_id)
         self.assertTrue(habit.is_running)
@@ -60,11 +54,7 @@ class HabitViewTestCase(TestCase):
         habit.growth_amount = 60
         habit.save()
 
-        self.client.post(
-            "/api/habit/timer/finish/",
-            {"habit_id": self.habit_id, "progress": 450},
-            **self.auth_headers,
-        )
+        self.__finish_timer(450)
 
         round_record = RoundRecord.objects.get(habit=habit)
         self.assertEqual(round_record.progress, 450)
@@ -74,6 +64,10 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(habit.current_xp, 150)
 
     def test_finish_timer_when_level_up_a_lot(self):
+        habit = Habit.objects.get(pk=self.habit_id)
+        habit.growth_amount = 60
+        habit.save()
+
         """
         lv.1: 0 / 300
         lv.2: 0 / 360
@@ -86,17 +80,21 @@ class HabitViewTestCase(TestCase):
         lv.3: 240 / 420
         """
 
-        habit = Habit.objects.get(pk=self.habit_id)
-        habit.growth_amount = 60
-        habit.save()
-
-        self.test_start_timer()
-        self.client.post(
-            "/api/habit/timer/finish/",
-            {"habit_id": self.habit_id, "progress": 900},
-            **self.auth_headers,
-        )
+        self.__start_timer()
+        self.__finish_timer(900)
 
         habit = Habit.objects.get(pk=self.habit_id)
         self.assertEqual(habit.goal_xp, 420)
         self.assertEqual(habit.current_xp, 240)
+
+    def __start_timer(self) -> None:
+        self.client.post(
+            "/api/habit/timer/start/", {"habit_id": self.habit_id}, **self.auth_headers
+        )
+
+    def __finish_timer(self, progress: int) -> None:
+        self.client.post(
+            "/api/habit/timer/finish/",
+            {"habit_id": self.habit_id, "progress": progress},
+            **self.auth_headers,
+        )
