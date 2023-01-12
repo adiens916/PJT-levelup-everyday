@@ -1,4 +1,5 @@
 from datetime import date, datetime, time, timedelta
+from unittest import expectedFailure
 
 from django.test import TestCase
 
@@ -29,6 +30,14 @@ class HabitViewTestCase(TestCase):
         self.assertIsInstance(habit.start_datetime, datetime)
         self.assertGreaterEqual(habit.start_datetime, before - timedelta(minutes=1))
         self.assertLessEqual(habit.start_datetime, after + timedelta(minutes=1))
+
+    @expectedFailure
+    def test_failed_start_timer_when_already_running(self):
+        habit = Habit.objects.get(pk=self.habit_id)
+        self.assertTrue(habit.is_running)
+
+        with self.assertRaises(Exception):
+            self.__start_timer()
 
     def test_finish_timer(self):
         self.__start_timer()
@@ -64,24 +73,25 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(habit.current_xp, 150)
 
     def test_finish_timer_when_level_up_a_lot(self):
+        # [given] (growth amount == 60)
+        # lv.1: 0 / 300
+        # lv.2: 0 / 360 (300 + 60)
+        # lv.3: 0 / 420 (360 + 60)
+        # lv.4: 0 / 480 (420 + 60)
+
         habit = Habit.objects.get(pk=self.habit_id)
         habit.growth_amount = 60
         habit.save()
 
-        """
-        lv.1: 0 / 300
-        lv.2: 0 / 360
-        lv.3: 0 / 420
-        lv.4: 0 / 480
-
-        when given 900 XP, then:
-        lv.1: 900 / 300 => lv.2
-        lv.2: 600 / 360 => lv.3
-        lv.3: 240 / 420
-        """
+        # [when] given 900 XP
 
         self.__start_timer()
         self.__finish_timer(900)
+
+        # [then]
+        # lv.1: 900 / 300 => lv.2
+        # lv.2: 600 / 360 => lv.3
+        # lv.3: 240 / 420
 
         habit = Habit.objects.get(pk=self.habit_id)
         self.assertEqual(habit.goal_xp, 420)
