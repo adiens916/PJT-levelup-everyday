@@ -44,9 +44,7 @@ def __check_day_changes_and_update_habits(user: User, habits: list[Habit]):
                 habit.lose_xp()
                 DailyRecord.find_record_and_update_from_habit(habit)
 
-            # TODO: habit.update_due()
-            DueAdjuster.adjust_habit_due(habit)
-            DueAdjuster.set_is_today_due_date(habit)
+            habit.update_due()
 
             # TODO: daily record must be created for due habits only
             # just use **create_or_update**
