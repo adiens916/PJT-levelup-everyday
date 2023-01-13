@@ -5,20 +5,6 @@ from account.models import User
 from .models import Habit, RoundRecord, DailyRecord
 
 
-class RecordSaver:
-    @staticmethod
-    def save(habit: Habit):
-        if habit.is_due_or_done() and habit.is_running:
-            round_record = RoundRecord()
-            round_record.create_from_habit_running(habit)
-            habit.end_recording(round_record.progress, save=False)
-            DailyRecord.find_record_and_update_from_habit(habit)
-
-    @staticmethod
-    def create_daily_record_for_habit_due_but_not_done(habit: Habit):
-        pass
-
-
 class GoalAdjuster:
     @staticmethod
     def adjust_habit_goal(habit: Habit) -> None:

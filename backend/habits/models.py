@@ -84,29 +84,29 @@ class Habit(models.Model):
         else:
             return (initial_growth_amount // 60) * 60
 
-    def start_recording(self):
+    def start_recording(self, should_change_user_record_state=True):
         self.start_datetime = timezone.now()
         self.is_running = True
         self.save()
 
-        user: User = self.user
-        user.is_recording = True
-        user.save()
+        if should_change_user_record_state:
+            user: User = self.user
+            user.is_recording = True
+            user.save()
 
-    def end_recording(self, progress: int, save=True):
+    def end_recording(self, progress: int, should_change_user_record_state=True):
         self.start_datetime = None
         self.is_running = False
         self.current_xp += progress
         self.use_xp_for_level_up()
         # 'is_done' will be reset when updating due date.
         self.is_done = True
+        self.save()
 
-        if save:
-            self.save()
-
-        user: User = self.user
-        user.is_recording = False
-        user.save()
+        if should_change_user_record_state:
+            user: User = self.user
+            user.is_recording = False
+            user.save()
 
     def use_xp_for_level_up(self):
         while self.current_xp >= self.goal_xp:
@@ -120,10 +120,13 @@ class Habit(models.Model):
         if self.current_xp >= decrease_amount:
             self.current_xp -= decrease_amount
         elif self.goal_xp > self.growth_amount:
-            self.level -= 1
             self.goal_xp -= self.growth_amount
             decrease_amount = int(self.goal_xp * 0.1)
             self.current_xp = self.goal_xp - decrease_amount
+
+            if self.level > 1:
+                self.level -= 1
+
         else:
             self.current_xp = 0
 

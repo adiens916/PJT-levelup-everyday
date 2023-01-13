@@ -11,7 +11,6 @@ from rest_framework import status
 
 from account.models import User
 from .models import Habit, RoundRecord, DailyRecord
-from .models_aux import RecordSaver, GoalAdjuster, DueAdjuster
 from .serializers import HabitSerializer, RoundRecordSerializer, DailyRecordSerializer
 from .views_aux import authenticate, authenticate_and_authorize
 

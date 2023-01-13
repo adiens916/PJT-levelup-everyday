@@ -1,10 +1,12 @@
 from django.test import Client
+
 from account.models import User
+from habits.models_type import HabitCreateType
 
 USERNAME = "john"
 PASSWORD = "doe"
 
-HABIT_INFO = {
+HABIT_INFO: HabitCreateType = {
     "name": "Reading a book",
     "estimate_type": "TIME",
     "estimate_unit": "",
@@ -13,7 +15,7 @@ HABIT_INFO = {
     "day_cycle": 2,
     "initial_goal": 300,
 }
-HABIT_INFO_2 = {
+HABIT_INFO_2: HabitCreateType = {
     "name": "Exercise",
     "estimate_type": "TIME",
     "estimate_unit": "",
@@ -22,7 +24,7 @@ HABIT_INFO_2 = {
     "day_cycle": 3,
     "initial_goal": "",
 }
-HABIT_INFO_3 = {
+HABIT_INFO_3: HabitCreateType = {
     "name": "Study",
     "estimate_type": "TIME",
     "estimate_unit": "",
@@ -50,9 +52,9 @@ class TestDataProvider:
 
         return self.__auth_headers
 
-    def create_habit(self) -> int:
+    def create_habit(self, **kwargs) -> int:
         response = Client().post(
-            "/api/habit/", data=HABIT_INFO, **self.get_auth_headers()
+            "/api/habit/", data={**HABIT_INFO, **kwargs}, **self.get_auth_headers()
         )
 
         items: dict = response.json()
