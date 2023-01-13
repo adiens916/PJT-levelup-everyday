@@ -20,14 +20,10 @@ class HabitViewTestCase(TestCase):
         provider.create_habits()
 
     def test_daily_record_created_at_first(self):
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: list[DailyRecordType] = response.json()
+        records = self.__get_records()
+        self.assertEqual(len(records), 1)
 
-        self.assertEqual(len(data), 1)
-
-        first_record = data[0]
+        first_record = records[0]
         self.assertEqual(first_record.get("habit"), self.habit_id)
         self.assertEqual(first_record.get("date"), date.today().isoformat())
         self.assertEqual(first_record.get("level_now"), 1)
@@ -38,11 +34,8 @@ class HabitViewTestCase(TestCase):
     @mock.patch("account.models_aux.datetime", wraps=datetime)
     def test_daily_record_created_after_days_passed(self, mocked_datetime):
         # [given] assuming a daily record has existed already
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: list[DailyRecordType] = response.json()
-        self.assertEqual(len(data), 1)
+        records = self.__get_records()
+        self.assertEqual(len(records), 1)
 
         # [given] 3 days has passed after a user visited
         now = datetime.today() + timedelta(days=3)
@@ -52,13 +45,10 @@ class HabitViewTestCase(TestCase):
         self.client.get("/api/habit/", **self.auth_headers)
 
         # [then] the new daily record for today should exist
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: list[DailyRecordType] = response.json()
-        self.assertEqual(len(data), 2)
+        records = self.__get_records()
+        self.assertEqual(len(records), 2)
 
-        latest_record = data[1]
+        latest_record = records[1]
         self.assertEqual(latest_record.get("date"), now.date().isoformat())
         self.assertEqual(latest_record.get("xp_change"), 0)
 
@@ -101,6 +91,27 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(record.get("xp_now"), 110)
         self.assertEqual(record.get("xp_change"), 410)
 
+    @expectedFailure
+    def test_get_daily_records(self):
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
+        )
+        data: dict = response.json()
+
+        self.assertContains(response, "date")
+        self.assertContains(response, "success")
+        self.assertContains(response, "level_now")
+        self.assertContains(response, "level_change")
+        self.assertContains(response, "xp_now")
+        self.assertContains(response, "xp_change")
+
+    def __get_records(self) -> list[DailyRecordType]:
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
+        )
+        data: list[DailyRecordType] = response.json()
+        return data
+
     def __record_habit_progress(self, progress: int) -> None:
         self.client.post(
             f"/api/habit/timer/start/", {"habit_id": self.habit_id}, **self.auth_headers
@@ -118,17 +129,3 @@ class HabitViewTestCase(TestCase):
         data: list[DailyRecordType] = response.json()
         record = data[index]
         return record
-
-    @expectedFailure
-    def test_get_daily_records(self):
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: dict = response.json()
-
-        self.assertContains(response, "date")
-        self.assertContains(response, "success")
-        self.assertContains(response, "level_now")
-        self.assertContains(response, "level_change")
-        self.assertContains(response, "xp_now")
-        self.assertContains(response, "xp_change")
