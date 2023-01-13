@@ -45,6 +45,7 @@ class HabitViewDayChangeTestCase(TestCase):
         # [then] habit loses current XP for about 10% of goal XP (300)
         # 300 * 0.1 == 30
         habit = self.__get_habit(habit_id)
+        self.assertEqual(habit.get("level"), 1)
         self.assertEqual(habit.get("goal_xp"), 300)
         self.assertEqual(habit.get("current_xp"), 120)
 
@@ -61,6 +62,7 @@ class HabitViewDayChangeTestCase(TestCase):
 
         # [then] goal XP and current XP both decreases
         habit = self.__get_habit(habit_id)
+        self.assertEqual(habit.get("level"), 1)
         self.assertEqual(habit.get("goal_xp"), 270)
         self.assertEqual(habit.get("current_xp"), 270 - 27)
 
@@ -81,6 +83,7 @@ class HabitViewDayChangeTestCase(TestCase):
 
         # [then] goal XP don't decrease
         habit = self.__get_habit(habit_id)
+        self.assertEqual(habit.get("level"), 1)
         self.assertEqual(habit.get("goal_xp"), 30)
         self.assertEqual(habit.get("current_xp"), 0)
 

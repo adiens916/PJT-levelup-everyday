@@ -120,10 +120,13 @@ class Habit(models.Model):
         if self.current_xp >= decrease_amount:
             self.current_xp -= decrease_amount
         elif self.goal_xp > self.growth_amount:
-            self.level -= 1
             self.goal_xp -= self.growth_amount
             decrease_amount = int(self.goal_xp * 0.1)
             self.current_xp = self.goal_xp - decrease_amount
+
+            if self.level > 1:
+                self.level -= 1
+
         else:
             self.current_xp = 0
 
