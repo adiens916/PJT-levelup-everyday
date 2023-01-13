@@ -42,11 +42,32 @@ class HabitViewDayChangeTestCase(TestCase):
         mocked_datetime.now.return_value = tomorrow
         self.__get_habits()
 
-        # [then] habit loses XP for about 10% of goal XP (300)
+        # [then] habit loses current XP for about 10% of goal XP (300)
         # 300 * 0.1 == 30
         habit = self.__get_habit(habit_id)
         self.assertEqual(habit.get("goal_xp"), 300)
         self.assertEqual(habit.get("current_xp"), 120)
+
+    @mock.patch("account.models_aux.datetime", wraps=datetime)
+    def test_lose_xp_and_level_down(self, mocked_datetime):
+        # [given] habit's goal xp == 300
+        # current xp == 0
+        habit_id = self.provider.create_habit(initial_goal=300)
+
+        # [when] day changes while habit's undone
+        tomorrow = datetime.combine(date.today() + timedelta(days=1), time(0, 0))
+        mocked_datetime.now.return_value = tomorrow
+        self.__get_habits()
+
+        # [then] goal XP and current XP both decreases
+        habit = self.__get_habit(habit_id)
+        self.assertEqual(habit.get("goal_xp"), 270)
+        self.assertEqual(habit.get("current_xp"), 270 - 27)
+
+        # how it works:
+        # 1. current XP can't decrease below 0
+        # 2. goal XP decreases first
+        # 3. then current XP decreases by 10% of new goal XP
 
     def __get_habits(self) -> None:
         self.client.get("/api/habit/", **self.auth_headers)
