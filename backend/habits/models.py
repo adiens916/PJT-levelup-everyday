@@ -130,8 +130,8 @@ class Habit(models.Model):
             self.current_xp = 0
 
     def update_due(self):
+        user: User = self.user
         if self.is_due_or_done():
-            user: User = self.user
             # due date should be reset as today for habit done but not due
             self.due_date = user.get_day_on_progress()
             self.due_date += timedelta(days=self.day_cycle)
