@@ -60,6 +60,16 @@ export interface DailyRecordType {
   xp_change: number;
 }
 
+export interface OldDailyRecordType {
+  id: number;
+  habit: number;
+  date: string;
+  success: boolean;
+  goal: number;
+  progress: number;
+  excess: number;
+}
+
 export interface StartTimerType {
   success: boolean;
   start_date: string;
