@@ -1,6 +1,6 @@
 import { ChartData, ChartDataset } from 'chart.js';
 import { useEffect, useState } from 'react';
-import { getRecords } from '../api/api';
+import { getDailyRecords, convertRecordsForChart } from '../api/recordApi';
 
 const initialState: DailyRecordsForChartType = {
   labels: [],
@@ -43,7 +43,9 @@ export function useDailyRecords(habitId: number) {
   };
 
   useEffect(() => {
-    getRecords(habitId).then((data) => setDailyRecords(data));
+    getDailyRecords(habitId).then((data) =>
+      setDailyRecords(convertRecordsForChart(data)),
+    );
   }, []);
 
   return data;
