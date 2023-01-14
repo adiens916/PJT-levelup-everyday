@@ -4,7 +4,7 @@ import { DailyRecordResponseType, DailyRecordType } from 'domain/habit/types';
 
 setAxiosInterceptorForHeader();
 
-export async function getRecords(habitId: number) {
+export async function getDailyRecords(habitId: number) {
   const response = await requestGetByAxios<DailyRecordResponseType[]>(
     `${host}/habit/${habitId}/record/`,
   );
