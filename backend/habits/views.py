@@ -45,9 +45,9 @@ def __check_day_changes_and_update_habits(user: User, habits: list[Habit]):
 
             habit.update_due()
 
-            # TODO: daily record must be created for due habits only
-            # just use **create_or_update**
-            DailyRecord().create_from_habit(habit)
+            # daily record must be created for due habits only
+            if habit.is_today_due_date:
+                DailyRecord().create_from_habit(habit, is_for_new_day=True)
             habit.save()
         # user's next reset date must be updated
         user.update_reset_date()

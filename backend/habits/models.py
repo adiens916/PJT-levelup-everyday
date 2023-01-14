@@ -197,11 +197,14 @@ class DailyRecord(models.Model):
     xp_now = models.PositiveIntegerField()
     xp_change = models.IntegerField()
 
-    def create_from_habit(self, habit: Habit):
+    def create_from_habit(self, habit: Habit, is_for_new_day=False):
         user: User = habit.user
 
         self.habit = habit
-        self.date = user.get_day_to_proceed()
+        if is_for_new_day:
+            self.date = user.get_day_to_proceed()
+        else:
+            self.date = user.get_day_on_progress()
 
         self.update_from_habit(habit)
 
