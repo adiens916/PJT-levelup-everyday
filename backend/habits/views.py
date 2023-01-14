@@ -41,14 +41,15 @@ def __check_day_changes_and_update_habits(user: User, habits: list[Habit]):
         for habit in habits:
             if habit.is_today_due_date and not habit.is_done:
                 habit.lose_xp()
-                DailyRecord.find_record_and_update_from_habit(habit)
+                DailyRecord.create_or_update_from_habit(habit)
 
             habit.update_due()
+            habit.save()
 
             # daily record must be created for due habits only
             if habit.is_today_due_date:
                 DailyRecord().create_from_habit(habit, is_for_new_day=True)
-            habit.save()
+
         # user's next reset date must be updated
         user.update_reset_date()
 
@@ -123,7 +124,7 @@ def finish_timer(request: Request):
     record.create_from_habit_finished(habit, progress)
     habit.end_recording(progress)
 
-    DailyRecord.find_record_and_update_from_habit(habit)
+    DailyRecord.create_or_update_from_habit(habit)
 
     serializer = RoundRecordSerializer(record)
     return Response(serializer.data)
