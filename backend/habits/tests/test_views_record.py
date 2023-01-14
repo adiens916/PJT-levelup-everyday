@@ -2,7 +2,7 @@ from datetime import date, datetime, time, timedelta
 from unittest import expectedFailure, mock
 from django.test import TestCase
 
-from habits.models_type import DailyRecordType
+from habits.models_type import DailyRecordType, HabitReadType
 from .provider import TestDataProvider
 
 
@@ -20,14 +20,10 @@ class HabitViewTestCase(TestCase):
         provider.create_habits()
 
     def test_daily_record_created_at_first(self):
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: list[DailyRecordType] = response.json()
+        records = self.__get_records()
+        self.assertEqual(len(records), 1)
 
-        self.assertEqual(len(data), 1)
-
-        first_record = data[0]
+        first_record = records[0]
         self.assertEqual(first_record.get("habit"), self.habit_id)
         self.assertEqual(first_record.get("date"), date.today().isoformat())
         self.assertEqual(first_record.get("level_now"), 1)
@@ -38,11 +34,8 @@ class HabitViewTestCase(TestCase):
     @mock.patch("account.models_aux.datetime", wraps=datetime)
     def test_daily_record_created_after_days_passed(self, mocked_datetime):
         # [given] assuming a daily record has existed already
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: list[DailyRecordType] = response.json()
-        self.assertEqual(len(data), 1)
+        records = self.__get_records()
+        self.assertEqual(len(records), 1)
 
         # [given] 3 days has passed after a user visited
         now = datetime.today() + timedelta(days=3)
@@ -52,19 +45,16 @@ class HabitViewTestCase(TestCase):
         self.client.get("/api/habit/", **self.auth_headers)
 
         # [then] the new daily record for today should exist
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: list[DailyRecordType] = response.json()
-        self.assertEqual(len(data), 2)
+        records = self.__get_records()
+        self.assertEqual(len(records), 2)
 
-        latest_record = data[1]
+        latest_record = records[1]
         self.assertEqual(latest_record.get("date"), now.date().isoformat())
         self.assertEqual(latest_record.get("xp_change"), 0)
 
     def test_daily_record_updated_when_round_finished(self):
         self.__record_habit_progress(60)
-        record = self.__get_record_by_request()
+        record = self.__get_first_record()
         self.assertEqual(record.get("xp_now"), 60)
         self.assertEqual(record.get("xp_change"), 60)
 
@@ -72,14 +62,13 @@ class HabitViewTestCase(TestCase):
         # [given]
         # habit's initial goal == 300
         # habit's growth amount == 30
-        response = self.client.get(f"/api/habit/{self.habit_id}/", **self.auth_headers)
-        data: dict = response.json()
-        self.assertEqual(data.get("goal_xp"), 300)
-        self.assertEqual(data.get("growth_amount"), 30)
+        habit = self.__get_habit()
+        self.assertEqual(habit.get("goal_xp"), 300)
+        self.assertEqual(habit.get("growth_amount"), 30)
 
         # [given] it has record for 60 seconds
         try:
-            record = self.__get_record_by_request()
+            record = self.__get_first_record()
             self.assertEqual(record.get("xp_now"), 60)
             self.assertEqual(record.get("xp_change"), 60)
         except:
@@ -87,19 +76,42 @@ class HabitViewTestCase(TestCase):
 
         # [when] adding 200 seconds
         self.__record_habit_progress(200)
-        record = self.__get_record_by_request()
+        record = self.__get_first_record()
         # [then] total 260 seconds
         self.assertEqual(record.get("xp_now"), 260)
         self.assertEqual(record.get("xp_change"), 260)
 
         # [when] adding 150 seconds
         self.__record_habit_progress(150)
-        record = self.__get_record_by_request()
+        record = self.__get_first_record()
         # [then] level increased & xp subtracted
         self.assertEqual(record.get("level_now"), 2)
         self.assertEqual(record.get("level_change"), 1)
         self.assertEqual(record.get("xp_now"), 110)
         self.assertEqual(record.get("xp_change"), 410)
+
+    def __get_records(self) -> list[DailyRecordType]:
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
+        )
+        data: list[DailyRecordType] = response.json()
+        return data
+
+    def __get_first_record(self) -> DailyRecordType:
+        return self.__get_record_by_index(0)
+
+    def __get_record_by_index(self, index) -> DailyRecordType:
+        response = self.client.get(
+            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
+        )
+        data: list[DailyRecordType] = response.json()
+        record = data[index]
+        return record
+
+    def __get_habit(self) -> HabitReadType:
+        response = self.client.get(f"/api/habit/{self.habit_id}/", **self.auth_headers)
+        data: HabitReadType = response.json()
+        return data
 
     def __record_habit_progress(self, progress: int) -> None:
         self.client.post(
@@ -110,25 +122,3 @@ class HabitViewTestCase(TestCase):
             {"habit_id": self.habit_id, "progress": progress},
             **self.auth_headers,
         )
-
-    def __get_record_by_request(self, index=0) -> DailyRecordType:
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: list[DailyRecordType] = response.json()
-        record = data[index]
-        return record
-
-    @expectedFailure
-    def test_get_daily_records(self):
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: dict = response.json()
-
-        self.assertContains(response, "date")
-        self.assertContains(response, "success")
-        self.assertContains(response, "level_now")
-        self.assertContains(response, "level_change")
-        self.assertContains(response, "xp_now")
-        self.assertContains(response, "xp_change")

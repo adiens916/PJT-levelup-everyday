@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 from django.conf import settings
 from django.db import models
@@ -9,12 +9,11 @@ from django.db.models import Sum
 
 from rest_framework.request import Request
 from account.models import User
-from account.models_aux import RelativeDateTime
 
 ESTIMATE_TYPE_CHOICES = [("TIME", "TIME"), ("COUNT", "COUNT")]
 GROWTH_TYPE_CHOICES = [("INCREASE", "INCREASE"), ("DECREASE", "DECREASE")]
 
-# Create your models here.
+
 class Habit(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -197,11 +196,26 @@ class DailyRecord(models.Model):
     xp_now = models.PositiveIntegerField()
     xp_change = models.IntegerField()
 
-    def create_from_habit(self, habit: Habit):
+    @staticmethod
+    def create_or_update_from_habit(habit: Habit) -> None:
+        user: User = habit.user
+        try:
+            daily_record = DailyRecord.objects.get(
+                habit=habit.pk, date=user.get_day_on_progress()
+            )
+        except DailyRecord.DoesNotExist:
+            DailyRecord().create_from_habit(habit)
+        else:
+            daily_record.update_from_habit(habit)
+
+    def create_from_habit(self, habit: Habit, is_for_new_day=False):
         user: User = habit.user
 
         self.habit = habit
-        self.date = user.get_day_to_proceed()
+        if is_for_new_day:
+            self.date = user.get_day_to_proceed()
+        else:
+            self.date = user.get_day_on_progress()
 
         self.update_from_habit(habit)
 
@@ -215,32 +229,18 @@ class DailyRecord(models.Model):
 
         self.save()
 
-    @staticmethod
-    def find_record_and_update_from_habit(habit: Habit) -> None:
-        user: User = habit.user
-        try:
-            daily_record = get_object_or_404(
-                DailyRecord, habit=habit.pk, date=user.get_day_on_progress()
-            )
-        except Exception:
-            daily_record = DailyRecord().create_from_habit(habit)
-        else:
-            daily_record.update_from_habit(habit)
-
     def calc_level_change(self) -> int:
         try:
-            yesterday_record = DailyRecord.objects.filter(habit=self.habit).order_by(
-                "-date"
-            )[1]
+            daily_records = DailyRecord.objects.filter(habit=self.habit)
+            yesterday_record = daily_records.order_by("-date")[1]
             return self.level_now - yesterday_record.level_now
         except IndexError:
-            # at the first day
+            # there's only one day, i.e. on the first day
             return self.level_now - 1
 
     def calc_xp_change(self) -> int:
-        queryset_result = RoundRecord.objects.filter(
-            habit=self.habit, date=self.date
-        ).aggregate(Sum("progress"))
-
-        today_progress_sum = queryset_result.get("progress__sum")
+        round_records = RoundRecord.objects.filter(habit=self.habit, date=self.date)
+        today_progress_sum = round_records.aggregate(Sum("progress")).get(
+            "progress__sum"
+        )
         return today_progress_sum if today_progress_sum else 0
