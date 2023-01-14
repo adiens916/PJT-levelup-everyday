@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { extractFields, getHabits } from '../api/api';
+import { getHabits } from '../api/crudApi';
 import { HabitType } from '../types';
 
 export default function useHabitList() {
@@ -11,9 +11,8 @@ export default function useHabitList() {
 
   const fetchHabits = async () => {
     try {
-      const response = await getHabits();
-      const convertedHabits = extractFields(response.data);
-      setHabits(convertedHabits);
+      const habits = await getHabits();
+      setHabits(habits);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         setIsError(true);
