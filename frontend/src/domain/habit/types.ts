@@ -54,6 +54,17 @@ export interface DailyRecordType {
   habit: number;
   date: string;
   success: boolean;
+  level_now: number;
+  level_change: number;
+  xp_now: number;
+  xp_change: number;
+}
+
+export interface OldDailyRecordType {
+  id: number;
+  habit: number;
+  date: string;
+  success: boolean;
   goal: number;
   progress: number;
   excess: number;
