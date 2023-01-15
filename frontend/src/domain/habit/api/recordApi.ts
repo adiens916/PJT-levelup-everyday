@@ -1,6 +1,6 @@
 import { axiosInstance } from 'common/api';
 import { setAxiosInterceptorForHeader } from 'domain/account/api';
-import { DailyRecordType, OldDailyRecordType } from 'domain/habit/types';
+import { DailyRecordType } from 'domain/habit/types';
 
 setAxiosInterceptorForHeader();
 
@@ -11,11 +11,11 @@ export async function getDailyRecords(habitId: number) {
   return response.data;
 }
 
-export function convertRecordsForChart(dailyRecords: OldDailyRecordType[]) {
+export function convertRecordsForChart(dailyRecords: DailyRecordType[]) {
   return {
     labels: dailyRecords.map((record) => record.date),
-    goals: dailyRecords.map((record) => record.goal),
-    progresses: dailyRecords.map((record) => record.progress),
-    excesses: dailyRecords.map((record) => record.excess),
+    level_now: dailyRecords.map((record) => record.level_now),
+    xp_now: dailyRecords.map((record) => record.xp_now),
+    xp_change: dailyRecords.map((record) => record.xp_change),
   };
 }

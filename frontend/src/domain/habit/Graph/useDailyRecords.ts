@@ -1,13 +1,9 @@
-import { ChartData, ChartDataset } from 'chart.js';
 import { useEffect, useState } from 'react';
-import { getDailyRecords, convertRecordsForChart } from '../api/recordApi';
 
-const initialState: DailyRecordsForChartType = {
-  labels: [],
-  goals: [],
-  progresses: [],
-  excesses: [],
-};
+import { ChartData, ChartDataset } from 'chart.js';
+
+import { getDailyRecords, convertRecordsForChart } from '../api/recordApi';
+import { DailyRecordsForChartType, initialState } from './types';
 
 export function useDailyRecords(habitId: number) {
   const [dailyRecords, setDailyRecords] =
@@ -15,7 +11,7 @@ export function useDailyRecords(habitId: number) {
 
   const datasetOfGoal: ChartDataset<'bar'> = {
     label: 'Goal',
-    data: dailyRecords.goals,
+    data: dailyRecords.level_now,
     backgroundColor: 'rgba(255, 255, 255, 0.5)', // White, transparent
     borderColor: 'blue',
     borderWidth: { top: 1, left: 1, right: 1 },
@@ -23,7 +19,7 @@ export function useDailyRecords(habitId: number) {
 
   const datasetOfProgress: ChartDataset<'bar'> = {
     label: 'Progress',
-    data: dailyRecords.progresses,
+    data: dailyRecords.xp_now,
     backgroundColor: '#00FFFF80', // Aqua
     // backgroundColor: '#6495ED80', // CornflowerBlue
     // backgroundColor: '#00BFFF80', // DeepSkyBlue
@@ -31,7 +27,7 @@ export function useDailyRecords(habitId: number) {
 
   const datasetOfExcess: ChartDataset<'bar'> = {
     label: 'Excess',
-    data: dailyRecords.excesses,
+    data: dailyRecords.xp_change,
     backgroundColor: '#FF149366', // DeepPink, transparent
     borderColor: '#FF1493',
     borderWidth: 1,
@@ -49,11 +45,4 @@ export function useDailyRecords(habitId: number) {
   }, []);
 
   return data;
-}
-
-interface DailyRecordsForChartType {
-  labels: string[];
-  goals: number[];
-  progresses: number[];
-  excesses: number[];
 }
