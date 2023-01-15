@@ -1,28 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from django.shortcuts import get_object_or_404
 
 from account.models import User
 from .models import Habit, RoundRecord, DailyRecord
-
-
-class RecordSaver:
-    @staticmethod
-    def save(habit: Habit):
-        if habit.is_due_or_done():
-            __class__.__save_round_record_if_running(habit)
-            __class__.__save_daily_record(habit)
-
-    @staticmethod
-    def __save_round_record_if_running(habit: Habit):
-        if habit.is_running:
-            round_record = RoundRecord()
-            round_record.create_from_habit_running(habit)
-            habit.end_recording(round_record.progress, save=False)
-
-    @staticmethod
-    def __save_daily_record(habit: Habit):
-        # 어제 기록 저장
-        daily_record = DailyRecord()
-        daily_record.create_from_habit(habit)
 
 
 class GoalAdjuster:
@@ -43,7 +23,7 @@ class DueAdjuster:
             user: User = habit.user
             # due date will be reset as yesterday
             # on which the user did the habit actually
-            habit.due_date = user.get_yesterday()
+            habit.due_date = user.get_day_on_progress()
             habit.due_date += timedelta(days=habit.day_cycle)
             habit.is_done = False
 
@@ -57,7 +37,7 @@ class DueAdjuster:
             return False
 
         user: User = habit.user
-        due_date_start = datetime.combine(habit.due_date, user.daily_reset_time)
+        due_date_start = datetime.combine(habit.due_date, user.reset_time)
         due_date_end = due_date_start + timedelta(days=1)
 
         now = datetime.now()

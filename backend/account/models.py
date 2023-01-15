@@ -1,49 +1,60 @@
-import re
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
-from django.http import HttpRequest
+from rest_framework.request import Request
 
-# Create your models here.
+from .models_aux import RelativeDateTime, is_iso_format_time
+
+
 class User(AbstractUser):
-    next_reset_date = models.DateField(blank=True, null=True)
-    daily_reset_time = models.TimeField(default=time(hour=0, minute=0))
+    last_reset_date = models.DateField(default=date.today)
+    reset_time = models.TimeField(default=time(hour=0, minute=0))
     is_recording = models.BooleanField(default=False)
 
     objects = UserManager()
 
     @staticmethod
-    def create_from_request(request: HttpRequest):
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
+    def create_from_request(request: Request):
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
         user: User = __class__.objects.create_user(username, email, password)
+
+        user.change_standard_reset_time(request)
+        user.last_reset_date = RelativeDateTime.get_relative_date(
+            datetime.now(), user.reset_time
+        )
+
+        user.save()
         return user
 
-    def change_standard_reset_time(self, request: HttpRequest) -> None:
-        standard_reset_time = request.POST.get("standard_reset_time")
+    def change_standard_reset_time(self, request: Request) -> None:
+        standard_reset_time = request.data.get("standard_reset_time")
         if not standard_reset_time:
             return
 
-        # Ex.) '03:30'
-        time_pattern = "([0-1][0-9]|2[0-3]):([0-5][0-9])"
-        matched = re.match(time_pattern, standard_reset_time)
+        matched = is_iso_format_time(standard_reset_time)
         if not matched:
-            return
+            raise ValueError(
+                f"Time format must be ISO format (HH:MM), \
+                    but given time format is ({time})"
+            )
 
         hour, minute = standard_reset_time.split(":")
-        self.daily_reset_time = time(int(hour), int(minute))
+        self.reset_time = time(int(hour), int(minute))
 
     def is_day_changed(self):
-        if self.next_reset_date == None:
-            return True
+        return RelativeDateTime(
+            self.last_reset_date, self.reset_time
+        ).is_day_changed_relatively()
 
-        return self.get_reset_datetime() <= datetime.now()
+    def get_day_on_progress(self):
+        return self.last_reset_date
 
-    def get_yesterday(self):
-        return self.get_reset_datetime().date() - timedelta(days=1)
+    def get_day_to_proceed(self):
+        return RelativeDateTime.get_relative_date_for_now(self.reset_time)
 
-    def get_reset_datetime(self):
-        reset_datetime = datetime.combine(self.next_reset_date, self.daily_reset_time)
-        return reset_datetime
+    def update_reset_date(self) -> None:
+        self.last_reset_date = self.get_day_to_proceed()
+        self.save()

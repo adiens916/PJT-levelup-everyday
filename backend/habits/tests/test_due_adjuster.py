@@ -17,8 +17,8 @@ class DueAdjusterTestCase(TestCase):
         """
 
         user = User()
-        user.daily_reset_time = time(6, 0)
-        user.next_reset_date = date(2022, 9, 4)
+        user.last_reset_date = date(2022, 9, 3)
+        user.reset_time = time(6, 0)
         user.save()
 
         habit = Habit()
@@ -41,21 +41,21 @@ class DueAdjusterTestCase(TestCase):
 
     @mock.patch("habits.models_aux.datetime", wraps=datetime)
     def test_is_today_due_date_at_exact_time(self, mocked_datetime):
-        # when: now is due
+        # [when] now is due
         now = datetime(2022, 9, 3, hour=6, minute=0)
         mocked_datetime.now.return_value = now
 
-        # then: the habit doesn't have to do yet
+        # [then] the habit should be done
         result = DueAdjuster.is_today_due_date(self.habit)
         self.assertTrue(result)
 
     @mock.patch("habits.models_aux.datetime", wraps=datetime)
     def test_is_today_due_date_before_day_end(self, mocked_datetime):
-        # when: now is before overdue by 1 minute
+        # [when] now is close to tomorrow, but it's today yet
         now = datetime(2022, 9, 4, hour=5, minute=59)
         mocked_datetime.now.return_value = now
 
-        # then: the habit doesn't have to do yet
+        # [then] the habit should be done
         result = DueAdjuster.is_today_due_date(self.habit)
         self.assertTrue(result)
 

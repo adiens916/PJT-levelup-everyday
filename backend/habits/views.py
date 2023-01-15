@@ -1,97 +1,83 @@
-from typing import Iterable
-
 from django.http import JsonResponse, HttpRequest
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework import status
 
-from account.models import User
-from .models import DailyRecord, Habit, RoundRecord
-from .models_aux import RecordSaver, GoalAdjuster, DueAdjuster
-from .views_aux import json_response_wrapper
+# from drf_yasg.utils import swagger_auto_schema
 
+from account.models import User
+from .models import Habit, RoundRecord, DailyRecord
+from .serializers import HabitSerializer, RoundRecordSerializer, DailyRecordSerializer
+from .views_aux import authenticate, authenticate_and_authorize
 
 # Create your views here.
 @csrf_exempt
 @api_view(["GET", "POST"])
+@authenticate
 def index(request: HttpRequest):
-    if not request.user.is_authenticated:
-        result = {"success": False, "error": "User not authenticated"}
-        return Response(result, status=status.HTTP_401_UNAUTHORIZED)
-
     if request.method == "GET":
         user: User = request.user
         habit_list = Habit.objects.filter(user=user.pk).order_by("-importance")
-        if user.is_day_changed():
-            for habit in habit_list:
-                RecordSaver.save(habit)
-                GoalAdjuster.adjust_habit_goal(habit)
-                DueAdjuster.adjust_habit_due(habit)
-                DueAdjuster.set_is_today_due_date(habit)
-                habit.save()
+        __check_day_changes_and_update_habits(user, habit_list)
 
-        return json_response_wrapper(habit_list)
+        serializer = HabitSerializer(habit_list, many=True)
+        return Response(serializer.data)
 
     elif request.method == "POST":
         habit = Habit()
         habit.create_from_request(request)
+        DailyRecord().create_from_habit(habit)
+
+        # Instead of DRF Response, you can use Django's built-in JsonResponse
         return JsonResponse({"id": habit.pk})
 
 
+def __check_day_changes_and_update_habits(user: User, habits: list[Habit]):
+    if user.is_day_changed():
+        for habit in habits:
+            if habit.is_today_due_date and not habit.is_done:
+                habit.lose_xp()
+                DailyRecord.create_or_update_from_habit(habit)
+
+            habit.update_due()
+            habit.save()
+
+            # daily record must be created for due habits only
+            if habit.is_today_due_date:
+                DailyRecord().create_from_habit(habit, is_for_new_day=True)
+
+        # user's next reset date must be updated
+        user.update_reset_date()
+
+
 @csrf_exempt
-@api_view(["GET", "POST"])
+@api_view(["GET", "DELETE"])
+@authenticate_and_authorize
 def index_each(request: HttpRequest, habit_id: int):
-    if not request.user.is_authenticated:
-        return Response(
-            {"success": False, "error": "User not authenticated"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
+    habit = get_object_or_404(Habit, pk=habit_id)
 
     if request.method == "GET":
-        user: User = request.user
-        habit = Habit.objects.filter(user=user.pk, pk=habit_id)
+        serializer = HabitSerializer(habit)
+        return Response(serializer.data)
 
-        if len(habit) and user.pk == habit[0].user.pk:
-            return json_response_wrapper(habit)
-        else:
-            return Response(
-                {"success": False, "detail": "Habit not owned by the user"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-    else:  # request.method == 'DELETE
-        habit = Habit.objects.get(pk=habit_id)
-        if not habit.is_owned_by_user(request.user):
-            return Response(
-                {"success": False, "detail": "Habit not owned by the user"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
+    elif request.method == "DELETE":
         habit.delete()
         return Response(
             {"success": True, "detail": "the habit's successfully deleted"},
-            status=status.HTTP_200_OK,
         )
 
 
 @csrf_exempt
-@api_view(["POST"])
-def update_importance(request: HttpRequest, habit_id: int):
-    if not request.user.is_authenticated:
-        return Response(
-            {"success": False, "detail": "User not authenticated"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
+@api_view(["PATCH"])
+@authenticate_and_authorize
+def update_importance(request: Request, habit_id: int):
+    habit = get_object_or_404(Habit, pk=habit_id)
 
-    habit = Habit.objects.get(pk=habit_id)
-    if not habit.is_owned_by_user(request.user):
-        return Response(
-            {"success": False, "detail": "Habit not owned by the user"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
-
-    habit.importance = request.POST.get("importance")
+    habit.importance = request.data.get("importance")
     habit.save()
     return Response(
         {"success": True, "detail": "Updated successfully"},
@@ -101,35 +87,22 @@ def update_importance(request: HttpRequest, habit_id: int):
 
 @csrf_exempt
 @api_view(["GET"])
+@authenticate_and_authorize
 def get_daily_records(request: HttpRequest, habit_id: int):
-    if not request.user.is_authenticated:
-        return Response(
-            {"success": False, "detail": "User not authenticated"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
-    records: Iterable[DailyRecord] = DailyRecord.objects.filter(habit=habit_id)
-
-    user: User = request.user
-    if len(records) and records[0].is_owned_by_user(user):
-        return json_response_wrapper(records)
-    # 아직 기록이 없을 때
-    elif len(records) == 0:
-        return json_response_wrapper([])
-    else:
-        return Response(
-            {"success": False, "detail": "Not owned by user"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
+    records = DailyRecord.objects.filter(habit=habit_id)
+    serializer = DailyRecordSerializer(records, many=True)
+    return Response(serializer.data)
 
 
 @csrf_exempt
 @api_view(["POST"])
-def start_timer(request: HttpRequest):
-    habit_id = request.POST.get("habit_id")
+@authenticate_and_authorize
+def start_timer(request: Request):
+    habit_id = request.data.get("habit_id")
     habit = Habit.objects.get(id=habit_id)
+
     habit.start_recording()
-    return JsonResponse(
+    return Response(
         {
             "success": True,
             "start_date": habit.start_datetime,
@@ -140,13 +113,18 @@ def start_timer(request: HttpRequest):
 
 @csrf_exempt
 @api_view(["POST"])
-def finish_timer(request: HttpRequest):
-    habit_id = request.POST.get("habit_id")
+@authenticate_and_authorize
+def finish_timer(request: Request):
+    habit_id = request.data.get("habit_id")
     habit: Habit = Habit.objects.get(id=habit_id)
-    progress = int(request.POST.get("progress"))
+    progress = int(request.data.get("progress"))
+    user: User = habit.user
 
     record = RoundRecord()
     record.create_from_habit_finished(habit, progress)
-    habit.end_recording(record.progress)
+    habit.end_recording(progress)
 
-    return json_response_wrapper([record])
+    DailyRecord.create_or_update_from_habit(habit)
+
+    serializer = RoundRecordSerializer(record)
+    return Response(serializer.data)
