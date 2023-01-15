@@ -25,6 +25,32 @@ export interface HabitType {
   temporary_progress: number;
 }
 
+export const initialState: HabitType = {
+  id: 0,
+  user: 0,
+  name: '',
+  description: '',
+  estimate_type: 'TIME',
+  final_goal: 0,
+  growth_amount: 0,
+  growth_type: 'INCREASE',
+  day_cycle: 0,
+  importance: 0,
+
+  level: 0,
+  goal_xp: 0,
+  current_xp: 0,
+  due_date: null,
+  is_today_due_date: false,
+  is_done: false,
+
+  is_running: false,
+  start_datetime: null,
+  is_paused: false,
+  paused_datetime: null,
+  temporary_progress: 0,
+};
+
 export type HabitCreateRequestType = Pick<
   HabitType,
   | 'name'
