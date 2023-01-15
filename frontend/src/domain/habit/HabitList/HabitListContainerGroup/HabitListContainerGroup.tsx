@@ -1,16 +1,18 @@
 import React from 'react';
+
 import { Typography } from '@mui/material';
 
 import HabitListContainer from '../HabitListContainer/HabitListContainer';
 import HabitItem from '../HabitItem/HabitItem';
-import { HabitDerivative } from '../../habitDerivative';
+import { splitHabitsByStatus } from './utils';
 import { HabitType } from '../../types';
 
-export default function HabitListContainerGroup(
-  props: HabitListContainerGroupType,
-) {
-  const { habitsToDo, habitsDone, habitsNotDue } =
-    HabitDerivative.splitHabitsByStatus(props.habits);
+export default function HabitListContainerGroup({
+  habits,
+}: {
+  habits: HabitType[];
+}) {
+  const { habitsToDo, habitsDone, habitsNotDue } = splitHabitsByStatus(habits);
 
   return (
     <>
@@ -56,8 +58,4 @@ export default function HabitListContainerGroup(
       />
     </>
   );
-}
-
-interface HabitListContainerGroupType {
-  habits: HabitType[];
 }
