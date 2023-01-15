@@ -40,7 +40,7 @@ export default function HabitItem(props: HabitItemType) {
         <ResponsiveStack>
           {/* 습관 숙련도 */}
           <TypographyByRatio ratio={habitDerivative.ratio}>
-            Lv. {habitDerivative.level}
+            Lv. {props.habit.level}
           </TypographyByRatio>
 
           {/* 습관 이름 */}

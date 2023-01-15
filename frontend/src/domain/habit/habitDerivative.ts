@@ -71,20 +71,6 @@ export class HabitDerivative {
     }
   }
 
-  get level() {
-    switch (this.habit.growth_type) {
-      case 'INCREASE':
-        if (this.habit.final_goal === 0) return 0;
-        return Math.floor((this.habit.goal_xp / this.habit.final_goal) * 100);
-      case 'DECREASE':
-        const growth = this.habit.final_goal * 10 - this.habit.goal_xp;
-        const level = Math.floor(growth / this.habit.growth_amount) + 1;
-        return level;
-      default:
-        return '';
-    }
-  }
-
   get currentProgressWithUnit() {
     return this.getValueWithUnit(this.habit, this.currentProgress);
   }
