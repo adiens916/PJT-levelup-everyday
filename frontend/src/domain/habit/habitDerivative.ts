@@ -25,12 +25,18 @@ export class HabitDerivative {
     }
   }
 
-  get currentProgressWithUnit() {
-    return this.getValueWithUnit(this.habit, this.currentProgress);
-  }
-
-  get goalWithUnit() {
-    return this.getValueWithUnit(this.habit, this.habit.goal_xp);
+  get goalLeftWithUnitAndMessage() {
+    if (this.currentProgress === 0 || this.ratio >= 100) {
+      return '';
+    }
+    switch (this.habit.growth_type) {
+      case 'INCREASE':
+        return ` (${this.currentProgressWithUnit} 했음)`;
+      case 'DECREASE':
+        return ` (${this.goalLeftWithUnit} 남음)`;
+      default:
+        return '';
+    }
   }
 
   get goalLeftWithUnit() {
@@ -40,18 +46,12 @@ export class HabitDerivative {
     );
   }
 
-  get goalLeftWithUnitAndMessage() {
-    if (this.currentProgress === 0 || this.ratio >= 100) {
-      return '';
-    }
-    switch (this.habit.growth_type) {
-      case 'INCREASE':
-        return ` (${this.goalLeftWithUnit} 남음)`;
-      case 'DECREASE':
-        return ` (${this.currentProgressWithUnit} 했음)`;
-      default:
-        return '';
-    }
+  get goalWithUnit() {
+    return this.getValueWithUnit(this.habit, this.habit.goal_xp);
+  }
+
+  get currentProgressWithUnit() {
+    return this.getValueWithUnit(this.habit, this.currentProgress);
   }
 
   getValueWithUnit(habit: HabitType, value: number) {
