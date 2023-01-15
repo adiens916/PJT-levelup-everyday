@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 
-import { initialState } from '../HabitTimer/reducer';
-import { HabitType } from '../types';
+import { HabitType, initialState } from '../types';
 import { createHabit } from '../api/crudApi';
-import { useNavigate } from 'react-router-dom';
 import useDocumentTitle from 'common/hook';
+
 type HabitKeyType = keyof HabitType;
 // interface HabitCreateType extends HabitType {
 //   final_goal: number | null;

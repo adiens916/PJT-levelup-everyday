@@ -1,5 +1,4 @@
-import { initialState } from 'domain/habit/HabitTimer/reducer';
-import { HabitType } from './types';
+import { HabitType, initialState } from './types';
 
 export class HabitDerivative {
   habit = initialState;
@@ -8,58 +7,13 @@ export class HabitDerivative {
     this.habit = habit;
   }
 
-  static splitHabitsByStatus(habits: HabitType[]) {
-    const habitsDone = habits.filter((habit) => this.isDone(habit));
-    const habitsDoneSet = new Set(habitsDone);
-    const habitsNotDone = habits.filter((e) => !habitsDoneSet.has(e));
-
-    const habitsToDo = habitsNotDone.filter((habit) => this.isToDo(habit));
-    const habitsToDoSet = new Set(habitsToDo);
-
-    const habitsNotDue = habitsNotDone.filter((e) => !habitsToDoSet.has(e));
-    return { habitsToDo, habitsDone, habitsNotDue };
-  }
-
-  static isDone(habit: HabitType) {
-    if (habit.is_running) {
-      return false;
-    }
-
-    switch (habit.growth_type) {
-      case 'INCREASE':
-        return habit.today_progress >= habit.today_goal;
-      case 'DECREASE':
-        return habit.today_progress === 0;
-      default:
-        return;
-    }
-  }
-
-  static isToDo(habit: HabitType) {
-    if (habit.is_running) {
-      return true;
-    }
-
-    switch (habit.growth_type) {
-      case 'INCREASE':
-        return (
-          habit.is_today_due_date ||
-          habit.today_progress + habit.temporary_progress > 0
-        );
-      case 'DECREASE':
-        return habit.today_progress !== 0;
-      default:
-        return;
-    }
-  }
-
   get currentProgress() {
-    return this.habit.today_progress + this.habit.temporary_progress;
+    return this.habit.current_xp + this.habit.temporary_progress;
   }
 
   get ratio() {
-    if (this.habit.today_goal === 0) return 0;
-    const ratio = (this.currentProgress / this.habit.today_goal) * 100;
+    if (this.habit.goal_xp === 0) return 0;
+    const ratio = (this.currentProgress / this.habit.goal_xp) * 100;
 
     switch (this.habit.growth_type) {
       case 'INCREASE':
@@ -71,49 +25,33 @@ export class HabitDerivative {
     }
   }
 
-  get level() {
-    switch (this.habit.growth_type) {
-      case 'INCREASE':
-        if (this.habit.final_goal === 0) return 0;
-        return Math.floor(
-          (this.habit.today_goal / this.habit.final_goal) * 100,
-        );
-      case 'DECREASE':
-        const growth = this.habit.final_goal * 10 - this.habit.today_goal;
-        const level = Math.floor(growth / this.habit.growth_amount) + 1;
-        return level;
-      default:
-        return '';
-    }
-  }
-
-  get currentProgressWithUnit() {
-    return this.getValueWithUnit(this.habit, this.currentProgress);
-  }
-
-  get goalWithUnit() {
-    return this.getValueWithUnit(this.habit, this.habit.today_goal);
-  }
-
-  get goalLeftWithUnit() {
-    return this.getValueWithUnit(
-      this.habit,
-      this.habit.today_goal - this.currentProgress,
-    );
-  }
-
   get goalLeftWithUnitAndMessage() {
     if (this.currentProgress === 0 || this.ratio >= 100) {
       return '';
     }
     switch (this.habit.growth_type) {
       case 'INCREASE':
-        return ` (${this.goalLeftWithUnit} 남음)`;
-      case 'DECREASE':
         return ` (${this.currentProgressWithUnit} 했음)`;
+      case 'DECREASE':
+        return ` (${this.goalLeftWithUnit} 남음)`;
       default:
         return '';
     }
+  }
+
+  get goalLeftWithUnit() {
+    return this.getValueWithUnit(
+      this.habit,
+      this.habit.goal_xp - this.currentProgress,
+    );
+  }
+
+  get goalWithUnit() {
+    return this.getValueWithUnit(this.habit, this.habit.goal_xp);
+  }
+
+  get currentProgressWithUnit() {
+    return this.getValueWithUnit(this.habit, this.currentProgress);
   }
 
   getValueWithUnit(habit: HabitType, value: number) {

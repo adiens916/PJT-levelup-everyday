@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useReducer } from 'react';
+
 import { Button, ButtonProps } from '@mui/material';
+
 import { getHabit } from '../api/crudApi';
 import { startTimer, finishTimer } from '../api/timerApi';
-import { reducer, initialState } from './reducer';
+import { initialState } from '../types';
+import { reducer } from './reducer';
 
 export default function useTimer(habitId: number) {
   const [habit, dispatch] = useReducer(reducer, initialState);
