@@ -1,9 +1,3 @@
-export interface HabitResponseType {
-  pk: number;
-  model: string;
-  fields: HabitType;
-}
-
 export interface HabitType {
   id?: number;
   user: number;
@@ -43,33 +37,6 @@ export interface HabitCreateResponseType {
   id: number;
 }
 
-export interface DailyRecordResponseType {
-  model: string;
-  pk: number;
-  fields: DailyRecordType;
-}
-
-export interface DailyRecordType {
-  id: number;
-  habit: number;
-  date: string;
-  success: boolean;
-  level_now: number;
-  level_change: number;
-  xp_now: number;
-  xp_change: number;
-}
-
-export interface OldDailyRecordType {
-  id: number;
-  habit: number;
-  date: string;
-  success: boolean;
-  goal: number;
-  progress: number;
-  excess: number;
-}
-
 export interface StartTimerType {
   success: boolean;
   start_date: string;
@@ -81,4 +48,15 @@ export interface FinishTimerType {
   start_datetime: string;
   end_datetime: string;
   progress: number;
+}
+
+export interface DailyRecordType {
+  id: number;
+  habit: number;
+  date: string;
+  success: boolean;
+  level_now: number;
+  level_change: number;
+  xp_now: number;
+  xp_change: number;
 }
