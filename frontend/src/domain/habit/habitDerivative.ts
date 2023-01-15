@@ -27,9 +27,9 @@ export class HabitDerivative {
 
     switch (habit.growth_type) {
       case 'INCREASE':
-        return habit.today_progress >= habit.today_goal;
+        return habit.current_xp >= habit.goal_xp;
       case 'DECREASE':
-        return habit.today_progress === 0;
+        return habit.current_xp === 0;
       default:
         return;
     }
@@ -44,22 +44,22 @@ export class HabitDerivative {
       case 'INCREASE':
         return (
           habit.is_today_due_date ||
-          habit.today_progress + habit.temporary_progress > 0
+          habit.current_xp + habit.temporary_progress > 0
         );
       case 'DECREASE':
-        return habit.today_progress !== 0;
+        return habit.current_xp !== 0;
       default:
         return;
     }
   }
 
   get currentProgress() {
-    return this.habit.today_progress + this.habit.temporary_progress;
+    return this.habit.current_xp + this.habit.temporary_progress;
   }
 
   get ratio() {
-    if (this.habit.today_goal === 0) return 0;
-    const ratio = (this.currentProgress / this.habit.today_goal) * 100;
+    if (this.habit.goal_xp === 0) return 0;
+    const ratio = (this.currentProgress / this.habit.goal_xp) * 100;
 
     switch (this.habit.growth_type) {
       case 'INCREASE':
@@ -75,11 +75,9 @@ export class HabitDerivative {
     switch (this.habit.growth_type) {
       case 'INCREASE':
         if (this.habit.final_goal === 0) return 0;
-        return Math.floor(
-          (this.habit.today_goal / this.habit.final_goal) * 100,
-        );
+        return Math.floor((this.habit.goal_xp / this.habit.final_goal) * 100);
       case 'DECREASE':
-        const growth = this.habit.final_goal * 10 - this.habit.today_goal;
+        const growth = this.habit.final_goal * 10 - this.habit.goal_xp;
         const level = Math.floor(growth / this.habit.growth_amount) + 1;
         return level;
       default:
@@ -92,13 +90,13 @@ export class HabitDerivative {
   }
 
   get goalWithUnit() {
-    return this.getValueWithUnit(this.habit, this.habit.today_goal);
+    return this.getValueWithUnit(this.habit, this.habit.goal_xp);
   }
 
   get goalLeftWithUnit() {
     return this.getValueWithUnit(
       this.habit,
-      this.habit.today_goal - this.currentProgress,
+      this.habit.goal_xp - this.currentProgress,
     );
   }
 

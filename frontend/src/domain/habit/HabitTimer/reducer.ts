@@ -12,10 +12,12 @@ export const initialState: HabitType = {
   day_cycle: 0,
   importance: 0,
 
+  level: 0,
+  goal_xp: 0,
+  current_xp: 0,
   due_date: null,
   is_today_due_date: false,
-  today_goal: 0,
-  today_progress: 0,
+  is_done: false,
 
   is_running: false,
   start_datetime: null,

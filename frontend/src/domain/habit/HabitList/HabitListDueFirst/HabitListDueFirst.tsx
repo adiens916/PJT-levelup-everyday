@@ -11,8 +11,7 @@ export default function HabitListDueFirst({ habits }: { habits: HabitType[] }) {
   // 오늘의 습관을 모두 끝마쳐야 다른 습관들을 볼 수 있음
   const is_done_today_habits = () =>
     habits.every(
-      (habit) =>
-        habit.is_today_due_date && habit.today_progress >= habit.today_goal,
+      (habit) => habit.is_today_due_date && habit.current_xp >= habit.goal_xp,
     );
 
   return (

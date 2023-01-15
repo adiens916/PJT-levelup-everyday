@@ -8,13 +8,15 @@ export interface HabitType {
   final_goal: number;
   growth_amount: number;
   growth_type: 'INCREASE' | 'DECREASE';
+  day_cycle: number;
   importance: number;
 
-  day_cycle: number;
+  level: number;
+  goal_xp: number;
+  current_xp: number;
   due_date: string | null;
   is_today_due_date: boolean;
-  today_goal: number;
-  today_progress: number;
+  is_done: boolean;
 
   is_running: boolean;
   start_datetime: string | null;
