@@ -2,7 +2,7 @@ from datetime import date, datetime, time, timedelta
 from unittest import expectedFailure, mock
 from django.test import TestCase
 
-from habits.models import RoundRecord, DailyRecord
+from habits.models import Habit, RoundRecord, DailyRecord
 from habits.models_type import DailyRecordType, HabitReadType
 from .provider import TestDataProvider
 
@@ -54,7 +54,52 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(latest_record.get("xp_change"), 0)
 
     @mock.patch("account.models_aux.datetime", wraps=datetime)
-    def test_daily_record_xp_accumulate(self, mocked_datetime):
+    def test_daily_record_level_change(self, mocked_datetime):
+        # [setup] delete previous records
+        DailyRecord.objects.filter(habit=self.habit_id).all().delete()
+        RoundRecord.objects.filter(habit=self.habit_id).all().delete()
+        records = self.__get_records()
+        self.assertEqual(len(records), 0)
+
+        # [given] habit's goal xp == 300, current xp == 0
+        habit = Habit.objects.get(pk=self.habit_id)
+        habit.current_xp = 0
+        habit.save()
+
+        # [given] on the first day, level change == 0
+        self.__record_habit_progress(0)
+        record = self.__get_first_record()
+        self.assertEqual(record.get("level_now"), 1)
+        self.assertEqual(record.get("level_change"), 0)
+
+        # [when] on the next day, record progress by 300
+        now = datetime.today() + timedelta(days=1)
+        mocked_datetime.now.return_value = now
+        self.__get_habits()
+        self.__record_habit_progress(300)
+
+        # [then] level change == 1
+        records = self.__get_records()
+        print(records)
+
+        record = self.__get_record_by_index(-1)
+        self.assertEqual(record.get("level_change"), 1)
+
+        # [when] on the next day, record progress by 360
+        now = datetime.today() + timedelta(days=1)
+        mocked_datetime.now.return_value = now
+        self.__get_habits()
+        self.__record_habit_progress(360)
+
+        records = self.__get_records()
+        print(records)
+
+        # [then] level change == 1
+        record = self.__get_record_by_index(-1)
+        self.assertEqual(record.get("level_change"), 1)
+
+    @mock.patch("account.models_aux.datetime", wraps=datetime)
+    def test_daily_level_change(self, mocked_datetime):
         # [setup] delete previous records
         DailyRecord.objects.filter(habit=self.habit_id).all().delete()
         RoundRecord.objects.filter(habit=self.habit_id).all().delete()
@@ -73,6 +118,9 @@ class HabitViewTestCase(TestCase):
         self.__record_habit_progress(70)
 
         # [then] xp_accumulate == 130
+        records = self.__get_records()
+        print(records)
+
         record = self.__get_record_by_index(-1)
         self.assertEqual(record.get("xp_accumulate"), 130)
 
@@ -81,6 +129,9 @@ class HabitViewTestCase(TestCase):
         mocked_datetime.now.return_value = now
         self.__get_habits()
         self.__record_habit_progress(80)
+
+        records = self.__get_records()
+        print(records)
 
         # [then] xp_accumulate == 210
         record = self.__get_record_by_index(-1)
@@ -135,12 +186,7 @@ class HabitViewTestCase(TestCase):
         return self.__get_record_by_index(0)
 
     def __get_record_by_index(self, index) -> DailyRecordType:
-        response = self.client.get(
-            f"/api/habit/{self.habit_id}/record/", **self.auth_headers
-        )
-        data: list[DailyRecordType] = response.json()
-        record = data[index]
-        return record
+        return self.__get_records()[index]
 
     def __get_habits(self) -> None:
         self.client.get("/api/habit/", **self.auth_headers)
