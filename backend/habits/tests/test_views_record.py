@@ -70,6 +70,31 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(latest_record.get("date"), now.date().isoformat())
         self.assertEqual(latest_record.get("xp_change"), 0)
 
+    @mock.patch("account.models_aux.datetime", wraps=datetime)
+    def test_daily_record_created_for_habit_not_due(self, mocked_datetime):
+        # [given] day cycle == 2
+        habit = self.__get_habit()
+        self.assertEqual(habit.get("day_cycle"), 2)
+
+        # [when] on the next day
+        now = datetime.today() + timedelta(days=1)
+        mocked_datetime.now.return_value = now
+        self.__get_habits()
+
+        # [then] it doesn't make a new daily record
+        records = self.__get_records()
+        self.assertEqual(len(records), 1)
+
+        # [when] the user has started recording
+        self.__record_habit_progress(60)
+
+        # [then] a new daily record has been created
+        records = self.__get_records()
+        self.assertEqual(len(records), 2)
+
+        today_record = records[1]
+        self.assertEqual(today_record.get("xp_change"), 60)
+
     @expectedFailure
     @mock.patch("account.models_aux.datetime", wraps=datetime)
     def test_daily_record_level_change(self, mocked_datetime):
