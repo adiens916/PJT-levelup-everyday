@@ -28,7 +28,7 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(first_record.get("date"), date.today().isoformat())
         self.assertEqual(first_record.get("level_now"), 1)
         self.assertEqual(first_record.get("level_change"), 0)
-        self.assertEqual(first_record.get("xp_now"), 0)
+        self.assertEqual(first_record.get("xp_accumulate"), 0)
         self.assertEqual(first_record.get("xp_change"), 0)
 
     @mock.patch("account.models_aux.datetime", wraps=datetime)
@@ -55,7 +55,7 @@ class HabitViewTestCase(TestCase):
     def test_daily_record_updated_when_round_finished(self):
         self.__record_habit_progress(60)
         record = self.__get_first_record()
-        self.assertEqual(record.get("xp_now"), 60)
+        self.assertEqual(record.get("xp_accumulate"), 60)
         self.assertEqual(record.get("xp_change"), 60)
 
     def test_daily_record_updated_when_round_finished_continuously(self):
@@ -69,7 +69,7 @@ class HabitViewTestCase(TestCase):
         # [given] it has record for 60 seconds
         try:
             record = self.__get_first_record()
-            self.assertEqual(record.get("xp_now"), 60)
+            self.assertEqual(record.get("xp_accumulate"), 60)
             self.assertEqual(record.get("xp_change"), 60)
         except:
             self.__record_habit_progress(60)
@@ -78,7 +78,7 @@ class HabitViewTestCase(TestCase):
         self.__record_habit_progress(200)
         record = self.__get_first_record()
         # [then] total 260 seconds
-        self.assertEqual(record.get("xp_now"), 260)
+        self.assertEqual(record.get("xp_accumulate"), 260)
         self.assertEqual(record.get("xp_change"), 260)
 
         # [when] adding 150 seconds
@@ -87,7 +87,7 @@ class HabitViewTestCase(TestCase):
         # [then] level increased & xp subtracted
         self.assertEqual(record.get("level_now"), 2)
         self.assertEqual(record.get("level_change"), 1)
-        self.assertEqual(record.get("xp_now"), 110)
+        self.assertEqual(record.get("xp_accumulate"), 410)
         self.assertEqual(record.get("xp_change"), 410)
 
     def __get_records(self) -> list[DailyRecordType]:
