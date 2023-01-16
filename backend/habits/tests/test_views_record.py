@@ -2,6 +2,7 @@ from datetime import date, datetime, time, timedelta
 from unittest import expectedFailure, mock
 from django.test import TestCase
 
+from habits.models import RoundRecord, DailyRecord
 from habits.models_type import DailyRecordType, HabitReadType
 from .provider import TestDataProvider
 
@@ -51,6 +52,39 @@ class HabitViewTestCase(TestCase):
         latest_record = records[1]
         self.assertEqual(latest_record.get("date"), now.date().isoformat())
         self.assertEqual(latest_record.get("xp_change"), 0)
+
+    @mock.patch("account.models_aux.datetime", wraps=datetime)
+    def test_daily_record_xp_accumulate(self, mocked_datetime):
+        # [setup] delete previous records
+        DailyRecord.objects.filter(habit=self.habit_id).all().delete()
+        RoundRecord.objects.filter(habit=self.habit_id).all().delete()
+        records = self.__get_records()
+        self.assertEqual(len(records), 0)
+
+        # [given] on the first day, xp accumulate == 60
+        self.__record_habit_progress(60)
+        record = self.__get_first_record()
+        self.assertEqual(record.get("xp_accumulate"), 60)
+
+        # [when] on the next day, record progress by 70
+        now = datetime.today() + timedelta(days=1)
+        mocked_datetime.now.return_value = now
+        self.__get_habits()
+        self.__record_habit_progress(70)
+
+        # [then] xp_accumulate == 130
+        record = self.__get_record_by_index(-1)
+        self.assertEqual(record.get("xp_accumulate"), 130)
+
+        # [when] on the next day, record progress by 80
+        now = datetime.today() + timedelta(days=1)
+        mocked_datetime.now.return_value = now
+        self.__get_habits()
+        self.__record_habit_progress(80)
+
+        # [then] xp_accumulate == 210
+        record = self.__get_record_by_index(-1)
+        self.assertEqual(record.get("xp_accumulate"), 210)
 
     def test_daily_record_updated_when_round_finished(self):
         self.__record_habit_progress(60)
@@ -107,6 +141,9 @@ class HabitViewTestCase(TestCase):
         data: list[DailyRecordType] = response.json()
         record = data[index]
         return record
+
+    def __get_habits(self) -> None:
+        self.client.get("/api/habit/", **self.auth_headers)
 
     def __get_habit(self) -> HabitReadType:
         response = self.client.get(f"/api/habit/{self.habit_id}/", **self.auth_headers)
