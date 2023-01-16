@@ -193,8 +193,8 @@ class DailyRecord(models.Model):
     success = models.BooleanField()
     level_now = models.PositiveIntegerField()
     level_change = models.IntegerField()
-    xp_now = models.PositiveIntegerField()
     xp_change = models.IntegerField()
+    xp_accumulate = models.PositiveIntegerField()
 
     @staticmethod
     def create_or_update_from_habit(habit: Habit) -> None:
@@ -224,8 +224,8 @@ class DailyRecord(models.Model):
 
         self.level_now = habit.level
         self.level_change = self.calc_level_change()
-        self.xp_now = habit.current_xp
         self.xp_change = self.calc_xp_change()
+        self.xp_accumulate = self.calc_xp_accumulate()
 
         self.save()
 
@@ -244,3 +244,12 @@ class DailyRecord(models.Model):
             "progress__sum"
         )
         return today_progress_sum if today_progress_sum else 0
+
+    def calc_xp_accumulate(self) -> int:
+        try:
+            daily_records = DailyRecord.objects.filter(habit=self.habit)
+            yesterday_record = daily_records.order_by("-date")[1]
+            return self.xp_accumulate - yesterday_record.xp_accumulate
+        except IndexError:
+            # there's only one day, i.e. on the first day
+            return self.xp_change
