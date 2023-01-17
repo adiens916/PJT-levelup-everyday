@@ -85,6 +85,6 @@ export interface DailyRecordType {
   success: boolean;
   level_now: number;
   level_change: number;
-  xp_now: number;
+  xp_accumulate: number;
   xp_change: number;
 }
