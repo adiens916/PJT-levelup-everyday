@@ -122,15 +122,8 @@ class HabitViewTestCase(TestCase):
         record = self.__get_record_by_index(-1)
         self.assertEqual(record.get("level_change"), 1)
 
-    @expectedFailure
     @mock.patch("account.models_aux.datetime", wraps=datetime)
     def test_daily_record_xp_accumulate(self, mocked_datetime):
-        # [setup] delete previous records
-        DailyRecord.objects.filter(habit=self.habit_id).all().delete()
-        RoundRecord.objects.filter(habit=self.habit_id).all().delete()
-        records = self.__get_records()
-        self.assertEqual(len(records), 0)
-
         # [given] on the first day, xp accumulate == 60
         self.__record_habit_progress(60)
         record = self.__get_first_record()
@@ -143,9 +136,6 @@ class HabitViewTestCase(TestCase):
         self.__record_habit_progress(70)
 
         # [then] xp_accumulate == 130
-        records = self.__get_records()
-        print(records)
-
         record = self.__get_record_by_index(-1)
         self.assertEqual(record.get("xp_accumulate"), 130)
 
@@ -154,9 +144,6 @@ class HabitViewTestCase(TestCase):
         mocked_datetime.now.return_value = after_two_days
         self.__get_habits()
         self.__record_habit_progress(80)
-
-        records = self.__get_records()
-        print(records)
 
         # [then] xp_accumulate == 210
         record = self.__get_record_by_index(-1)
