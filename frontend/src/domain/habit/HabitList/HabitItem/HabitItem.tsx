@@ -56,9 +56,9 @@ export default function HabitItem(props: HabitItemType) {
             ratioThreshold={80}
             colorBefore="aquamarine"
           >
-            {habitDerivative.goalWithUnit}
+            {habitDerivative.progressPerGoal}
           </TypographyByRatio>
-          {habitDerivative.goalLeftWithUnitAndMessage && (
+          {/* {habitDerivative.goalLeftWithUnitAndMessage && (
             <TypographyByRatio
               ratio={habitDerivative.ratio}
               ratioThreshold={80}
@@ -66,7 +66,7 @@ export default function HabitItem(props: HabitItemType) {
             >
               {habitDerivative.goalLeftWithUnitAndMessage}
             </TypographyByRatio>
-          )}
+          )} */}
         </ResponsiveStack>
       </Button>
       <HabitItemMenu habit={props.habit} />

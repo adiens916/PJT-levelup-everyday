@@ -54,6 +54,10 @@ export class HabitDerivative {
     return this.getValueWithUnit(this.habit, this.currentProgress);
   }
 
+  get progressPerGoal() {
+    return `${this.habit.current_xp} / ${this.habit.goal_xp}`;
+  }
+
   getValueWithUnit(habit: HabitType, value: number) {
     if (habit.estimate_type === 'COUNT') {
       return `${value}${habit.estimate_unit}`;
