@@ -95,7 +95,6 @@ class HabitViewTestCase(TestCase):
         today_record = records[1]
         self.assertEqual(today_record.get("xp_change"), 60)
 
-    @expectedFailure
     @mock.patch("account.models_aux.datetime", wraps=datetime)
     def test_daily_record_level_change(self, mocked_datetime):
         # [given] on the first day, level change == 0
@@ -110,20 +109,14 @@ class HabitViewTestCase(TestCase):
         self.__record_habit_progress(300)
 
         # [then] level change == 1
-        records = self.__get_records()
-        print(records)
-
         record = self.__get_record_by_index(-1)
         self.assertEqual(record.get("level_change"), 1)
 
-        # [when] on the next day, record progress by 360
+        # [when] on the next day, record progress by 330
         after_two_days = tomorrow + timedelta(days=1)
         mocked_datetime.now.return_value = after_two_days
         self.__get_habits()
-        self.__record_habit_progress(360)
-
-        records = self.__get_records()
-        print(records)
+        self.__record_habit_progress(330)
 
         # [then] level change == 1
         record = self.__get_record_by_index(-1)
