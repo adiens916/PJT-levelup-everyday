@@ -56,8 +56,8 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(len(records), 1)
 
         # [given] 3 days has passed after a user visited
-        now = datetime.today() + timedelta(days=3)
-        mocked_datetime.now.return_value = now
+        after_three_days = datetime.today() + timedelta(days=3)
+        mocked_datetime.now.return_value = after_three_days
 
         # [when] the user logs in and get habit list
         self.__get_habits()
@@ -67,7 +67,7 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(len(records), 2)
 
         latest_record = records[1]
-        self.assertEqual(latest_record.get("date"), now.date().isoformat())
+        self.assertEqual(latest_record.get("date"), after_three_days.date().isoformat())
         self.assertEqual(latest_record.get("xp_change"), 0)
 
     @mock.patch("account.models_aux.datetime", wraps=datetime)
@@ -77,8 +77,8 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(habit.get("day_cycle"), 2)
 
         # [when] on the next day
-        now = datetime.today() + timedelta(days=1)
-        mocked_datetime.now.return_value = now
+        tomorrow = datetime.today() + timedelta(days=1)
+        mocked_datetime.now.return_value = tomorrow
         self.__get_habits()
 
         # [then] it doesn't make a new daily record
@@ -104,8 +104,8 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(record.get("level_change"), 0)
 
         # [when] on the next day, record progress by 300
-        now = datetime.today() + timedelta(days=1)
-        mocked_datetime.now.return_value = now
+        tomorrow = datetime.today() + timedelta(days=1)
+        mocked_datetime.now.return_value = tomorrow
         self.__get_habits()
         self.__record_habit_progress(300)
 
@@ -117,8 +117,8 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(record.get("level_change"), 1)
 
         # [when] on the next day, record progress by 360
-        now = datetime.today() + timedelta(days=1)
-        mocked_datetime.now.return_value = now
+        after_two_days = tomorrow + timedelta(days=1)
+        mocked_datetime.now.return_value = after_two_days
         self.__get_habits()
         self.__record_habit_progress(360)
 
@@ -144,8 +144,8 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(record.get("xp_accumulate"), 60)
 
         # [when] on the next day, record progress by 70
-        now = datetime.today() + timedelta(days=1)
-        mocked_datetime.now.return_value = now
+        tomorrow = datetime.today() + timedelta(days=1)
+        mocked_datetime.now.return_value = tomorrow
         self.__get_habits()
         self.__record_habit_progress(70)
 
@@ -157,8 +157,8 @@ class HabitViewTestCase(TestCase):
         self.assertEqual(record.get("xp_accumulate"), 130)
 
         # [when] on the next day, record progress by 80
-        now = datetime.today() + timedelta(days=1)
-        mocked_datetime.now.return_value = now
+        after_two_days = tomorrow + timedelta(days=1)
+        mocked_datetime.now.return_value = after_two_days
         self.__get_habits()
         self.__record_habit_progress(80)
 
