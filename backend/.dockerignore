@@ -1,5 +1,8 @@
-__pycache__
-.pytest_cache
-venv
-migrations
-.collected_static
+# Python
+venv/
+**/__pycache__/
+**/.pytest_cache/
+
+# Django
+.collected_static/
+**/migrations/
