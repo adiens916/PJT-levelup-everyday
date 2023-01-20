@@ -273,4 +273,4 @@ class DailyRecord(models.Model):
 
     def __is_date_equal_to_today(self):
         user: User = self.habit.user
-        return self.date == user.get_day_on_progress()
+        return self.date == user.get_day_to_proceed()
