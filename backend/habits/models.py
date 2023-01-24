@@ -113,21 +113,44 @@ class Habit(models.Model):
             self.goal_xp += self.growth_amount
             self.level += 1
 
-    def lose_xp(self):
-        decrease_amount = int(self.goal_xp * 0.1)
+    def lose_xp(self) -> int:
+        steps_for_losing_xp = (
+            self.__lose_xp_if_current_xp_is_enough,
+            self.__lose_xp_with_level_down,
+            self.__lose_xp_if_goal_xp_is_not_enough,
+        )
 
+        for step in steps_for_losing_xp:
+            decrease_amount = step()
+            if decrease_amount != None:
+                return decrease_amount
+
+    def __lose_xp_if_current_xp_is_enough(self) -> int | None:
+        decrease_amount = int(self.goal_xp * 0.1)
         if self.current_xp >= decrease_amount:
             self.current_xp -= decrease_amount
-        elif self.goal_xp > self.growth_amount:
+            return decrease_amount
+        else:
+            return None
+
+    def __lose_xp_with_level_down(self) -> int | None:
+        if self.goal_xp > self.growth_amount:
             self.goal_xp -= self.growth_amount
-            decrease_amount = int(self.goal_xp * 0.1)
-            self.current_xp = self.goal_xp - decrease_amount
+
+            new_decrease_amount = int(self.goal_xp * 0.1)
+            self.current_xp = self.goal_xp - new_decrease_amount
 
             if self.level > 1:
                 self.level -= 1
 
+            return new_decrease_amount
         else:
-            self.current_xp = 0
+            return None
+
+    def __lose_xp_if_goal_xp_is_not_enough(self) -> int | None:
+        decrease_amount = self.current_xp
+        self.current_xp = 0
+        return decrease_amount
 
     def update_due(self):
         user: User = self.user
@@ -230,12 +253,11 @@ class DailyRecord(models.Model):
         self.save()
 
     def calc_level_change(self) -> int:
-        yesterday_record = self.__get_previous_record()
-        if not yesterday_record:
-            # there's only one day, i.e. on the first day
+        previous_record = self.__get_previous_record()
+        if not previous_record:
             return self.level_now - 1
         else:
-            return self.level_now - yesterday_record.level_now
+            return self.level_now - previous_record.level_now
 
     def calc_xp_change(self) -> int:
         round_records = RoundRecord.objects.filter(habit=self.habit, date=self.date)
@@ -245,12 +267,11 @@ class DailyRecord(models.Model):
         return today_progress_sum if today_progress_sum else 0
 
     def calc_xp_accumulate(self) -> int:
-        yesterday_record = self.__get_previous_record()
-        if not yesterday_record:
-            # there's only one day, i.e. on the first day
+        previous_record = self.__get_previous_record()
+        if not previous_record:
             return self.xp_change
         else:
-            return yesterday_record.xp_accumulate + self.xp_change
+            return previous_record.xp_accumulate + self.xp_change
 
     def __get_previous_record(self):
         daily_records = DailyRecord.objects.filter(habit=self.habit.pk)
