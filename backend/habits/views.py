@@ -40,8 +40,8 @@ def __check_day_changes_and_update_habits(user: User, habits: list[Habit]):
     if user.is_day_changed():
         for habit in habits:
             if habit.is_today_due_date and not habit.is_done:
-                habit.lose_xp()
-                DailyRecord.create_or_update_from_habit(habit)
+                lost_xp = habit.lose_xp()
+                DailyRecord.get_today_record(habit).update_from_habit(habit, -lost_xp)
 
             habit.update_due()
             habit.save()
