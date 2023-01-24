@@ -161,6 +161,32 @@ class HabitViewTestCase(TestCase):
         record = self.__get_record_by_index(-1)
         self.assertEqual(record.get("xp_accumulate"), 210)
 
+    @mock.patch("account.models_aux.datetime", wraps=datetime)
+    def test_daily_record_xp_change(self, mocked_datetime):
+        # [setup] initialize habit
+        habit = Habit.objects.get(pk=self.habit_id)
+        habit.day_cycle = 1
+        habit.save()
+
+        # [given] on the first day, xp accumulate == 60
+        self.__record_habit_progress(60)
+        record = self.__get_first_record()
+        self.assertEqual(record.get("xp_accumulate"), 60)
+
+        # [given] on the next day, skip habit
+        tomorrow = datetime.today() + timedelta(days=1)
+        mocked_datetime.now.return_value = tomorrow
+        self.__get_habits()
+
+        # [when] on the next day, XP decreases
+        after_two_days = tomorrow + timedelta(days=1)
+        mocked_datetime.now.return_value = after_two_days
+        self.__get_habits()
+
+        # [then] xp_accumulate == 30
+        record = self.__get_record_by_index(-1)
+        self.assertEqual(record.get("xp_accumulate"), 30)
+
     def test_daily_record_updated_when_round_finished(self):
         self.__record_habit_progress(60)
         record = self.__get_first_record()
