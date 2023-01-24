@@ -13,9 +13,9 @@ export function useDailyRecords(habitId: number) {
   const data: ChartData<'bar'> = {
     labels: dailyRecords.labels,
     datasets: [
-      blueBar('XP Change', dailyRecords.xp_change),
-      whiteClearBar('XP Now', dailyRecords.xp_now),
-      redClearBar('Level', dailyRecords.level_now),
+      blueBar('XP Sum', dailyRecords.xp_accumulate),
+      redClearBar('XP Change', dailyRecords.xp_change),
+      whiteClearBar('Level', dailyRecords.level_now),
     ],
   };
 

@@ -37,5 +37,5 @@ class DailyRecordType(TypedDict):
     success: bool
     level_now: int
     level_change: int
-    xp_now: int
     xp_change: int
+    xp_accumulate: int

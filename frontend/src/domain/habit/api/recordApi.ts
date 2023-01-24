@@ -15,7 +15,7 @@ export function convertRecordsForChart(dailyRecords: DailyRecordType[]) {
   return {
     labels: dailyRecords.map((record) => record.date),
     level_now: dailyRecords.map((record) => record.level_now),
-    xp_now: dailyRecords.map((record) => record.xp_now),
+    xp_accumulate: dailyRecords.map((record) => record.xp_accumulate),
     xp_change: dailyRecords.map((record) => record.xp_change),
   };
 }
