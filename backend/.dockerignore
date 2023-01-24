@@ -5,7 +5,3 @@ venv/
 
 ### Django
 .collected_static/
-# All migrations except __init__.py are ignored
-# because Django doesn't make migrations when migrations folder doesn't exist 
-**/migrations/
-!**/migrations/__init__.py

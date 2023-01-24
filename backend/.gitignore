@@ -1,5 +1,5 @@
-# Custom
-migrations/
+### Custom
+# migrations/
 .collected_static/
 
 # Created by https://www.toptal.com/developers/gitignore/api/django
